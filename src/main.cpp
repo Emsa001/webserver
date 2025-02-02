@@ -1,17 +1,7 @@
-#include <iostream>
-#include <sstream>
-#include <cstring>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <errno.h>
+#include "../includes/webserv.hpp"
 
-#define PORT 8080
-
-std::string executeCGI(const std::string &scriptPath) {
+std::string executeCGI(const std::string &scriptPath) 
+{
     int pipe_fd[2];
     if (pipe(pipe_fd) == -1) {
         return "HTTP/1.1 500 Internal Server Error\n\nFailed to create pipe.";
@@ -28,11 +18,9 @@ std::string executeCGI(const std::string &scriptPath) {
         dup2(pipe_fd[1], STDOUT_FILENO);
         close(pipe_fd[1]);
 
-        // Execute the CGI script
         char *argv[] = {const_cast<char *>(scriptPath.c_str()), NULL};
         char *envp[] = {NULL};
         execve(scriptPath.c_str(), argv, envp);
-        exit(1);
     }
 
     close(pipe_fd[1]);
@@ -60,17 +48,16 @@ std::string response(const std::string &request)
 {
     // Check if the request targets the CGI script
     if (request.find("GET /cgi-bin/hello.py") == 0)
-        return executeCGI("./hello.py");
+        return executeCGI("/cgi/hello.py");
 
-    std::stringstream ss;
-    ss << "HTTP/1.1 200 OK\n";
-    ss << "Content-Type: text/html\n";
-    ss << "Content-Length: 13\n";
-    ss << "Connection: close\n";
-    ss << "\n";
-    ss << "Hello, World!";
-    return ss.str();
+    std::string response =
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Type: text/html\r\n\r\n"
+        "<!DOCTYPE html><html><head><title>Hello, World!</title></head>"
+        "<body><h1>Hello, World!</h1></body></html>";
+    return response;
 }
+
 
 int main() 
 {
@@ -78,7 +65,15 @@ int main()
     if (server_fd == -1) 
         return 1;
 
-    sockaddr_in server_addr{};
+    // Set SO_REUSEADDR option
+    int opt = 1;
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
+        std::cerr << "Setsockopt failed: " << strerror(errno) << std::endl;
+        close(server_fd);
+        return 1;
+    }
+
+    sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(PORT);
     server_addr.sin_addr.s_addr = INADDR_ANY;
@@ -94,20 +89,16 @@ int main()
 
     while (true) 
     {
-        sockaddr_in client_addr{};
+        sockaddr_in client_addr;
         socklen_t client_len = sizeof(client_addr);
         int client_fd = accept(server_fd, (sockaddr *)&client_addr, &client_len);
-        if (client_fd == -1) {
-            std::cerr << "Accept failed: " << strerror(errno) << std::endl;
+        if (client_fd == -1)
             continue;
-        }
 
-        // Read the client's request
         char buffer[1024] = {0};
         read(client_fd, buffer, sizeof(buffer) - 1);
-
-        // Generate the appropriate response
         std::string html = response(buffer);
+
         send(client_fd, html.c_str(), html.size(), 0);
 
         close(client_fd);
