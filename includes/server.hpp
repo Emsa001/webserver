@@ -9,6 +9,7 @@ class Server
     private:
         int fd;
         int port;
+        
     public:
         Server(int port);
         ~Server();

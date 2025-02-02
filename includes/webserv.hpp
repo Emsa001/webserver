@@ -17,7 +17,7 @@
 #include "client.hpp"
 
 #define PORT 8080
-extern bool stop;
+extern bool SERVER_STOP;
 
 std::string cgi_execute(const std::string &scriptPath);
 void handle_signal();

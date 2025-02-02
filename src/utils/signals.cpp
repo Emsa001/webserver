@@ -1,11 +1,11 @@
 #include "../../includes/webserv.hpp"
 
-bool stop = false;
+bool SERVER_STOP = false;
 
 void change_stop(int signal) 
 {
     if (signal == SIGINT) 
-        stop = true;
+        SERVER_STOP = true;
 }
 
 void handle_signal() 

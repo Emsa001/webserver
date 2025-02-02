@@ -52,7 +52,7 @@ void Server::run()
 {
     std::cout << "Server is running on http://localhost:" << this->port << std::endl;
 
-    while(!stop)
+    while(!SERVER_STOP)
     {
         Client client(this->fd);
         if (client.fd == -1)
