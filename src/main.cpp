@@ -3,9 +3,8 @@
 std::string executeCGI(const std::string &scriptPath) 
 {
     int pipe_fd[2];
-    if (pipe(pipe_fd) == -1) {
+    if (pipe(pipe_fd) == -1)
         return "HTTP/1.1 500 Internal Server Error\n\nFailed to create pipe.";
-    }
 
     pid_t pid = fork();
     if (pid < 0)
@@ -48,7 +47,7 @@ std::string response(const std::string &request)
 {
     // Check if the request targets the CGI script
     if (request.find("GET /cgi-bin/hello.py") == 0)
-        return executeCGI("/cgi/hello.py");
+        return executeCGI("./src/cgi/hello.py");
 
     std::string response =
         "HTTP/1.1 200 OK\r\n"
