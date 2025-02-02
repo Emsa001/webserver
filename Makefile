@@ -2,7 +2,7 @@ NAME =  webserv
 CXX = c++ -std=c++98
 CPPFLAGS = -Wall -Werror -Wextra
 
-SRC = $(wildcard *.cpp) $(wildcard */*.cpp)
+SRC = $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*/*.cpp)
 OBJ = $(SRC:.cpp=.o)
 
 all: $(NAME)
