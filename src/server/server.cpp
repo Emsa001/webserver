@@ -1,14 +1,19 @@
 #include "../../includes/webserv.hpp"
 Webserver::Webserver(int port)
 {
+    // AF_UNIX, AF_LOCAL - Local communication
+    // AF_INET - IPv4 Internet protocols
+    // AF_INET6 - IPv6 Internet protocols
+    // AF_IPX - IPX Novell protocols
+
+    // SOCK_STREAM - Two-way reliable communication (TCP)
+    // SOCK_DGRAM - Connectionless, unreliable (UDP)
+
     this->port = port; 
     this->fd = socket(AF_INET, SOCK_STREAM, 0);
     if (this->fd == -1) 
         return;
-}
 
-void Webserver::run()
-{
     int opt = 1;
     // allows the server to bind to an address that is in the TIME_WAIT state
     if (setsockopt(this->fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
@@ -22,13 +27,23 @@ void Webserver::run()
     server_addr.sin_port = htons(this->port);
     server_addr.sin_addr.s_addr = INADDR_ANY;
 
-    if (bind(this->fd, (sockaddr *)&server_addr, sizeof(server_addr)) == -1 || listen(this->fd, 5) == -1) 
+    if (bind(this->fd, (sockaddr *)&server_addr, sizeof(server_addr)) == -1) 
     {
-        std::cerr << "Bind or listen failed: " << strerror(errno) << std::endl;
+        std::cerr << "Bind failed: " << strerror(errno) << std::endl;
         close(this->fd);
         return;
     }
 
+    if(listen(this->fd, 5) == -1)
+    {
+        std::cerr << "Listen failed: " << strerror(errno) << std::endl;
+        close(this->fd);
+        return;
+    }
+}
+
+void Webserver::run()
+{
     std::cout << "Server is running on http://localhost:" << this->port << std::endl;
 
     while(true)
