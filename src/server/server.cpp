@@ -42,11 +42,17 @@ Webserver::Webserver(int port)
     }
 }
 
+Webserver::~Webserver()
+{
+    close(this->fd);
+    std::cout << "Destructor called" << std::endl;
+}
+
 void Webserver::run()
 {
     std::cout << "Server is running on http://localhost:" << this->port << std::endl;
 
-    while(true)
+    while(!stop)
     {
         Client client(this->fd);
         if (client.fd == -1)

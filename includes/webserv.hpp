@@ -15,6 +15,7 @@
 #include <stdlib.h>
 
 #define PORT 8080
+extern bool stop;
 
 std::string cgi_execute(const std::string &scriptPath);
 
@@ -36,13 +37,10 @@ class Webserver
         int port;
     public:
         Webserver(int port);
-        ~Webserver() { 
-            close(this->fd); 
-            std::cout << "Server socket closedddddddddddd." << std::endl;
-            }
+        ~Webserver();
+        int get_fd() { return this->fd; }
 
         void run();
-        int get_fd() { return this->fd; }
         std::string get_response(Client &client);
         void send_response(int client_fd, const std::string &response);
 };
