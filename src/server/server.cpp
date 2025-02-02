@@ -1,5 +1,5 @@
-#include "../../includes/webserv.hpp"
-Webserver::Webserver(int port)
+#include "../../includes/server.hpp"
+Server::Server(int port)
 {
     // AF_UNIX, AF_LOCAL - Local communication
     // AF_INET - IPv4 Internet protocols
@@ -42,13 +42,13 @@ Webserver::Webserver(int port)
     }
 }
 
-Webserver::~Webserver()
+Server::~Server()
 {
     close(this->fd);
-    std::cout << "Destructor called" << std::endl;
+    std::cout << "\nDestructor called" << std::endl;
 }
 
-void Webserver::run()
+void Server::run()
 {
     std::cout << "Server is running on http://localhost:" << this->port << std::endl;
 
@@ -66,7 +66,7 @@ void Webserver::run()
     }
 }
 
-std::string Webserver::get_response(Client &client) 
+std::string Server::get_response(Client &client) 
 {
     // request can targets to the CGI script
     if (client.request.find("GET /cgi-bin/hello.py") == 0)
@@ -80,7 +80,7 @@ std::string Webserver::get_response(Client &client)
     return response;
 }
 
-void Webserver::send_response(int client_fd, const std::string &response) 
+void Server::send_response(int client_fd, const std::string &response) 
 {
     send(client_fd, response.c_str(), response.size(), 0);
     close(client_fd);

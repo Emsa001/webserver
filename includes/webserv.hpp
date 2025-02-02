@@ -13,36 +13,13 @@
 #include <errno.h>
 #include <signal.h>
 #include <stdlib.h>
+#include "server.hpp"
+#include "client.hpp"
 
 #define PORT 8080
 extern bool stop;
 
 std::string cgi_execute(const std::string &scriptPath);
-
-class Client
-{
-    private:
-    public:
-        int fd;
-        std::string request;
-
-        Client(int server_fd);
-        ~Client() { close(this->fd); }
-};
-
-class Webserver
-{
-    private:
-        int fd;
-        int port;
-    public:
-        Webserver(int port);
-        ~Webserver();
-        int get_fd() { return this->fd; }
-
-        void run();
-        std::string get_response(Client &client);
-        void send_response(int client_fd, const std::string &response);
-};
+void handle_signal();
 
 #endif
