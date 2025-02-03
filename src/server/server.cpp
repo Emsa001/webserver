@@ -48,7 +48,7 @@ Server::~Server()
     std::cout << "\nDestructor called" << std::endl;
 }
 
-void Server::run()
+void Server::simple_run()
 {
     std::cout << "Server is running on http://localhost:" << this->port << std::endl;
 
@@ -63,6 +63,60 @@ void Server::run()
         send_response(client.fd, Response);
 
         close(client.fd);
+    }
+}
+
+void Server::run()
+{
+    std::cout << "Server is running on http://localhost:" << this->port << std::endl;
+
+    struct pollfd fds[200];
+    int nfds = 1;
+
+    fds[0].fd = this->fd;
+    fds[0].events = POLLIN;
+    fds[0].revents = 0;
+
+    while (!SERVER_STOP)
+    {
+        int poll_count = poll(fds, nfds, -1);
+        if (poll_count == -1)
+        {
+            std::cerr << "Poll failed: " << strerror(errno) << std::endl;
+            break;
+        }
+
+        for (int i = 0; i < nfds; i++)
+        {
+            if (fds[i].revents & POLLIN)
+            {
+                if (fds[i].fd == this->fd)
+                {
+                    sockaddr_in client_addr;
+                    socklen_t client_len = sizeof(client_addr);
+                    int client_fd = accept(this->fd, (sockaddr *)&client_addr, &client_len);
+                    if (client_fd == -1)
+                    {
+                        std::cerr << "Accept failed: " << strerror(errno) << std::endl;
+                        continue;
+                    }
+
+                    fds[nfds].fd = client_fd;
+                    fds[nfds].events = POLLIN;
+                    nfds++;
+                }
+                else
+                {
+                    Client client(fds[i].fd);
+                    std::string response = get_response(client);
+                    send_response(fds[i].fd, response);
+
+                    for (int j = i; j < nfds - 1; j++)
+                        fds[j] = fds[j + 1];
+                    nfds--;
+                }
+            }
+        }
     }
 }
 

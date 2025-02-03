@@ -15,6 +15,7 @@ class Server
         ~Server();
 
         void run();
+        void simple_run();
         std::string get_response(Client &client);
         void send_response(int client_fd, const std::string &response);
 };

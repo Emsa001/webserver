@@ -1,15 +1,12 @@
 #include "../../includes/client.hpp"
 
-Client::Client(int server_fd) 
+Client::Client(int client_fd)
 {
-    sockaddr_in client_addr;
-    socklen_t client_len = sizeof(client_addr);
-    this->fd = accept(server_fd, (sockaddr *)&client_addr, &client_len);
-    if (this->fd == -1)
-        return;
+    this->fd = client_fd;
 
     char buffer[1024] = {0};
-    read(fd, buffer, sizeof(buffer) - 1);
+    ssize_t bytes_read = read(fd, buffer, sizeof(buffer) - 1);
     
-    this->request = buffer;
+    if (bytes_read > 0)
+        this->request = buffer;
 }
