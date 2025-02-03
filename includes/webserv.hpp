@@ -20,6 +20,7 @@
 #include <iostream>
 #include <sstream>
 #include <cstring>
+#include <fstream>
 
 // project headers
 #include "server.hpp"

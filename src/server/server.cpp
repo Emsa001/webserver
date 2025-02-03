@@ -71,19 +71,21 @@ void Server::run()
     std::cout << "Server is running on http://localhost:" << this->port << std::endl;
 
     struct pollfd fds[200];
+    bzero(fds, sizeof(fds));
     int nfds = 1;
 
     fds[0].fd = this->fd;
     fds[0].events = POLLIN;
     fds[0].revents = 0;
 
+    
     while (!SERVER_STOP)
     {
         int poll_count = poll(fds, nfds, -1);
         if (poll_count == -1)
         {
             std::cerr << "Poll failed: " << strerror(errno) << std::endl;
-            break;
+            return;
         }
 
         for (int i = 0; i < nfds; i++)
@@ -118,20 +120,6 @@ void Server::run()
             }
         }
     }
-}
-
-std::string Server::get_response(Client &client) 
-{
-    // request can targets to the CGI script
-    if (client.request.find("GET /cgi-bin/hello.py") == 0)
-        return cgi_execute("./src/cgi/hello.py");
-
-    std::string response =
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: text/html\r\n\r\n"
-        "<!DOCTYPE html><html><head><title>Hello, World!</title></head>"
-        "<body><h1>Hello, World!</h1></body></html>";
-    return response;
 }
 
 void Server::send_response(int client_fd, const std::string &response) 
