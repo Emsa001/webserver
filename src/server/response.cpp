@@ -34,18 +34,20 @@ std::string DELETE(const std::string &request)
     return "HTTP/1.1 200 OK\r\n\r\nResource deleted successfully.";
 }
 
-
-std::string Server::get_response(Client &client) 
+std::string GET(const std::string &request)
 {
-    if (client.request.find("GET /cgi-bin/hello.py") == 0)
+    int path_start = request.find("GET /") + 5;
+    int path_end = request.find(" ", path_start);
+    std::string path = request.substr(path_start, path_end - path_start);
+
+    if (path == "cgi-bin/hello.py")
     {
         std::string cgi_output = cgi_execute("./src/cgi/hello.py");
         if (cgi_output.empty())
             return "HTTP/1.1 500 Internal Server Error\r\n\r\n";
         return "HTTP/1.1 200 OK\r\n" + cgi_output;
     }
-
-    if (client.request.find("GET /") == 0)
+    else if (path == "")
     {
         std::string response =
             "HTTP/1.1 200 OK\r\n"
@@ -54,6 +56,15 @@ std::string Server::get_response(Client &client)
             "<body><h1>Hello, World!</h1></body></html>";
         return response;
     }
+    else
+        return "HTTP/1.1 404 Not Found\r\n" + cgi_execute("./src/cgi/404.py");
+}
+
+std::string Server::get_response(Client &client) 
+{
+
+    if (client.request.find("GET /") == 0)
+        return GET(client.request);
 
     if (client.request.find("POST /upload") == 0)
         POST(client.request);
