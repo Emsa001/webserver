@@ -1,4 +1,5 @@
-#include "../../includes/server.hpp"
+#include "server.hpp"
+
 Server::Server(int port)
 {
     // AF_UNIX, AF_LOCAL - Local communication
@@ -55,21 +56,25 @@ void Server::run()
     while(!SERVER_STOP)
     {
         Client client(this->fd);
-        if (client.fd == -1)
+
+        int fd = client.get_fd();
+
+        if (fd== -1)
             continue;
         
         std::string Response = get_response(client);
 
-        send_response(client.fd, Response);
-
-        close(client.fd);
+        send_response(fd, Response);
+        close(fd);
     }
 }
 
 std::string Server::get_response(Client &client) 
 {
-    // request can targets to the CGI script
-    if (client.request.find("GET /cgi-bin/hello.py") == 0)
+    
+    std::string request = client.get_request();
+
+    if (request.find("GET /cgi-bin/hello.py") == 0)
         return cgi_execute("./src/cgi/hello.py");
 
     std::string response =

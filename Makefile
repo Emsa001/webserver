@@ -1,17 +1,29 @@
-NAME =  webserv
+NAME = webserv
 CXX = c++ -std=c++98
-CPPFLAGS = -Wall -Werror -Wextra
+CPPFLAGS = -Wall -Werror -Wextra -Iincludes
 
-SRC = $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*/*.cpp)
-OBJ = $(SRC:.cpp=.o)
+SRC_DIR = src
+OBJ_DIR = .obj
+INCLUDES_DIR = includes
+
+SRC = $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/*/*.cpp)
+OBJ = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRC))
+INCLUDES = $(wildcard $(INCLUDES_DIR)/*.h) $(wildcard $(INCLUDES_DIR)/*/*.h)
 
 all: $(NAME)
 
 $(NAME): $(OBJ)
 	$(CXX) $(CPPFLAGS) $(OBJ) -o $(NAME)
 
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(INCLUDES)
+	mkdir -p $(dir $@)
+	$(CXX) $(CPPFLAGS) -c $< -o $@
+
+run: all
+	./$(NAME)
+
 clean:
-	rm -rf $(OBJ)
+	rm -rf $(OBJ_DIR)
 
 fclean: clean
 	rm -rf $(NAME)

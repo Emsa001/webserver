@@ -1,4 +1,4 @@
-#include "../../includes/webserv.hpp"
+#include "webserv.hpp"
 
 bool SERVER_STOP = false;
 

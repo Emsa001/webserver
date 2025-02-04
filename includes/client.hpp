@@ -5,12 +5,15 @@
 class Client
 {
     private:
-    public:
         int fd;
         std::string request;
+    public:
 
         Client(int server_fd);
         ~Client() { close(this->fd); }
+
+        std::string get_request() { return this->request; }
+        int get_fd() { return this->fd; }
 };
 
 

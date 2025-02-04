@@ -1,4 +1,4 @@
-#include "../../includes/webserv.hpp"
+#include "webserv.hpp"
 
 std::string cgi_execute(const std::string &scriptPath) 
 {
