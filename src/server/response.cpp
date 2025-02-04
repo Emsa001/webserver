@@ -42,7 +42,7 @@ std::string GET(const std::string &request)
 
     if (path == "cgi-bin/hello.py")
     {
-        std::string cgi_output = cgi_execute("./src/cgi/hello.py");
+        std::string cgi_output = cgi_execute("./pages/hello.py");
         if (cgi_output.empty())
             return "HTTP/1.1 500 Internal Server Error\r\n\r\n";
         return "HTTP/1.1 200 OK\r\n" + cgi_output;
@@ -57,7 +57,7 @@ std::string GET(const std::string &request)
         return response;
     }
     else
-        return "HTTP/1.1 404 Not Found\r\n" + cgi_execute("./src/cgi/404.py");
+        return "HTTP/1.1 404 Not Found\r\n" + cgi_execute("./pages/404.py");
 }
 
 std::string Server::get_response(Client &client) 
