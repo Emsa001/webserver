@@ -1,12 +1,12 @@
 NAME = webserv
-CXX = c++ -std=c++98
-CPPFLAGS = -Wall -Werror -Wextra -Iincludes
+CXX = c++ -std=c++98 #-fsanitize=address
+CPPFLAGS = -Iincludes #-Wall -Werror -Wextra 
 
 SRC_DIR = src
 OBJ_DIR = .obj
 INCLUDES_DIR = includes
 
-SRC = $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/*/*.cpp)
+SRC = $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/*/*.cpp) $(wildcard $(SRC_DIR)/*/*/*.cpp)
 OBJ = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRC))
 INCLUDES = $(wildcard $(INCLUDES_DIR)/*.h) $(wildcard $(INCLUDES_DIR)/*/*.h)
 
@@ -28,6 +28,6 @@ clean:
 fclean: clean
 	rm -rf $(NAME)
 
-re: clean all
+re: clean run
 
 .PHONY: all clean fclean re
