@@ -6,7 +6,7 @@
 /*   By: escura <escura@student.42wolfsburg.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 14:45:07 by escura            #+#    #+#             */
-/*   Updated: 2025/02/07 15:44:21 by escura           ###   ########.fr       */
+/*   Updated: 2025/02/07 21:40:58 by escura           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,10 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
+#include <stack>
 #include <string>
 #include <fstream>
-#include <map>
 #include <sstream>
 #include <cstdlib>
 
@@ -25,7 +26,6 @@ class ConfigValue;
 
 typedef std::map<std::string, ConfigValue> config_map;
 typedef std::vector<ConfigValue> config_array;
-typedef std::vector<config_map> config_servers;
 
 class ConfigValue {
     public:
@@ -80,20 +80,16 @@ class ConfigValue {
 
 std::ostream& operator<<(std::ostream& os, const ConfigValue& cv);
 
-
-std::ostream& operator<<(std::ostream& os, const ConfigValue& cv);
-
 class Config
 {
-    private:
-        enum BlockType { NONE, SERVER_BLOCK, LOCATION_BLOCK };
-        
-        config_servers servers;
+    private:        
+        config_map root;
+        config_array servers;
 
         // temp
-        BlockType parent;
-        BlockType block;
-        std::string currentLocation;
+        std::stack<config_map> blocks;
+        config_map *block;
+        int blockId;
         // temp
 
         std::ifstream file;
@@ -102,14 +98,17 @@ class Config
 
     public:
         Config();
+        Config(std::string const &filename);
         ~Config();
 
-        void setBlock();
-        void readBlock();
-        void loadKey(std::string const &key, std::string const &value);
+        void parse();
+        void processLine();
+        void setBlock(int level);
 
-        config_servers getServers();
-        config_array getLocations(std::string const &server_name);
+        void setKey(std::string const &key, std::string const &value);
+
+        config_map getRoot() const { return root; }
+        config_array getServers() const { return servers; }
 };
 
 #endif

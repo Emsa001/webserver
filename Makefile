@@ -10,7 +10,7 @@ SRC = $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/*/*.cpp) $(wildcard $(S
 OBJ = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRC))
 INCLUDES = $(wildcard $(INCLUDES_DIR)/*.h) $(wildcard $(INCLUDES_DIR)/*/*.h)
 
-all: $(NAME)
+all: $(NAME) run
 
 $(NAME): $(OBJ)
 	$(CXX) $(CPPFLAGS) $(OBJ) -o $(NAME)

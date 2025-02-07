@@ -129,6 +129,37 @@ bool ConfigValue::operator==(const bool &other) const
     return (type == BOOL) && (b == other);
 }
 
+std::ostream& operator<<(std::ostream& os, const ConfigValue& cv) {
+    switch (cv.getType()) {
+        case ConfigValue::INT:
+            os << cv.getInt();
+            break;
+        case ConfigValue::BOOL:
+            os << (cv.getBool() ? "true" : "false");
+            break;
+        case ConfigValue::STRING:
+            os << cv.getString();
+            break;
+        case ConfigValue::ARRAY:
+            os << "[ ";
+            for (size_t i = 0; i < cv.getArray().size(); i++) {
+                if (i > 0) os << ", ";
+                os << (cv.getArray())[i];
+            }
+            os << " ]";
+            break;
+        case ConfigValue::MAP:
+            os << "{ ";
+            for (config_map::const_iterator it = cv.getMap().begin(); it != cv.getMap().end(); ++it) {
+                if (it != cv.getMap().begin()) os << ", ";
+                os << it->first << ": " << it->second;
+            }
+            os << " }";
+            break;
+    }
+    return os;
+}
+
 // Member functions
 
 ConfigValue ConfigValue::detectType(const std::string &value)

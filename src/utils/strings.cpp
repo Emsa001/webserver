@@ -32,3 +32,13 @@ std::string getFirstWord(std::string const s) {
     }
     return s;
 }
+
+bool firstChar(std::string const &s, char c) {
+    for (size_t i = 0; i < s.size(); i++) {
+        if (s[i] == c)
+            return true;
+        if (!std::isspace(s[i]))
+            return false;
+    }
+    return false;
+}

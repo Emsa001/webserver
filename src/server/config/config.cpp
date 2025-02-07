@@ -5,210 +5,199 @@
 #include <algorithm>
 #include <cctype>
 
-bool find(const std::string &str, const std::string &to_find)
-{
-    return str.find(to_find) != std::string::npos;
-}
-
-void erase(std::string &str, const std::string &to_erase)
-{
-    size_t pos = str.find(to_erase);
-
-    if (pos != std::string::npos)
-    {
-        str.erase(pos, to_erase.size());
-    }
-}
-
 Config::Config()
 {
-    this->block = NONE;
+    this->block = NULL;
+    this->blockId = 0;
     std::cout << "Config is created" << std::endl;
+    this->file.open("conf/default.yml");
+}
 
-    this->file.open("conf/default.conf");
-
-    if (!this->file.is_open())
-    {
-        std::cerr << "Error: Could not open file" << std::endl;
-        exit(1);
-    }
-
-    std::cout << std::endl
-              << std::endl;
-    this->lineNum = 1;
-    while (std::getline(this->file, this->line))
-    {
-        this->lineNum++;
-        trim(this->line);
-
-        if (this->line[0] == '#' || this->line.empty())
-            continue;
-
-        setBlock();
-    }
-
-    if (this->block != NONE)
-    {
-        std::cerr << "Error: block not closed" << std::endl;
-        exit(1);
-    }
-
-    this->file.close();
+Config::Config(std::string const &filename)
+{
+    this->block = NULL;
+    this->blockId = 0;
+    std::cout << "Config is created" << std::endl;
+    this->file.open(filename.c_str());
 }
 
 Config::~Config() {
-    for (size_t i = 0; i < servers.size(); i++) {
-        servers[i].clear();
-    }
-
     std::cout << "Config destructor called, resources freed successfully." << std::endl;
-}
-
-std::ostream& operator<<(std::ostream& os, const ConfigValue& cv) {
-    switch (cv.getType()) {
-        case ConfigValue::INT:
-            os << cv.getInt();
-            break;
-        case ConfigValue::BOOL:
-            os << (cv.getBool() ? "true" : "false");
-            break;
-        case ConfigValue::STRING:
-            os << cv.getString();
-            break;
-        case ConfigValue::ARRAY:
-            os << "[ ";
-            for (size_t i = 0; i < cv.getArray().size(); i++) {
-                if (i > 0) os << ", ";
-                os << (cv.getArray())[i];
-            }
-            os << " ]";
-            break;
-        case ConfigValue::MAP:
-            os << "{ ";
-            for (config_map::const_iterator it = cv.getMap().begin(); it != cv.getMap().end(); ++it) {
-                if (it != cv.getMap().begin()) os << ", ";
-                os << it->first << ": " << it->second;
-            }
-            os << " }";
-            break;
-    }
-    return os;
 }
 
 
 // Member functions
 
-
-void Config::setBlock()
-{
-    std::string &line = this->line;
-
-    int temp = this->block;
-
-    if (line == "server")
+void Config::parse(){
+    if (!this->file.is_open())
     {
-        if (this->block != NONE)
-        {
-            std::cerr << "Error: server block wrong position" << std::endl;
-            exit(1);
-        }
-        this->parent = this->block;
-        this->block = SERVER_BLOCK;
-        this->servers.push_back(config_map());
-        getline(this->file, this->line);
-    }
-    else if (line.compare(0, 8, "location") == 0)
-    {
-        if (this->block != SERVER_BLOCK)
-        {
-            std::cerr << "Error: location block wrong position" << std::endl;
-            exit(1);
-        }
-
-        this->parent = this->block;
-        this->block = LOCATION_BLOCK;
-    }
-    else if (this->block == NONE)
-    {
-        std::cerr << "Error: block not found: " << line << " " << lineNum << std::endl;
-        exit(1);
-    }
-    else if (line == "}")
-    {
-        this->block = this->parent;
-        this->parent = NONE;
+        std::cerr << "Error: Could not open file" << std::endl;
+        return ;
     }
 
-    readBlock();
+    std::cout << std::endl
+              << std::endl;
+    this->lineNum = 0;
+    while (std::getline(this->file, this->line))
+    {
+        this->lineNum++;
+        if (this->line.empty())
+            continue;
+
+        this->processLine();
+    }
+
+    this->file.close();
 }
 
-void Config::readBlock()
-{
+void Config::setBlock(int currentIndent) {
+    if(this->block == NULL)
+        return ;
 
-    if (this->line == "{" || this->line == "}")
-        return;
+    while (!this->blocks.empty() && currentIndent < this->blocks.top().at("level").getInt() * 4) {
+        this->blocks.pop();
+    }
 
-    config_map *map = NULL;
+    if(this->blocks.empty())
+        this->block = NULL;
+    else{
+        this->block = &(this->blocks.top());
+        int blockIndent = this->block->at("level").getInt() * 4;
+
+        if(blockIndent != currentIndent) {
+            std::cerr << "Error: indentation not matching" << std::endl;
+            exit(1);
+        }
+    }
+}
+
+
+void Config::processLine() {
+
+    std::string &line = this->line;
+    char quote = '\0';
 
     std::string key;
     std::string value;
+    bool isValue = false;
 
-    std::size_t first_space = this->line.find_first_of(' ');
+    int currentIndent = 0;
 
-    if (first_space != std::string::npos)
-    {
-        key = this->line.substr(0, first_space);
+    for (size_t i = 0; i < line.size(); i++) {
+        char p = i > 0 ? line[i - 1] : '\0';
+        char c = line[i];
+        char n = line.size() > i + 1 ? line[i + 1] : '\0';
 
-        std::size_t end = this->line.find_first_of(';', first_space);
-        if (end != std::string::npos)
-            value = this->line.substr(first_space, end - first_space);
-        else
-            value = this->line.substr(first_space);
+        // menage comments
+        if(c == '#' && (std::isspace(p) || i == 0) && quote == '\0'){
+            if(i == 0)
+                return ;
+            break;
+        }
+
+        // manage intent
+        if (std::isspace(c) && quote == '\0' && key.empty()) {
+            currentIndent++;
+            continue;
+        }
+        
+        // manage quotes
+        if (c == '"' || c == '\'') {
+            if(quote == '\0')
+                quote = c;
+            else if (quote == c)
+                quote = '\0';
+            continue;
+        }
+
+        if(c == ':' && !isValue){
+            if(n == '\0' || n == '\n'){
+                config_map newBlock = config_map();
+                const int level = currentIndent / 4;
+
+                newBlock["blockType"] = ConfigValue(key);
+                newBlock["level"] = ConfigValue(level);
+                newBlock["blockId"] = ConfigValue(this->blockId++);
+
+                this->blocks.push(newBlock);
+                this->block = &(blocks.top());
+                
+                if(level == 0){
+                    this->servers.push_back(newBlock);
+                }
+
+                return ;
+            }
+            else if(std::isspace(n)){
+                isValue = true;
+                i++;
+                continue;
+            }
+        }
+
+        if(isValue) {
+            value += c;
+        } else {
+            key += c;
+        }
+    }
+    
+    this->setBlock(currentIndent - 4);
+
+    // Errors
+
+    if(currentIndent > 0 && this->block == NULL) {
+        std::cerr << "Error: indentation outside block" << std::endl;
+        exit(1);
     }
 
-    trim(value);
-    loadKey(key, value);
+    if(quote != '\0') {
+        std::cerr << "Error: quote not closed" << std::endl;
+        exit(1);
+    }
+
+    if(key.empty()) {
+        std::cerr << "Error: no key" << std::endl;
+        exit(1);
+    }
+
+    if(!isValue) {
+        std::cerr << "Error: no value" << std::endl;
+        exit(1);
+    }
+
+    setKey(key, value);
 }
 
-void Config::loadKey(const std::string &key, const std::string &value)
+void Config::setKey(const std::string &key, const std::string &value)
 {
     ConfigValue typedValue = ConfigValue::detectType(value);
 
-    if (this->block == SERVER_BLOCK)
-        this->servers.back()[key] = ConfigValue(typedValue);
-    else if (this->block == LOCATION_BLOCK)
-    {
-        if (key == "location") {
-            this->currentLocation = getFirstWord(value);
-            this->servers.back()[this->currentLocation] = ConfigValue(config_map());
-            config_map &locationMap = this->servers.back()[this->currentLocation].getMap();
-            locationMap["type"] = key;
-            locationMap["path"] = this->currentLocation;
-        } else {
-            config_map &locationMap = this->servers.back()[this->currentLocation].getMap();
-            locationMap[key] = typedValue;
-        }
-    }
-}
+    if (this->block != NULL){
+        std::string type = this->block->at("blockType");
+        if (type == "location") {
+            config_array locations = this->servers.back().getMap()["locations"];
+            bool blockExists = false;
 
-config_servers Config::getServers() {
-    return this->servers;
-}
-
-config_array Config::getLocations(std::string const &server_name) {
-    config_array locations;
-
-    for (size_t i = 0; i < this->servers.size(); i++) {
-        if (this->servers[i]["server_name"] == server_name) {
-            config_map m = this->servers[i];
-
-            for (config_map::iterator it = m.begin(); it != m.end(); it++) {
-                if(it->second.getType() == ConfigValue::MAP){
-                    locations.push_back(it->second);
+            for (config_array::iterator it = locations.begin(); it != locations.end(); ++it) {
+                int blockId = it->getMap()["blockId"];
+                int currentBlockId = this->block->at("blockId");
+                if(blockId == currentBlockId) {
+                    it->getMap()[key] = typedValue;
+                    blockExists = true;
+                    break;
                 }
             }
-        }
-    }
 
-    return locations;
+            if (!blockExists) {
+                locations.push_back(*this->block);
+            }
+
+            this->servers.back().getMap()["locations"] = locations;
+            return;
+        }
+        this->servers.back().getMap()[key] = typedValue;
+    }
+    else
+        this->root[key] = typedValue;
 }

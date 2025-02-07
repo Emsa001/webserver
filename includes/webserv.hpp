@@ -37,4 +37,6 @@ void trim(std::string &s);
 void removeNewLines(std::string &s);
 std::string getFirstWord(std::string const s);
 
+bool firstChar(std::string const &s, char c);
+
 #endif

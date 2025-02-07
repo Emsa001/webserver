@@ -1,27 +1,23 @@
+logFormat: "[request] [status] [time]"
+max_thread: 3310
+
 server:
-    listen: 9090
-    server_name: localhost
-    keep_alive_timeout: 65
-
-    location /tell: 
-        root: html
-        index: 
-            - beqa.html 
-            - ellen.htm
-
-    location /tell2:
-        root: src
-        index: 
-            - index.html 
-            - tralalalal.htm
-
-    max_client_body_size: 2000
-
-    error_page: 
-        status: 500 502 503 504
-        page: /50x.html
-
-server: 
+    server_name: "localhost"
     listen: 8080
-    server_name: localhost2
-    keep_alive_timeout: 65
+    max_client_body_size: 1000
+
+    location:
+        path: /static
+        root: /var/www/static
+        index: index.html
+
+    location:
+        path: /images
+        root: /var/www/images
+        index: index.jpg
+
+
+server:
+    server_name: "example.com"
+    listen: 8081
+    max_client_body_size: 1000
