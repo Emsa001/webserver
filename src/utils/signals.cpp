@@ -5,6 +5,9 @@ bool SERVER_STOP = false;
 void change_stop(int signal) 
 {
     if (signal == SIGINT) 
+    {
+        exit(1);
+    }
         SERVER_STOP = true;
 }
 

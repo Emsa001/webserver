@@ -53,16 +53,17 @@ void Server::run()
 {
     std::cout << "Server is running on http://localhost:" << this->port << std::endl;
 
-    while(!SERVER_STOP)
+    while(1)
     {
         Client client(this->fd);
 
         int fd = client.get_fd();
 
-        if (fd== -1)
+        if (fd == -1)
             continue;
         
         std::string Response = get_response(client);
+        std::cout << "Client joined" << std::endl;
 
         send_response(fd, Response);
         close(fd);
