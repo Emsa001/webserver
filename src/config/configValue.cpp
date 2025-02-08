@@ -6,22 +6,22 @@ ConfigValue::ConfigValue(int i) : type(INT), i(i) {}
 
 ConfigValue::ConfigValue(bool b) : type(BOOL), b(b) {}
 
-ConfigValue::ConfigValue(const std::string &str) : type(STRING)
+ConfigValue::ConfigValue(std::string const &str) : type(STRING)
 {
-    s = new std::string(str);
+    s = str;
 }
 
-ConfigValue::ConfigValue(const config_array &array) : type(ARRAY)
+ConfigValue::ConfigValue(config_array const &array) : type(ARRAY)
 {
-    a = new config_array(array);
+    a = array;
 }
 
-ConfigValue::ConfigValue(const config_map &map) : type(MAP)
+ConfigValue::ConfigValue(config_map const &map) : type(MAP)
 {
-    m = new config_map(map);
+    m = map;
 }
 
-ConfigValue::ConfigValue(const ConfigValue &other)
+ConfigValue::ConfigValue(ConfigValue const &other)
 {
     type = other.type;
     switch (type)
@@ -33,13 +33,13 @@ ConfigValue::ConfigValue(const ConfigValue &other)
         b = other.b;
         break;
     case STRING:
-        s = new std::string(*other.s);
+        s = other.s;
         break;
     case ARRAY:
-        a = new config_array(*other.a);
+        a = other.a;
         break;
     case MAP:
-        m = new config_map(*other.m);
+        m = other.m;
         break;
     }
 }
@@ -51,12 +51,12 @@ ConfigValue::~ConfigValue()
 
 void ConfigValue::clear()
 {
-    if (type == STRING)
-        delete s;
-    if (type == ARRAY)
-        delete a;
-    if (type == MAP)
-        delete m;
+    // if (type == STRING)
+    //     delete s;
+    // if (type == ARRAY)
+    //     delete a;
+    // if (type == MAP)
+    //     delete m;
 }
 
 // Operators
@@ -76,13 +76,13 @@ ConfigValue &ConfigValue::operator=(const ConfigValue &other)
             b = other.b;
             break;
         case STRING:
-            s = new std::string(*other.s);
+            s = other.s;
             break;
         case ARRAY:
-            a = new config_array(*other.a);
+            a = other.a;
             break;
         case MAP:
-            m = new config_map(*other.m);
+            m = other.m;
             break;
         }
     }
@@ -91,7 +91,7 @@ ConfigValue &ConfigValue::operator=(const ConfigValue &other)
 
 ConfigValue::operator std::string() const
 {
-    return (type == STRING) ? *s : "";
+    return (type == STRING) ? s : "";
 }
 
 ConfigValue::operator int() const
@@ -106,17 +106,17 @@ ConfigValue::operator bool() const
 
 ConfigValue::operator config_array() const
 {
-    return (type == ARRAY) ? *a : config_array();
+    return (type == ARRAY) ? a : config_array();
 }
 
 ConfigValue::operator config_map() const
 {
-    return (type == MAP) ? *m : config_map();
+    return (type == MAP) ? m : config_map();
 }
 
 bool ConfigValue::operator==(const std::string &other) const
 {
-    return (type == STRING) && (*s == other);
+    return (type == STRING) && (s == other);
 }
 
 bool ConfigValue::operator==(const int &other) const

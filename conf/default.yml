@@ -15,9 +15,3 @@ server:
         path: /images
         root: /var/www/images
         index: index.jpg
-
-
-server:
-    server_name: "example.com"
-    listen: 8081
-    max_client_body_size: 1000

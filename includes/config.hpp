@@ -6,7 +6,7 @@
 /*   By: escura <escura@student.42wolfsburg.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 14:45:07 by escura            #+#    #+#             */
-/*   Updated: 2025/02/07 21:40:58 by escura           ###   ########.fr       */
+/*   Updated: 2025/02/08 19:40:00 by escura           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,13 +33,12 @@ class ConfigValue {
 
     private:
         Type type;
-        union {
-            int i;
-            bool b;
-            std::string* s;
-            config_array* a;
-            config_map* m;
-        };
+
+        int i;
+        bool b;
+        std::string s;
+        config_array a;
+        config_map m;
 
         void clear();
 
@@ -57,10 +56,10 @@ class ConfigValue {
         Type getType() const { return type; }
         int getInt() const { return (type == INT) ? i : 0; }
         bool getBool() const { return (type == BOOL) ? b : false; }
-        std::string getString() const { return (type == STRING) ? *s : ""; }
-        config_array getArray() const { return (type == ARRAY) ? *a : config_array(); }
-        config_map& getMap() { return *m; }
-        const config_map& getMap() const { return *m; }
+        std::string getString() const { return (type == STRING) ? s : ""; }
+        config_array getArray() const { return (type == ARRAY) ? a : config_array(); }
+        config_map& getMap() { return m; }
+        const config_map& getMap() const { return m; }
 
         // Type conversions
         operator std::string() const;
@@ -78,16 +77,16 @@ class ConfigValue {
 };
 
 
+
 std::ostream& operator<<(std::ostream& os, const ConfigValue& cv);
 
 class Config
 {
     private:        
         config_map root;
-        config_array servers;
 
         // temp
-        std::stack<config_map> blocks;
+        std::vector<config_map> blocks;
         config_map *block;
         int blockId;
         // temp
@@ -106,9 +105,9 @@ class Config
         void setBlock(int level);
 
         void setKey(std::string const &key, std::string const &value);
+        void updateParents();
 
         config_map getRoot() const { return root; }
-        config_array getServers() const { return servers; }
 };
 
 #endif
