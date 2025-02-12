@@ -22,7 +22,13 @@ const char site[] =
 "</center></body></html>\r\n";
 
 class Server {
+private:
+  const int _port;
+  int _sockfd;
 public:
+  Server();
+  ~Server();
+
   void run();
 };
 
