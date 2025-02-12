@@ -6,7 +6,7 @@
 /*   By: escura <escura@student.42wolfsburg.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 14:45:07 by escura            #+#    #+#             */
-/*   Updated: 2025/02/12 15:13:30 by escura           ###   ########.fr       */
+/*   Updated: 2025/02/12 22:48:02 by escura           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,20 +93,35 @@ class Config
 
         std::ifstream file;
         std::string line;
-        int lineNum;
 
+        int indent;
+        int expectedIndent;
+
+        bool processLine();
+        bool handleComment(char p, char c, char quote, size_t i);
+        bool handleIndentation(char c, char quote, const std::string &key, int previousIndent);
+        bool handleQuotes(char c, char &quote);
+        int handleKeyValueSeparator(char c, char n, bool *isValue, size_t *i, std::string &key);
+        void createNewBlock(const std::string &key);
+        bool validateAndSetKey(char quote, const std::string &key, const std::string &value);
+        bool setBlock();
+
+        bool isReserved(std::string const &key);
+        bool setKey(std::string const &key, std::string const &value);
+        void updateParents();
+
+        bool setKeyInBlock(const std::string &key, const ConfigValue &typedValue);
+        config_map* findParentBlock(int blockId, int level);
+        void updateParentBlock(config_map* parent, const std::string &blockName, int blockId);
+        
     public:
         Config();
         Config(std::string const &filename);
         ~Config();
 
         void parse();
-        bool processLine();
-        void setBlock(int level);
-        bool isReserved(std::string const &key);
+        
 
-        bool setKey(std::string const &key, std::string const &value);
-        void updateParents();
         config_map cleanTemp(config_map *temp);
 
         config_map getRoot() const { return root; }

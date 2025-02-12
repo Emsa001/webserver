@@ -1,0 +1,12 @@
+{
+    "configurations": [
+        {
+            "name": "C++ Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/webserv",
+            "environment": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

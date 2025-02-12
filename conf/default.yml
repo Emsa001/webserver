@@ -5,7 +5,7 @@ server1:
     listen: 80
     max_client_body_size: 1000
 
-server2:
-    server_name: "2"
-    listen: 81
-    max_client_body_size: 1000
+    location:
+        path: "/test"
+        root: "./test"
+        index: "index.html"
