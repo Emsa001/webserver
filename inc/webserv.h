@@ -1,5 +1,5 @@
-#ifndef WEBSERV_HPP
-#define WEBSERV_HPP
+#ifndef WEBSERV_H
+#define WEBSERV_H
 
 int testfun(void);
 
