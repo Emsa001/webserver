@@ -1,0 +1,6 @@
+# binaries
+*.o
+webserv
+test
+
+gtest/
