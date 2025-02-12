@@ -6,7 +6,7 @@
 /*   By: escura <escura@student.42wolfsburg.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 14:45:07 by escura            #+#    #+#             */
-/*   Updated: 2025/02/08 19:40:00 by escura           ###   ########.fr       */
+/*   Updated: 2025/02/12 15:13:30 by escura           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,13 +101,28 @@ class Config
         ~Config();
 
         void parse();
-        void processLine();
+        bool processLine();
         void setBlock(int level);
+        bool isReserved(std::string const &key);
 
-        void setKey(std::string const &key, std::string const &value);
+        bool setKey(std::string const &key, std::string const &value);
         void updateParents();
+        config_map cleanTemp(config_map *temp);
 
         config_map getRoot() const { return root; }
+        config_array getServers() const {
+            config_array servers = config_array();
+
+            config_map::const_iterator it = this->root.begin();
+            while (it != this->root.end()) {
+                if (it->second.getMap().count("listen")) {
+                    servers.push_back(it->second);
+                }
+                it++;
+            }
+
+            return servers;
+        };
 };
 
 #endif

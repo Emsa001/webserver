@@ -1,17 +1,11 @@
-logFormat: "[request] [status] [time]"
-max_thread: 3310
+log_format: "combined"
 
-server:
-    server_name: "localhost"
-    listen: 8080
+server1:
+    server_name: "123.123.123"
+    listen: 80
     max_client_body_size: 1000
 
-    location:
-        path: /static
-        root: /var/www/static
-        index: index.html
-
-    location:
-        path: /images
-        root: /var/www/images
-        index: index.jpg
+server2:
+    server_name: "2"
+    listen: 81
+    max_client_body_size: 1000

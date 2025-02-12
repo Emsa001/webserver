@@ -138,7 +138,7 @@ std::ostream& operator<<(std::ostream& os, const ConfigValue& cv) {
             os << (cv.getBool() ? "true" : "false");
             break;
         case ConfigValue::STRING:
-            os << cv.getString();
+            os << '"' << cv.getString() << '"';
             break;
         case ConfigValue::ARRAY:
             os << "[ ";

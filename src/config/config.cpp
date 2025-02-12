@@ -45,9 +45,10 @@ void Config::parse()
         if (this->line.empty())
             continue;
 
-        this->processLine();
+        if(this->processLine()) break;
     }
 
+    this->cleanTemp(&this->root);
     this->file.close();
 }
 
@@ -76,7 +77,7 @@ void Config::setBlock(int currentIndent)
     }
 }
 
-void Config::processLine()
+bool Config::processLine()
 {
 
     std::string &line = this->line;
@@ -98,7 +99,7 @@ void Config::processLine()
         if (c == '#' && (std::isspace(p) || i == 0) && quote == '\0')
         {
             if (i == 0)
-                return;
+                return 0;
             break;
         }
 
@@ -121,8 +122,8 @@ void Config::processLine()
 
         if ((c == ':' || c == '-') && !isValue)
         {
-            if (c == '-')
-                (*this->block)["blockType"] = ConfigValue(std::string("array"));
+            // if (c == '-')
+            //     (*this->block)["blockType"] = ConfigValue(std::string("array"));
 
             if (n == '\0' || n == '\n')
             {
@@ -137,7 +138,7 @@ void Config::processLine()
                 this->blocks.push_back(newBlock);
                 this->block = &(blocks.back());
 
-                return;
+                return 0;
             }
             else if (std::isspace(n))
             {
@@ -157,53 +158,44 @@ void Config::processLine()
         }
     }
 
-    // // Errors
+    // Errors
 
-    // if (currentIndent > 0 && this->block == NULL)
-    // {
-    //     std::cerr << "Error: indentation outside block" << std::endl;
-    //     exit(1);
-    // }
+    if (currentIndent > 0 && this->block == NULL)
+    {
+        std::cerr << "Error: indentation outside block" << std::endl;
+        return 1;
+    }
 
-    // if (quote != '\0')
-    // {
-    //     std::cerr << "Error: quote not closed" << std::endl;
-    //     exit(1);
-    // }
+    if (quote != '\0')
+    {
+        std::cerr << "Error: quote not closed" << std::endl;
+        return 1;
+    }
 
-    // if (key.empty())
-    // {
-    //     bool error = true;
-    //     if(this->block != NULL){
-    //         if(this->block->at("blockType").getString() == "array")
-    //             error = false;
-    //     }
-    //     if(error){
-    //         std::cerr << "Error: no key for line: '" << this->line << "'" << std::endl;
-    //         exit(1);
-    //     }
-    // }
+    if (key.empty())
+    {
+        bool error = true;
+        if(this->block != NULL){
+            if(this->block->at("blockType").getString() == "array")
+                error = false;
+        }
+        if(error){
+            std::cerr << "Error: no key for line: '" << this->line << "'" << std::endl;
+            return 1;
+        }
+    }
 
-    // if (!isValue)
-    // {
-    //     std::cerr << "Error: no value for key: '" << key << "'" << std::endl;
-    //     exit(1);
-    // }
+    if (!isValue)
+    {
+        std::cerr << "Error: no value for key: '" << key << "'" << std::endl;
+        return 1;
+    }
 
     this->setBlock(currentIndent - 4);
-    setKey(key, value);
+    return setKey(key, value);
 }
 
 void Config::updateParents() {
-    std::map<int, config_map*> parentMap; // Stores blockId -> pointer to block
-
-    // Build the parent lookup table
-    for (size_t i = 0; i < this->blocks.size(); i++) {
-        int blockId = this->blocks[i].at("blockId").getInt();
-        parentMap[blockId] = &this->blocks[i];
-    }
-
-    // Link children to their parents
     for (size_t i = 0; i < this->blocks.size(); i++) {
         config_map &block = this->blocks[i]; 
         int blockId = block.at("blockId").getInt();
@@ -213,34 +205,39 @@ void Config::updateParents() {
             this->root[block.at("blockName")] = block;
             continue;
         }
-
-        // Find parent by scanning backwards
-        for (int j = blockId - 1; j >= 0; j--) {
-            if (parentMap.find(j) != parentMap.end()) {
-                config_map *parent = parentMap[j];
-                if (parent->at("level").getInt() == level - 1) {
-                    (*parent)[block.at("blockName")] = block; // Assign child to parent
-                    break;
-                }
-            }
-        }
     }
 }
 
+bool Config::isReserved(const std::string &key){
+    if(key == "blockId" || key == "blockName" || key == "blockType" || key == "level") {
+        return true;
+    }
+    return false;
+}
 
-void Config::setKey(const std::string &key, const std::string &value) {
-    ConfigValue typedValue = value;
+
+bool Config::setKey(const std::string &key, const std::string &value) {
+    ConfigValue typedValue = ConfigValue::detectType(value);
+
+    if(this->isReserved(key)){
+        std::cerr << "Error: " << key << " is reserved" << std::endl;
+        return 1;
+    }
 
     if (this->block != NULL) {
         std::string blockName = this->block->at("blockName");
         int blockId = this->block->at("blockId");
         int level = this->block->at("level").getInt();
 
+        if(level > 1){
+            std::cerr << "Error: block level too deep" << std::endl;
+            return 1;
+        }
+
         (*this->block)[key] = typedValue;
 
-        if (blockId == 0) return;
 
-        config_map* parent = NULL;
+        config_map* parent = &this->root;
         for (int i = blockId - 1; i >= 0; i--) {
             if (this->blocks[i].at("level").getInt() == level - 1) {
                 parent = &this->blocks[i];
@@ -248,37 +245,66 @@ void Config::setKey(const std::string &key, const std::string &value) {
             }
         }
 
-        if (parent) {
-            (*parent)[blockName] = *this->block; 
-            
-            // config_map* currentParent = parent;
-            // while (currentParent) {
-            //     std::string parentName = currentParent->at("blockName");
-            //     int parentId = currentParent->at("blockId");
+        if (parent){
+            if (blockName == "location") {
+                if (!parent->count("locations"))
+                    (*parent)["locations"] = ConfigValue(config_array());
                 
-            //     config_map* grandParent = NULL;
-            //     for (int j = parentId - 1; j >= 0; j--) {
-            //         if (this->blocks[j].at("level").getInt() == currentParent->at("level").getInt() - 1) {
-            //             grandParent = &this->blocks[j];
-            //             break;
-            //         }
-            //     }
+                config_array locations = (*parent)["locations"];
+                bool blockIdExists = false;
 
-            //     if (grandParent) {
-            //         (*grandParent)[parentName] = *currentParent;
-            //         currentParent = grandParent;
-            //     } else {
-            //         currentParent = NULL;
-            //     }
-            // }
+                for (size_t i = 0; i < locations.size(); ++i) {
+                    if(locations[i].getMap().at("blockId").getInt() == blockId){                        
+                        locations[i] = *this->block;
+                        blockIdExists = true;
+                        break;
+                    }
+                }
+
+                if (!blockIdExists)
+                    locations.push_back(*this->block);
+
+                parent->at("locations") = locations;
+
+            } else
+                (*parent)[blockName] = *this->block;
         }
 
-        std::cout << "Block : " << *this->block << std::endl;
-        std::cout << "Parent: " << *parent << std::endl;
-
         updateParents();
-        return;
+        return 0;
     }
 
     this->root[key] = typedValue;
+
+    return 0;
+}
+
+config_map Config::cleanTemp(config_map *temp) {
+    config_map::iterator it = temp->begin();
+    
+    while(it != temp->end()){
+        
+        if (it->second.getType() == ConfigValue::MAP) {
+            cleanTemp(&(it->second.getMap()));
+        }
+        if(it->second.getType() == ConfigValue::ARRAY){
+            config_array array = it->second.getArray();
+            config_array test;
+            for(size_t i = 0; i < array.size(); i++){
+                if(array[i].getType() == ConfigValue::MAP)
+                    test.push_back(cleanTemp(&(array[i].getMap())));
+            }
+            it->second = ConfigValue(test);
+        }
+        
+        if (this->isReserved(it->first)) {
+            config_map::iterator tempIt = it;
+            ++it;
+            temp->erase(tempIt);
+        } else {
+            ++it;
+        }
+    }
+
+    return *temp;
 }
