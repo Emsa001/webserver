@@ -109,6 +109,8 @@ void Config::createNewBlock(const std::string &key)
 
 bool Config::validateAndSetKey(char quote, const std::string &key, const std::string &value)
 {
+    if(key.empty() && value.empty())
+        return true;
     if (this->indent > 0 && this->block == NULL)
         throw std::runtime_error("Error: Wrong indentation");
     if (quote != '\0')
@@ -117,8 +119,6 @@ bool Config::validateAndSetKey(char quote, const std::string &key, const std::st
         throw std::runtime_error("Error: no key for line");
     if (value.empty())
         throw std::runtime_error("Error: no value for key");
-    if (!this->setBlock())
-        return false;
     
     return setKey(key, value);
 }

@@ -37,10 +37,10 @@ void Config::parse()
     this->file.close();
 }
 
-bool Config::setBlock()
+void Config::setBlock()
 {
     if (this->block == NULL)
-        return true;
+        return;
 
     while (!this->blocks.empty() && (this->indent - 4) < this->blocks.back().at("level").getInt() * 4)
         this->blocks.pop_back();
@@ -49,7 +49,7 @@ bool Config::setBlock()
         this->block = NULL;
         this->indent = 0;
         this->blocks.clear();
-        return true;
+        return;
     }
     
     this->block = &(this->blocks.back());
@@ -58,7 +58,7 @@ bool Config::setBlock()
     if (blockIndent != this->indent - 4)
         throw std::runtime_error("Error: indentation not matching");
 
-    return true;
+    return;
 }
 
 bool Config::isReserved(const std::string &key){
@@ -66,6 +66,7 @@ bool Config::isReserved(const std::string &key){
 }
 
 bool Config::setKey(const std::string &key, const std::string &value) {
+    this->setBlock();
     ConfigValue typedValue = ConfigValue::detectType(value);
     
     if (isReserved(key)) {
@@ -104,10 +105,11 @@ bool Config::setKeyInBlock(const std::string &key, const ConfigValue &typedValue
 void Config::updateParents() {
     for (size_t i = 0; i < this->blocks.size(); i++) {
         config_map &block = this->blocks[i]; 
+
         int blockId = block.at("blockId").getInt();
         int level = block.at("level").getInt();
 
-        if (blockId == 0) { 
+        if (level == 0) { 
             this->root[block.at("blockName")] = block;
             continue;
         }
@@ -127,8 +129,6 @@ config_map* Config::findParentBlock(int blockId, int level) {
 
 void Config::updateParentBlock(config_map* parent, const std::string &blockName, int blockId) {
     if (blockName == "location") {
-        std::cout << *parent << std::endl;
-        std::cout << *this->block << std::endl << std::endl;
         if (!parent->count("locations"))
             (*parent)["locations"] = ConfigValue(config_array());
         config_array locations = (*parent)["locations"];
@@ -146,7 +146,6 @@ void Config::updateParentBlock(config_map* parent, const std::string &blockName,
             locations.push_back(*this->block);
         
         (*parent)["locations"] = locations;
-
         return ;
     }
 

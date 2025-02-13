@@ -1,11 +1,30 @@
+this_is_global: Hello
+
 server1:
+    listen: 80
+    location:
+        path: "/public"
+        root: "./public"
+        index: "index.html"
+
+    location:
+        path: "/profile"
+        root: "./profile"
+        index: "index.html"
+                                 
     location:
         path: "/test"
         root: "./test"
         index: "index.html"
+    
+    errors:
+        404: "404.html"
+        500: "500.html"
 
 server2:
+    listen: 81
+    max_client_body_size: 2000
     location:
         path: "/test2"
-        root: "./test2"
+        root: "./tes2"
         index: "index2.html"

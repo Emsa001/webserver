@@ -181,18 +181,5 @@ ConfigValue ConfigValue::detectType(const std::string &value)
     if (isNumber)
         return ConfigValue(atoi(value.c_str()));
 
-    if (value.find(' ') != std::string::npos)
-    {
-        std::istringstream iss(value);
-
-        std::string word;
-        config_array array;
-
-        while (iss >> word)
-            array.push_back(ConfigValue(word));
-
-        return ConfigValue(array);
-    }
-
     return ConfigValue(value);
 }

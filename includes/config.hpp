@@ -6,7 +6,7 @@
 /*   By: escura <escura@student.42wolfsburg.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 14:45:07 by escura            #+#    #+#             */
-/*   Updated: 2025/02/13 14:10:39 by escura           ###   ########.fr       */
+/*   Updated: 2025/02/13 16:22:51 by escura           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,7 @@ class Config
         int handleKeyValueSeparator(char c, char n, bool *isValue, size_t *i, std::string &key);
         void createNewBlock(const std::string &key);
         bool validateAndSetKey(char quote, const std::string &key, const std::string &value);
-        bool setBlock();
+        void setBlock();
 
         bool isReserved(std::string const &key);
         bool setKey(std::string const &key, std::string const &value);
