@@ -10,6 +10,7 @@
 
 void Config::parse()
 {
+
     if (!this->file.is_open())
     {
         std::cerr << "Error: Could not open file" << std::endl;
@@ -21,7 +22,15 @@ void Config::parse()
         if (this->line.empty())
             continue;
 
-        if(!this->processLine()) break;
+        try{
+            if(!this->processLine()) break;
+        }catch(const std::exception &e){
+            this->file.close();
+            std::cerr << e.what() << std::endl;
+            this->root.clear();
+            this->blocks.clear();
+            return;
+        }
     }
 
     this->cleanTemp(&this->root);
@@ -52,19 +61,6 @@ bool Config::setBlock()
     return true;
 }
 
-void Config::updateParents() {
-    for (size_t i = 0; i < this->blocks.size(); i++) {
-        config_map &block = this->blocks[i]; 
-        int blockId = block.at("blockId").getInt();
-        int level = block.at("level").getInt();
-
-        if (blockId == 0) { 
-            this->root[block.at("blockName")] = block;
-            continue;
-        }
-    }
-}
-
 bool Config::isReserved(const std::string &key){
     return (key == "blockId" || key == "blockName" || key == "blockType" || key == "level");
 }
@@ -87,16 +83,12 @@ bool Config::setKey(const std::string &key, const std::string &value) {
 
 bool Config::setKeyInBlock(const std::string &key, const ConfigValue &typedValue) {
 
-    std::cout << *this->block << std::endl;
-
     std::string blockName = this->block->at("blockName");
     int blockId = this->block->at("blockId");
     int level = this->block->at("level").getInt();
     
-    if (level > 1) {
-        std::cerr << "Error: block level too deep" << std::endl;
-        return false;
-    }
+    if (level > 1)
+        throw std::runtime_error("Error: block level too deep");
 
     
     (*this->block)[key] = typedValue;
@@ -107,6 +99,19 @@ bool Config::setKeyInBlock(const std::string &key, const ConfigValue &typedValue
     
     updateParents();
     return true;
+}
+
+void Config::updateParents() {
+    for (size_t i = 0; i < this->blocks.size(); i++) {
+        config_map &block = this->blocks[i]; 
+        int blockId = block.at("blockId").getInt();
+        int level = block.at("level").getInt();
+
+        if (blockId == 0) { 
+            this->root[block.at("blockName")] = block;
+            continue;
+        }
+    }
 }
 
 config_map* Config::findParentBlock(int blockId, int level) {
@@ -122,6 +127,8 @@ config_map* Config::findParentBlock(int blockId, int level) {
 
 void Config::updateParentBlock(config_map* parent, const std::string &blockName, int blockId) {
     if (blockName == "location") {
+        std::cout << *parent << std::endl;
+        std::cout << *this->block << std::endl << std::endl;
         if (!parent->count("locations"))
             (*parent)["locations"] = ConfigValue(config_array());
         config_array locations = (*parent)["locations"];

@@ -34,8 +34,6 @@ bool Config::processLine()
         else key += c;
     }
 
-    std::cout << "KEY: " << key << " VALUE: " << value << std::endl;
-
     return validateAndSetKey(quote, key, value);
 }
 

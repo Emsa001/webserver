@@ -1,11 +1,11 @@
-log_format: "combined"
-
 server1:
-    server_name: "123.123.123"
-    listen: 80
-    max_client_body_size: 1000
-
     location:
         path: "/test"
         root: "./test"
         index: "index.html"
+
+server2:
+    location:
+        path: "/test2"
+        root: "./test2"
+        index: "index2.html"
