@@ -35,7 +35,13 @@ $(NAME): $(OBJ)
 $(OBJ): $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o "$@" "$<"
 
-.PHONY: run all clean fclean re test t
+setup:
+	docker build -t pre-commit -f assets/pre-commit.Dockerfile . 
+
+format:
+	docker run -v.:/mnt -it --rm pre-commit
+
+.PHONY: run all clean fclean re test t setup format
 
 # ===== TESTING =====
 TEST_CXXFLAGS		+= -I$(GTESTDIR)/googletest/include -g -I$(INCDIR)
