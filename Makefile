@@ -8,24 +8,20 @@ CXXFLAGS		+= -std=c++98 -pedantic
 CXXFLAGS		+= -I$(INCDIR)
 
 # source files
-INCDIR			= inc
+INCDIR			= includes
 SRCDIR			= src
 OBJDIR			= .obj
-SRC				= $(wildcard $(SRCDIR)/*.cpp)
-OBJ				= $(SRC:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
+SRC				= $(wildcard $(SRCDIR)/*.cpp) $(wildcard $(SRCDIR)/*/*.cpp) $(wildcard $(SRCDIR)/*/*/*.cpp)
+OBJ				= $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SRC))
 
 
 run: $(NAME)
 	./$(NAME)
 
-SRC = $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/*/*.cpp) $(wildcard $(SRC_DIR)/*/*/*.cpp)
-OBJ = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRC))
-INCLUDES = $(wildcard $(INCLUDES_DIR)/*.h) $(wildcard $(INCLUDES_DIR)/*/*.h)
-
-all: $(NAME) run
+all: $(NAME)
 
 clean:
-	$(RM) -rf $(wildcard $(OBJDIR)/*)
+	$(RM) -rf $(OBJDIR)
 
 fclean: clean
 	$(RM) -f $(NAME)
@@ -37,6 +33,7 @@ $(NAME): $(OBJ)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o "$@" $?
 
 $(OBJ): $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o "$@" "$<"
 
 setup:

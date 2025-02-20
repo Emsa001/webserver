@@ -1,4 +1,4 @@
-#include "webserv.hpp"
+#include "Webserv.hpp"
 
 #include <iostream>
 #include <string>
@@ -106,7 +106,6 @@ void Config::updateParents() {
     for (size_t i = 0; i < this->blocks.size(); i++) {
         config_map &block = this->blocks[i]; 
 
-        int blockId = block.at("blockId").getInt();
         int level = block.at("level").getInt();
 
         if (level == 0) { 

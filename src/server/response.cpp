@@ -1,4 +1,4 @@
-#include "../../includes/server.hpp"
+#include "Server.hpp"
 
 void POST(const std::string &request)
 {
@@ -63,14 +63,16 @@ std::string GET(const std::string &request)
 std::string Server::get_response(Client &client) 
 {
 
-    if (client.request.find("GET /") == 0)
-        return GET(client.request);
+    std::string const &request = client.get_request();
 
-    if (client.request.find("POST /upload") == 0)
-        POST(client.request);
+    if (request.find("GET /") == 0)
+        return GET(request);
 
-    if (client.request.find("DELETE /") == 0)
-        return DELETE(client.request);
+    if (request.find("POST /upload") == 0)
+        POST(request);
+
+    if (request.find("DELETE /") == 0)
+        return DELETE(request);
 
     return "HTTP/1.1 400 Bad Request\r\n\r\n";
 }

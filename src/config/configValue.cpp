@@ -1,4 +1,4 @@
-#include "config.hpp"
+#include "Config.hpp"
 
 ConfigValue::ConfigValue() : type(INT), i(0) {}
 

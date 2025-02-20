@@ -24,9 +24,9 @@
 #include <fstream>
 
 // project headers
-#include "server.hpp"
-#include "client.hpp"
-#include "config.hpp"
+#include "Server.hpp"
+#include "Client.hpp"
+#include "Config.hpp"
 
 #define PORT 8080
 extern bool SERVER_STOP;

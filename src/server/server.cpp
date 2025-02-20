@@ -1,4 +1,4 @@
-#include "server.hpp"
+#include "Server.hpp"
 
 Server::Server(int port)
 {
@@ -72,11 +72,7 @@ void Server::simple_run()
 
 void Server::run()
 {
-    
-    std::string request = client.get_request();
-
-    if (request.find("GET /cgi-bin/hello.py") == 0)
-        return cgi_execute("./src/cgi/hello.py");
+    std::cout << "Server is running on http://localhost:" << this->port << std::endl;
 
     struct pollfd fds[200];
     bzero(fds, sizeof(fds));
