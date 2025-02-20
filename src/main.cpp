@@ -1,10 +1,3 @@
-#include "../includes/webserv.hpp"
+#include <Server.h>
 
-int main() 
-{
-    Server server(PORT);
-    handle_signal();
-    server.run();
-
-    return 0;
-}
+int main(int argc, char *argv[]) { Server().run(); }

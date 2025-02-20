@@ -1,23 +1,11 @@
-hello from beqa branch
+# webserv
+hello world
 
-
-### GET
-```Bash
-curl http://localhost:8080
-```
-
-### POST (file upload)
-```Bash
-curl -X POST -H "Content-Length: 13" -d "Hello, World" http://localhost:8080/upload
-```
-
-### DELETE (remove file)
-```Bash
-curl -X DELETE http://localhost:8080/uploads/file.txt
-```
-
-### Test 
-```Bash
-siege -c255 -t100 -r22 http://localhost:8080
-```
-
+## Research
+- [AOSA Python Web Server](https://aosabook.org/en/500L/a-simple-web-server.html)
+- HTTP
+  - [httpwg.org specs](https://httpwg.org/specs/)
+  - [RFC 2616](https://www.rfc-editor.org/rfc/rfc2616)
+  - [Wikipedia](https://en.wikipedia.org/wiki/HTTP)
+  - [MDN Response Status](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
+- [MIME](https://en.wikipedia.org/wiki/MIME)
