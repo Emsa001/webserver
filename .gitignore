@@ -1,2 +1,9 @@
 .obj
 .vscode
+
+# binaries
+*.o
+webserv
+test
+
+gtest/

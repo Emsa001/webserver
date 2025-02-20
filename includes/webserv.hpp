@@ -21,6 +21,7 @@
 #include <sstream>
 #include <cstring>
 #include <algorithm>
+#include <fstream>
 
 // project headers
 #include "server.hpp"
