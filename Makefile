@@ -25,6 +25,7 @@ clean:
 
 fclean: clean
 	$(RM) -f $(NAME)
+	$(RM) -f test
 
 re: fclean
 	$(MAKE)
