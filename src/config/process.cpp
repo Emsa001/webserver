@@ -72,12 +72,13 @@ bool Config::handleIndentation(char c, char quote, const std::string &key, int p
 
     if(this->expectedIndent != -1){
         if(this->expectedIndent != this->indent)
-            throw std::runtime_error("Error: indentation not matching");
+            throw ParseError(this->ln, "Indentation not matching");
+
         this->expectedIndent = -1;
     }
 
     if(this->indent > previousIndent + 4)
-        throw std::runtime_error("Error: indentation not matching");
+        throw ParseError(this->ln, "Indentation not matching");
 
     return false;
 }
@@ -95,30 +96,34 @@ bool Config::handleQuotes(char c, char &quote)
     return false;
 }
 
-void Config::createNewBlock(const std::string &key)
-{
-    config_map newBlock = config_map();
-    int level = this->indent / 4;
-    newBlock["blockName"] = ConfigValue(key);
-    newBlock["level"] = ConfigValue(level);
-    newBlock["blockId"] = ConfigValue(this->blockId++);
-    newBlock["blockType"] = ConfigValue(std::string("map"));
-    this->blocks.push_back(newBlock);
-    this->block = &(blocks.back());
-}
-
 bool Config::validateAndSetKey(char quote, const std::string &key, const std::string &value)
 {
     if(key.empty() && value.empty())
         return true;
     if (this->indent > 0 && this->block == NULL)
-        throw std::runtime_error("Error: Wrong indentation");
+        throw ParseError(this->ln, "Indentation not matching");
     if (quote != '\0')
-        throw std::runtime_error("Error: quote not closed");
+        throw ParseError(this->ln, "Quote not closed");
     if (key.empty() && (!this->block || this->block->at("blockType").getString() != "array"))
-        throw std::runtime_error("Error: no key for line");
+        throw ParseError(this->ln, "Key not found");
     if (value.empty())
-        throw std::runtime_error("Error: no value for key");
+        throw ParseError(this->ln, "Value not found");
     
     return setKey(key, value);
+}
+
+bool Config::setKey(const std::string &key, const std::string &value) {
+    this->setBlock();
+    ConfigValue typedValue = ConfigValue::detectType(value);
+    
+    if (isReserved(key)) {
+        throw ParseError(this->ln, "'" + key + "' is a reserved keyword");
+    }
+    
+    if (this->block != NULL)
+        return setKeyInBlock(key, typedValue);
+    
+    this->root[key] = typedValue;
+
+    return true;
 }

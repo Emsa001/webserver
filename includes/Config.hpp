@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   config.hpp                                         :+:      :+:    :+:   */
+/*   Config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: escura <escura@student.42wolfsburg.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 14:45:07 by escura            #+#    #+#             */
-/*   Updated: 2025/02/13 16:22:51 by escura           ###   ########.fr       */
+/*   Updated: 2025/02/21 18:28:06 by escura           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #include <sstream>
 #include <cstdlib>
 
+std::string intToString(int i);
 class ConfigValue;
 
 typedef std::map<std::string, ConfigValue> config_map;
@@ -56,10 +57,11 @@ class ConfigValue {
         Type getType() const { return type; }
         int getInt() const { return (type == INT) ? i : 0; }
         bool getBool() const { return (type == BOOL) ? b : false; }
-        std::string getString() const { return (type == STRING) ? s : ""; }
-        config_array getArray() const { return (type == ARRAY) ? a : config_array(); }
-        config_map& getMap() { return m; }
+
+        const std::string &getString() const { return s; }
+        const config_array &getArray() const { return a; }
         const config_map& getMap() const { return m; }
+        config_map &getMap() { return m; }
 
         // Type conversions
         operator std::string() const;
@@ -76,8 +78,6 @@ class ConfigValue {
         static ConfigValue detectType(const std::string &value);
 };
 
-
-
 std::ostream& operator<<(std::ostream& os, const ConfigValue& cv);
 
 class Config
@@ -93,9 +93,12 @@ class Config
 
         std::ifstream file;
         std::string line;
+        int ln;
 
         int indent;
         int expectedIndent;
+
+        void init();
 
         bool processLine();
         bool handleComment(char p, char c, char quote, size_t i);
@@ -114,16 +117,16 @@ class Config
         config_map* findParentBlock(int blockId, int level);
         void updateParentBlock(config_map* parent, const std::string &blockName, int blockId);
         
+        config_map cleanTemp(config_map *temp);
+                
     public:
         Config();
         Config(std::string const &filename);
         ~Config();
 
-        void parse();
+        bool parse();
+        bool validate();
         
-
-        config_map cleanTemp(config_map *temp);
-
         config_map getRoot() const { return root; }
         config_array getServers() const {
             config_array servers = config_array();
@@ -138,6 +141,23 @@ class Config
 
             return servers;
         };
+
+    
+    class ParseError : public std::exception {
+        private:
+            int ln;
+            std::string msg;
+            std::string full_msg; // Store the full message as a member variable
+        public:
+            ParseError(int line, const std::string& message) : ln(line), msg(message) {
+                full_msg = "Error at line: " + intToString(ln) + " - " + msg;
+            }
+            virtual ~ParseError() throw() {}
+            const char* what() const throw() {
+                return full_msg.c_str();
+            }
+    };
 };
+
 
 #endif

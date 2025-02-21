@@ -45,19 +45,8 @@ ConfigValue::ConfigValue(ConfigValue const &other)
 }
 
 ConfigValue::~ConfigValue()
-{
-    clear();
-}
+{}
 
-void ConfigValue::clear()
-{
-    // if (type == STRING)
-    //     delete s;
-    // if (type == ARRAY)
-    //     delete a;
-    // if (type == MAP)
-    //     delete m;
-}
 
 // Operators
 
@@ -65,7 +54,6 @@ ConfigValue &ConfigValue::operator=(const ConfigValue &other)
 {
     if (this != &other)
     {
-        clear(); // Free old memory
         type = other.type;
         switch (type)
         {
