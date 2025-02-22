@@ -1,15 +1,13 @@
 #include "Webserv.hpp"
 
-int main()
-{
+int main() {
     Config config("conf/myserver.yml");
-    if(!config.parse())
+    if (!config.parse())
         return 1;
 
     std::cout << std::endl << std::endl << std::endl;
     std::cout << config.getRoot() << std::endl;
     std::cout << std::endl << std::endl << std::endl;
-
 
     // std::string log_format = config.getRoot()["log_format"];
 
@@ -22,4 +20,3 @@ int main()
 
     return 0;
 }
-

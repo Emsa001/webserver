@@ -1,7 +1,6 @@
 #include "Server.hpp"
 
-Server::Server(int port)
-{
+Server::Server(int port) {
     // AF_UNIX, AF_LOCAL - Local communication
     // AF_INET - IPv4 Internet protocols
     // AF_INET6 - IPv6 Internet protocols
@@ -10,14 +9,15 @@ Server::Server(int port)
     // SOCK_STREAM - Two-way reliable communication (TCP)
     // SOCK_DGRAM - Connectionless, unreliable (UDP)
 
-    this->port = port; 
+    this->port = port;
     this->fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->fd == -1) 
+    if (this->fd == -1)
         return;
 
     int opt = 1;
     // allows the server to bind to an address that is in the TIME_WAIT state
-    if (setsockopt(this->fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
+    if (setsockopt(this->fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) ==
+        -1) {
         std::cerr << "Setsockopt failed: " << strerror(errno) << std::endl;
         close(this->fd);
         return;
@@ -28,40 +28,36 @@ Server::Server(int port)
     server_addr.sin_port = htons(this->port);
     server_addr.sin_addr.s_addr = INADDR_ANY;
 
-    if (bind(this->fd, (sockaddr *)&server_addr, sizeof(server_addr)) == -1) 
-    {
+    if (bind(this->fd, (sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
         std::cerr << "Bind failed: " << strerror(errno) << std::endl;
         close(this->fd);
         return;
     }
 
-    if(listen(this->fd, 5) == -1)
-    {
+    if (listen(this->fd, 5) == -1) {
         std::cerr << "Listen failed: " << strerror(errno) << std::endl;
         close(this->fd);
         return;
     }
 }
 
-Server::~Server()
-{
+Server::~Server() {
     close(this->fd);
     std::cout << "\nDestructor called" << std::endl;
 }
 
-void Server::simple_run()
-{
-    std::cout << "Server is running on http://localhost:" << this->port << std::endl;
+void Server::simple_run() {
+    std::cout << "Server is running on http://localhost:" << this->port
+              << std::endl;
 
-    while(1)
-    {
+    while (1) {
         Client client(this->fd);
 
         int fd = client.get_fd();
 
         if (fd == -1)
             continue;
-        
+
         std::string Response = get_response(client);
         std::cout << "Client joined" << std::endl;
 
@@ -70,9 +66,9 @@ void Server::simple_run()
     }
 }
 
-void Server::run()
-{
-    std::cout << "Server is running on http://localhost:" << this->port << std::endl;
+void Server::run() {
+    std::cout << "Server is running on http://localhost:" << this->port
+              << std::endl;
 
     struct pollfd fds[200];
     bzero(fds, sizeof(fds));
@@ -82,37 +78,30 @@ void Server::run()
     fds[0].events = POLLIN;
     fds[0].revents = 0;
 
-    
-    while (!SERVER_STOP)
-    {
+    while (!SERVER_STOP) {
         int poll_count = poll(fds, nfds, -1);
-        if (poll_count == -1)
-        {
+        if (poll_count == -1) {
             std::cerr << "Poll failed: " << strerror(errno) << std::endl;
             return;
         }
 
-        for (int i = 0; i < nfds; i++)
-        {
-            if (fds[i].revents & POLLIN)
-            {
-                if (fds[i].fd == this->fd)
-                {
+        for (int i = 0; i < nfds; i++) {
+            if (fds[i].revents & POLLIN) {
+                if (fds[i].fd == this->fd) {
                     sockaddr_in client_addr;
                     socklen_t client_len = sizeof(client_addr);
-                    int client_fd = accept(this->fd, (sockaddr *)&client_addr, &client_len);
-                    if (client_fd == -1)
-                    {
-                        std::cerr << "Accept failed: " << strerror(errno) << std::endl;
+                    int client_fd =
+                        accept(this->fd, (sockaddr*)&client_addr, &client_len);
+                    if (client_fd == -1) {
+                        std::cerr << "Accept failed: " << strerror(errno)
+                                  << std::endl;
                         continue;
                     }
 
                     fds[nfds].fd = client_fd;
                     fds[nfds].events = POLLIN;
                     nfds++;
-                }
-                else
-                {
+                } else {
                     Client client(fds[i].fd);
                     std::string response = get_response(client);
                     send_response(fds[i].fd, response);
@@ -126,8 +115,7 @@ void Server::run()
     }
 }
 
-void Server::send_response(int client_fd, const std::string &response) 
-{
+void Server::send_response(int client_fd, const std::string& response) {
     send(client_fd, response.c_str(), response.size(), 0);
     close(client_fd);
 }

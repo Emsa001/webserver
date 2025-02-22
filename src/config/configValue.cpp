@@ -6,26 +6,15 @@ ConfigValue::ConfigValue(int i) : type(INT), i(i) {}
 
 ConfigValue::ConfigValue(bool b) : type(BOOL), b(b) {}
 
-ConfigValue::ConfigValue(std::string const &str) : type(STRING)
-{
-    s = str;
-}
+ConfigValue::ConfigValue(std::string const& str) : type(STRING) { s = str; }
 
-ConfigValue::ConfigValue(config_array const &array) : type(ARRAY)
-{
-    a = array;
-}
+ConfigValue::ConfigValue(config_array const& array) : type(ARRAY) { a = array; }
 
-ConfigValue::ConfigValue(config_map const &map) : type(MAP)
-{
-    m = map;
-}
+ConfigValue::ConfigValue(config_map const& map) : type(MAP) { m = map; }
 
-ConfigValue::ConfigValue(ConfigValue const &other)
-{
+ConfigValue::ConfigValue(ConfigValue const& other) {
     type = other.type;
-    switch (type)
-    {
+    switch (type) {
     case INT:
         i = other.i;
         break;
@@ -44,19 +33,14 @@ ConfigValue::ConfigValue(ConfigValue const &other)
     }
 }
 
-ConfigValue::~ConfigValue()
-{}
-
+ConfigValue::~ConfigValue() {}
 
 // Operators
 
-ConfigValue &ConfigValue::operator=(const ConfigValue &other)
-{
-    if (this != &other)
-    {
+ConfigValue& ConfigValue::operator=(const ConfigValue& other) {
+    if (this != &other) {
         type = other.type;
-        switch (type)
-        {
+        switch (type) {
         case INT:
             i = other.i;
             break;
@@ -77,91 +61,77 @@ ConfigValue &ConfigValue::operator=(const ConfigValue &other)
     return *this;
 }
 
-ConfigValue::operator std::string() const
-{
-    return (type == STRING) ? s : "";
-}
+ConfigValue::operator std::string() const { return (type == STRING) ? s : ""; }
 
-ConfigValue::operator int() const
-{
-    return (type == INT) ? i : 0;
-}
+ConfigValue::operator int() const { return (type == INT) ? i : 0; }
 
-ConfigValue::operator bool() const
-{
-    return (type == BOOL) ? b : false;
-}
+ConfigValue::operator bool() const { return (type == BOOL) ? b : false; }
 
-ConfigValue::operator config_array() const
-{
+ConfigValue::operator config_array() const {
     return (type == ARRAY) ? a : config_array();
 }
 
-ConfigValue::operator config_map() const
-{
+ConfigValue::operator config_map() const {
     return (type == MAP) ? m : config_map();
 }
 
-bool ConfigValue::operator==(const std::string &other) const
-{
+bool ConfigValue::operator==(const std::string& other) const {
     return (type == STRING) && (s == other);
 }
 
-bool ConfigValue::operator==(const int &other) const
-{
+bool ConfigValue::operator==(const int& other) const {
     return (type == INT) && (i == other);
 }
 
-bool ConfigValue::operator==(const bool &other) const
-{
+bool ConfigValue::operator==(const bool& other) const {
     return (type == BOOL) && (b == other);
 }
 
 std::ostream& operator<<(std::ostream& os, const ConfigValue& cv) {
     switch (cv.getType()) {
-        case ConfigValue::INT:
-            os << cv.getInt();
-            break;
-        case ConfigValue::BOOL:
-            os << (cv.getBool() ? "true" : "false");
-            break;
-        case ConfigValue::STRING:
-            os << '"' << cv.getString() << '"';
-            break;
-        case ConfigValue::ARRAY:
-            os << "[ ";
-            for (size_t i = 0; i < cv.getArray().size(); i++) {
-                if (i > 0) os << ", ";
-                os << (cv.getArray())[i];
-            }
-            os << " ]";
-            break;
-        case ConfigValue::MAP:
-            os << "{ ";
-            for (config_map::const_iterator it = cv.getMap().begin(); it != cv.getMap().end(); ++it) {
-                if (it != cv.getMap().begin()) os << ", ";
-                os << it->first << ": " << it->second;
-            }
-            os << " }";
-            break;
+    case ConfigValue::INT:
+        os << cv.getInt();
+        break;
+    case ConfigValue::BOOL:
+        os << (cv.getBool() ? "true" : "false");
+        break;
+    case ConfigValue::STRING:
+        os << '"' << cv.getString() << '"';
+        break;
+    case ConfigValue::ARRAY:
+        os << "[ ";
+        for (size_t i = 0; i < cv.getArray().size(); i++) {
+            if (i > 0)
+                os << ", ";
+            os << (cv.getArray())[i];
+        }
+        os << " ]";
+        break;
+    case ConfigValue::MAP:
+        os << "{ ";
+        for (config_map::const_iterator it = cv.getMap().begin();
+             it != cv.getMap().end(); ++it) {
+            if (it != cv.getMap().begin())
+                os << ", ";
+            os << it->first << ": " << it->second;
+        }
+        os << " }";
+        break;
     }
     return os;
 }
 
 // Member functions
 
-ConfigValue ConfigValue::detectType(const std::string &value)
-{
+ConfigValue ConfigValue::detectType(const std::string& value) {
     if (value == "true")
         return ConfigValue(true);
     if (value == "false")
         return ConfigValue(false);
 
     bool isNumber = true;
-    for (size_t i = 0; i < value.size(); i++)
-    {
-        if (!isdigit(value[i]))
-        {
+    for (size_t i = 0; i < value.size(); i++) {
+        if (!isdigit(value[i])) {
             isNumber = false;
             break;
         }

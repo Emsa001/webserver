@@ -1,29 +1,27 @@
 #include "Webserv.hpp"
 
-void Config::init(){
+void Config::init() {
     this->block = NULL;
     this->blockId = 0;
     this->indent = 0;
     this->expectedIndent = -1;
-    
+
     this->ln = 0;
 }
 
-Config::Config()
-{
+Config::Config() {
     this->init();
     std::cout << "Config is created" << std::endl;
     this->file.open("conf/default.yml");
 }
 
-Config::Config(std::string const &filename)
-{
+Config::Config(std::string const& filename) {
     this->init();
     std::cout << "Config is created" << std::endl;
     this->file.open(filename.c_str());
 }
 
-Config::~Config()
-{
-    std::cout << "Config destructor called, resources freed successfully." << std::endl;
+Config::~Config() {
+    std::cout << "Config destructor called, resources freed successfully."
+              << std::endl;
 }

@@ -2,17 +2,14 @@
 
 bool SERVER_STOP = false;
 
-void change_stop(int signal) 
-{
-    if (signal == SIGINT) 
-    {
+void change_stop(int signal) {
+    if (signal == SIGINT) {
         exit(1);
     }
-        SERVER_STOP = true;
+    SERVER_STOP = true;
 }
 
-void handle_signal() 
-{
+void handle_signal() {
     struct sigaction sa;
     sa.sa_handler = change_stop;
     sigemptyset(&sa.sa_mask);
