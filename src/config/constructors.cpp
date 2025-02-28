@@ -5,6 +5,8 @@ void Config::init(){
     this->blockId = 0;
     this->indent = 0;
     this->expectedIndent = -1;
+
+    this->schema = createSchema();
     
     this->ln = 0;
 }

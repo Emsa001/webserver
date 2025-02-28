@@ -40,5 +40,6 @@ std::string getFirstWord(std::string const s);
 
 bool firstChar(std::string const &s, char c);
 std::string intToString(int i);
+ConfigSchema createSchema();
 
 #endif

@@ -1,104 +1,37 @@
+log_format: "combined"
+
 server1:
     listen: 80
-    max_client_body_size: 5000
+    max_client_body_size: 1000
+
     location:
         path: "/static"
         root: "./static"
         index: "index.html"
-        autoindex: true
 
     location:
         path: "/api"
         root: "./api"
         index: "api.html"
-        methods: ["GET", "POST"]
 
     location:
         path: "/uploads"
         root: "./uploads"
         index: "index.html"
-        allow_uploads: true
 
     errors:
-        403: "403.html"
-        404: "404.html"
         500: "500.html"
+        404: "404.html"
 
 server2:
-    listen: 8080
-    max_client_body_size: 10000
-    location:
-        path: "/admin"
-        root: "./admin"
-        index: "dashboard.html"
-        auth_required: true
+    listen: 81
+    max_client_body_size: 1000
 
     location:
-        path: "/logs"
-        root: "./logs"
-        index: "logs.html"
-        autoindex: true
-
-    location:
-        path: "/reports"
-        root: "./reports"
-        index: "reports.html"
-    
-    errors:
-        404: "not_found.html"
-        500: "server_error.html"
-
-server3:
-    listen: 443
-    ssl: true
-    cert_file: "./ssl/cert.pem"
-    key_file: "./ssl/key.pem"
-    
-    location:
-        path: "/secure"
-        root: "./secure"
-        index: "secure.html"
-
-    location:
-        path: "/data"
-        root: "./data"
-        index: "data.html"
-        methods: ["GET", "PUT", "DELETE"]
-
-    location:
-        path: "/config"
-        root: "./config"
-        index: "config.html"
-        auth_required: true
+        path: "/static"
+        root: "./static"
+        index: "index.html"
 
     errors:
-        401: "unauthorized.html"
-        403: "forbidden.html"
-        404: "not_found.html"
-        500: "server_error.html"
-
-server4:
-    listen: 3000
-    location:
-        path: "/media"
-        root: "./media"
-        index: "media.html"
-        autoindex: true
-
-    location:
-        path: "/user"
-        root: "./user"
-        index: "profile.html"
-        methods: ["GET", "POST", "PUT"]
-
-    location:
-        path: "/chat"
-        root: "./chat"
-        index: "chat.html"
-        websockets: true
-
-    errors:
-        400: "bad_request.html"
-        403: "forbidden.html"
-        404: "not_found.html"
-        500: "server_error.html"
+        500: "500.html"
+        404: "404.html"
