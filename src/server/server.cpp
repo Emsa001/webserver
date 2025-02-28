@@ -49,27 +49,6 @@ Server::~Server()
     std::cout << "\nDestructor called" << std::endl;
 }
 
-void Server::simple_run()
-{
-    std::cout << "Server is running on http://localhost:" << this->port << std::endl;
-
-    while(1)
-    {
-        Client client(this->fd);
-
-        int fd = client.get_fd();
-
-        if (fd == -1)
-            continue;
-        
-        std::string Response = get_response(client);
-        std::cout << "Client joined" << std::endl;
-
-        send_response(fd, Response);
-        close(fd);
-    }
-}
-
 void Server::run()
 {
     std::cout << "Server is running on http://localhost:" << this->port << std::endl;
@@ -88,12 +67,14 @@ void Server::run()
         int poll_count = poll(fds, nfds, -1);
         if (poll_count == -1)
         {
-            std::cerr << "Poll failed: " << strerror(errno) << std::endl;
+            std::cout << "Poll failed: " << std::endl;
             return;
         }
 
         for (int i = 0; i < nfds; i++)
         {
+            // check if the POLLIN flag is set in fds[i].revents
+            // it means that there is data to read
             if (fds[i].revents & POLLIN)
             {
                 if (fds[i].fd == this->fd)
@@ -103,7 +84,7 @@ void Server::run()
                     int client_fd = accept(this->fd, (sockaddr *)&client_addr, &client_len);
                     if (client_fd == -1)
                     {
-                        std::cerr << "Accept failed: " << strerror(errno) << std::endl;
+                        std::cout << "Accept failed: " << std::endl;
                         continue;
                     }
 

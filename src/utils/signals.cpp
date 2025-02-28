@@ -4,10 +4,7 @@ bool SERVER_STOP = false;
 
 void change_stop(int signal) 
 {
-    if (signal == SIGINT) 
-    {
-        exit(1);
-    }
+    if (signal == SIGINT)
         SERVER_STOP = true;
 }
 

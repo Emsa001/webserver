@@ -16,7 +16,7 @@ OBJ				= $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SRC))
 
 
 run: $(NAME)
-	./$(NAME)
+#	./$(NAME)
 
 all: $(NAME)
 
