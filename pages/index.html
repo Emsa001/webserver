@@ -1,66 +1,126 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>File Upload and Management</title>
-    </head>
+<head>
+    <title>File Upload and Management</title>
+    <meta charset="utf-8">
     <style>
-        body { background-color: #333; color: white; text-align: center; font-family: Arial, sans-serif; }
-        h1 { font-size: 3em; margin-top: 20px; }
-        p { font-size: 1.5em; }
-        .file-list { margin-top: 20px; }
-        .file-list ul { list-style-type: none; padding: 0; }
-        .file-list li { margin: 10px 0; }
+        body {
+            background-color: #333;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+        .file-list {
+            width: 300px;
+            background-color: #444;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .file-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .file-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .file-list li {
+            display: flex;
+            justify-content: space-between;
+            background-color: #555;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .button {
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #ff0000;
+        }
+        .file-list button {
+            background-color: #ff5555;
+            padding: 5px 10px;
+        }
     </style>
-    <body>
+</head>
+<body>
+    <div>
         <h1>File Upload and Management</h1>
-
-        <form action="/upload" method="POST" enctype="multipart/form-data">
-            <input type="file" name="file" id="fileInput" required>
-            <button type="submit">Upload File</button>
-        </form>
-
-        <div class="file-list">
+    </div>
+    <div class="file-list">
+        <div class="file-list-header">
             <h2>Files</h2>
-            <ul id="fileList">
-            </ul>
+            <button class="button upload-button" onclick="uploadFile()">Upload</button>
         </div>
+        <ul id="fileList"></ul>
+        <button class="button refresh-button" onclick="location.reload()">Refresh File List</button>
+    </div>
 
-        <button onclick="location.reload()">Refresh File List</button>
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                fetchFiles();
-            });
+    <script>
+        document.addEventListener('DOMContentLoaded', fetchFiles, uploadFile);
 
-            async function fetchFiles() {
-                try {
-                    const response = await fetch('/files');
-                    const files = await response.json();
-                    const fileList = document.getElementById('fileList');
-                    fileList.innerHTML = '';
+        async function fetchFiles() {
+            try {
+                const response = await fetch('/files');
+                const files = await response.json();
+                const fileList = document.getElementById('fileList');
+                fileList.innerHTML = '';
 
-                    files.forEach(file => {
-                        const li = document.createElement('li');
-                        li.textContent = file;
-                        const deleteButton = document.createElement('button');
-                        deleteButton.textContent = 'Delete';
-                        deleteButton.onclick = () => deleteFile(file);
-                        li.appendChild(deleteButton);
-                        fileList.appendChild(li);
-                    });
-                } catch (error) {
-                    console.error('Error fetching files:', error);
-                }
+                files.forEach(file => {
+                    const li = document.createElement('li');
+                    li.textContent = "📁 " + file;
+                    const button = document.createElement('button');
+                    button.textContent = 'Delete';
+                    button.className = 'button';
+                    button.onclick = () => deleteFile(file);
+                    li.appendChild(button);
+                    fileList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Error fetching files:', error);
             }
+        }
 
-            async function deleteFile(filename) {
-                try {
-                    const response = await fetch(`${filename}`, {
-                        method: 'DELETE',
-                    });
-                } catch (error) {
-                    console.error('Error deleting file:', error);
+        async function deleteFile(filename) {
+            try {
+                const response = await fetch(`${filename}`, { method: 'DELETE' });
+                if (response.ok) {
+                    fetchFiles();
+                } else {
+                    console.error('Error deleting file:', response.statusText);
                 }
+            } catch (error) {
+                console.error('Error deleting file:', error);
             }
-        </script>
-    </body>
+        }
+
+        async function uploadFile() {
+            const formData = new FormData();
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.onchange = () => {
+                formData.append('file', fileInput.files[0]);
+                fetch('/files', { method: 'POST', body: formData })
+                    .then(response => {
+                        if (response.ok) {
+                            fetchFiles();
+                        } else {
+                            console.error('Error uploading file:', response.statusText);
+                        }
+                    })
+                    .catch(error => console.error('Error uploading file:', error));
+            };
+            fileInput.click();
+        }
+    </script>
+</body>
 </html>
