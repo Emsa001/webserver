@@ -94,6 +94,7 @@ void Server::run()
                 }
                 else
                 {
+                    std::cout << "Client connected" << std::endl;
                     Client client(fds[i].fd);
                     std::string response = get_response(client);
                     send_response(fds[i].fd, response);

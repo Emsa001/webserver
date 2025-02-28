@@ -1,79 +1,115 @@
 #include "Server.hpp"
 
-void POST(const std::string &request)
-{
-    size_t num = request.find("Content-Length: ");
-    if (num == std::string::npos)
-        return;
-
-    int len = request.find("\r\n", num);
-    std::string str = request.substr(num + 16, len - (num + 16));
-    
-    int full_content = std::atoi(str.c_str());
-    int start = request.find("\r\n\r\n") + 4;
-    std::string file_data = request.substr(start, full_content);
-
-    std::ofstream file("./uploads/file.txt", std::ios::binary);
-    if (!file)
-        return;
-        
-    file.write(file_data.c_str(), file_data.size());
-    file.close();
+std::vector<std::string> listFiles(const std::string &directory) {
+    std::vector<std::string> files;
+    DIR *dir;
+    struct dirent *ent;
+    if ((dir = opendir(directory.c_str())) != NULL) {
+        while ((ent = readdir(dir)) != NULL) {
+            if (ent->d_type == DT_REG) {
+                files.push_back(ent->d_name);
+            }
+        }
+        closedir(dir);
+    }
+    return files;
 }
 
-std::string DELETE(const std::string &request)
-{
-    int path_start = request.find("DELETE /") + 8;
-    int path_end = request.find(" ", path_start);
-
-    std::string path = request.substr(path_start, path_end - path_start);
-
-    if (remove(path.c_str()) != 0)
-        return "HTTP/1.1 404 Not Found\r\n\r\nResource not found.";
-
-    return "HTTP/1.1 200 OK\r\n\r\nResource deleted successfully.";
-}
-
-std::string GET(const std::string &request)
-{
+std::string GET(const std::string &request) {
     int path_start = request.find("GET /") + 5;
     int path_end = request.find(" ", path_start);
     std::string path = request.substr(path_start, path_end - path_start);
-
-    if (path == "cgi-bin/hello.py")
+    
+    if (path == "files") 
     {
-        std::string cgi_output = cgi_execute("./pages/hello.py");
-        if (cgi_output.empty())
-            return "HTTP/1.1 500 Internal Server Error\r\n\r\n";
-        return "HTTP/1.1 200 OK\r\n" + cgi_output;
-    }
-    else if (path == "")
-    {
-        std::string response =
-            "HTTP/1.1 200 OK\r\n"
-            "Content-Type: text/html\r\n\r\n"
-            "<!DOCTYPE html><html><head><title>Hello, World!</title></head>"
-            "<body><h1>Hello, World!</h1></body></html>";
+        std::vector<std::string> files = listFiles("./uploads");
+        std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n";
+        response += "[";
+        for (size_t i = 0; i < files.size(); i++) {
+            response += "\"" + files[i] + "\"";
+            if (i < files.size() - 1) {
+                response += ",";
+            }
+        }
+        response += "]";
         return response;
-    }
-    else
-        return "HTTP/1.1 404 Not Found\r\n" + cgi_execute("./pages/404.py");
+    } 
+    else if (path == "") 
+    {
+        std::ifstream file("./pages/index.html");
+        if (!file) 
+            return "HTTP/1.1 404 Not Found\r\n\r\n";
+        
+        std::string response =
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Type: text/html\r\n\r\n";
+        
+        std::string line;
+        while (std::getline(file, line)) {
+            response += line + "\n";
+        }
+        file.close();
+        return response;
+    } 
+    else 
+        return "HTTP/1.1 404 Not Found\r\n\r\n";
 }
 
-std::string Server::get_response(Client &client) 
-{
+bool saveFile(const std::string &filePath, const std::string &fileData) {
 
+    std::ofstream file(filePath.c_str(), std::ios::binary);
+    if (!file)
+        return false;
+
+    file.write(fileData.c_str(), fileData.size());
+    file.close();
+    return true;
+}
+
+void POST(const std::string &request) {
+    size_t num = request.find("Content-Length: ");
+    if (num == std::string::npos) {
+        return;
+    }
+    std::string filePath = "./uploads/"; //
+    size_t start = request.find("filename=\"") + 10;
+    size_t end = request.find("\"", start);
+    std::string name = request.substr(start, end - start);
+    filePath += name;
+
+    size_t data_start = request.find("\r\n\r\n") + 4;
+    std::string fileData = request.substr(data_start);
+
+    saveFile(filePath, fileData);
+}
+
+bool deleteFile(const std::string &filePath) {
+    return (remove(filePath.c_str()) == 0);
+}
+
+std::string DELETE(const std::string &request) {
+    int path_start = request.find("DELETE /") + 8;
+    int path_end = request.find(" ", path_start);
+    std::string path = request.substr(path_start, path_end - path_start);
+
+    std::string filePath = "./uploads/" + path;
+    if (deleteFile(filePath))
+        return "HTTP/1.1 200 OK\r\n\r\nFile deleted successfully.";
+    else
+        return "HTTP/1.1 404 Not Found\r\n\r\nFile not found.";
+}
+
+std::string Server::get_response(Client &client) {
     std::string const &request = client.get_request();
 
-    if (request.find("GET /") == 0)
+    if (request.find("GET /") == 0) {
         return GET(request);
-
-    if (request.find("POST /upload") == 0)
+    } else if (request.find("POST /upload") == 0) {
         POST(request);
-
-    if (request.find("DELETE /") == 0)
+        return "HTTP/1.1 200 OK\r\n\r\nFile uploaded successfully.";
+    } else if (request.find("DELETE /") == 0) {
         return DELETE(request);
-
-    return "HTTP/1.1 400 Bad Request\r\n\r\n";
+    } else {
+        return "HTTP/1.1 400 Bad Request\r\n\r\n";
+    }
 }
-

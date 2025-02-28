@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>File Upload and Management</title>
+    </head>
+    <style>
+        body { background-color: #333; color: white; text-align: center; font-family: Arial, sans-serif; }
+        h1 { font-size: 3em; margin-top: 20px; }
+        p { font-size: 1.5em; }
+        .file-list { margin-top: 20px; }
+        .file-list ul { list-style-type: none; padding: 0; }
+        .file-list li { margin: 10px 0; }
+    </style>
+    <body>
+        <h1>File Upload and Management</h1>
+
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" id="fileInput" required>
+            <button type="submit">Upload File</button>
+        </form>
+
+        <div class="file-list">
+            <h2>Files</h2>
+            <ul id="fileList">
+            </ul>
+        </div>
+
+        <button onclick="location.reload()">Refresh File List</button>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                fetchFiles();
+            });
+
+            async function fetchFiles() {
+                try {
+                    const response = await fetch('/files');
+                    const files = await response.json();
+                    const fileList = document.getElementById('fileList');
+                    fileList.innerHTML = '';
+
+                    files.forEach(file => {
+                        const li = document.createElement('li');
+                        li.textContent = file;
+                        const deleteButton = document.createElement('button');
+                        deleteButton.textContent = 'Delete';
+                        deleteButton.onclick = () => deleteFile(file);
+                        li.appendChild(deleteButton);
+                        fileList.appendChild(li);
+                    });
+                } catch (error) {
+                    console.error('Error fetching files:', error);
+                }
+            }
+
+            async function deleteFile(filename) {
+                try {
+                    const response = await fetch(`${filename}`, {
+                        method: 'DELETE',
+                    });
+                } catch (error) {
+                    console.error('Error deleting file:', error);
+                }
+            }
+        </script>
+    </body>
+</html>

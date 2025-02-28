@@ -10,6 +10,7 @@
 
 // c headers
 #include <unistd.h>
+#include <dirent.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <signal.h>
@@ -17,11 +18,12 @@
 #include <poll.h>
 
 // c++ headers
+#include <algorithm>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <cstring>
-#include <algorithm>
-#include <fstream>
+#include <vector>
 
 // project headers
 #include "Server.hpp"
