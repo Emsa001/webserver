@@ -4,7 +4,7 @@ void Config::updateParents() {
     for (size_t i = 0; i < this->blocks.size(); i++) {
         config_map &block = this->blocks[i]; 
 
-        int level = block.at("level").getInt();
+        int level = block.at("blockLevel").getInt();
 
         if (level == 0) { 
             this->root[block.at("blockName")] = block;
@@ -30,8 +30,8 @@ config_map* Config::findParentBlock(int blockId, int level) {
             continue;
         }
 
-        config_map::iterator it = this->blocks[i].find("level");
-        if (it != this->blocks[i].end() && it->second.getType() == ConfigValue::INT) {
+        config_map::iterator it = this->blocks[i].find("blockLevel");
+        if (it != this->blocks[i].end() && it->second.getType() == INT) {
             int foundLevel = it->second.getInt();
             if (foundLevel == level - 1) {
                 return &this->blocks[i];

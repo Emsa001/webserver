@@ -48,3 +48,13 @@ std::string intToString(int i) {
     ss << i;
     return ss.str();
 }
+
+// Helper function to convert enum to string
+std::string typeToString(ValueType type) {
+    switch (type) {
+        case STRING: return "STRING";
+        case INT: return "INT";
+        case BOOL: return "BOOL";
+        default: return "UNKNOWN";
+    }
+}

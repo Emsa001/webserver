@@ -50,7 +50,7 @@ std::string Server::GET(const std::string &request) {
         }
         file.close();
         return response;
-    } 
+    }
     else 
         return "HTTP/1.1 404 Not Found\r\n\r\n";
 }

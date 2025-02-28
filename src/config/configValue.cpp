@@ -26,21 +26,23 @@ ConfigValue::ConfigValue(ConfigValue const &other)
     type = other.type;
     switch (type)
     {
-    case INT:
-        i = other.i;
-        break;
-    case BOOL:
-        b = other.b;
-        break;
-    case STRING:
-        s = other.s;
-        break;
-    case ARRAY:
-        a = other.a;
-        break;
-    case MAP:
-        m = other.m;
-        break;
+        case INT:
+            i = other.i;
+            break;
+        case BOOL:
+            b = other.b;
+            break;
+        case STRING:
+            s = other.s;
+            break;
+        case ARRAY:
+            a = other.a;
+            break;
+        case MAP:
+            m = other.m;
+            break;
+        default:
+            break;
     }
 }
 
@@ -57,21 +59,23 @@ ConfigValue &ConfigValue::operator=(const ConfigValue &other)
         type = other.type;
         switch (type)
         {
-        case INT:
-            i = other.i;
-            break;
-        case BOOL:
-            b = other.b;
-            break;
-        case STRING:
-            s = other.s;
-            break;
-        case ARRAY:
-            a = other.a;
-            break;
-        case MAP:
-            m = other.m;
-            break;
+            case INT:
+                i = other.i;
+                break;
+            case BOOL:
+                b = other.b;
+                break;
+            case STRING:
+                s = other.s;
+                break;
+            case ARRAY:
+                a = other.a;
+                break;
+            case MAP:
+                m = other.m;
+                break;
+            default:
+                break;
         }
     }
     return *this;
@@ -119,16 +123,16 @@ bool ConfigValue::operator==(const bool &other) const
 
 std::ostream& operator<<(std::ostream& os, const ConfigValue& cv) {
     switch (cv.getType()) {
-        case ConfigValue::INT:
+        case INT:
             os << cv.getInt();
             break;
-        case ConfigValue::BOOL:
+        case BOOL:
             os << (cv.getBool() ? "true" : "false");
             break;
-        case ConfigValue::STRING:
+        case STRING:
             os << '"' << cv.getString() << '"';
             break;
-        case ConfigValue::ARRAY:
+        case ARRAY:
             os << "[ ";
             for (size_t i = 0; i < cv.getArray().size(); i++) {
                 if (i > 0) os << ", ";
@@ -136,13 +140,15 @@ std::ostream& operator<<(std::ostream& os, const ConfigValue& cv) {
             }
             os << " ]";
             break;
-        case ConfigValue::MAP:
+        case MAP:
             os << "{ ";
             for (config_map::const_iterator it = cv.getMap().begin(); it != cv.getMap().end(); ++it) {
                 if (it != cv.getMap().begin()) os << ", ";
                 os << it->first << ": " << it->second;
             }
             os << " }";
+            break;
+        default:
             break;
     }
     return os;

@@ -108,7 +108,13 @@ bool Config::validateAndSetKey(char quote, const std::string &key, const std::st
         throw ParseError(this->ln, "Key not found");
     if (value.empty())
         throw ParseError(this->ln, "Value not found");
-    
+
+    int blockKind = this->block ? this->block->at("blockKind").getInt() : -1;
+
+    if(!this->schema.validate(key, ConfigValue::detectType(value).getType(), blockKind)){
+        throw ParseError(this->ln, "Key '" + key + "' is not allowed in this context or it's not of the correct type");
+    }
+
     return setKey(key, value);
 }
 
@@ -116,7 +122,7 @@ bool Config::setKey(const std::string &key, const std::string &value) {
     this->setBlock();
     ConfigValue typedValue = ConfigValue::detectType(value);
     
-    if (isReserved(key)) {
+    if (Config::isReserved(key)) {
         throw ParseError(this->ln, "'" + key + "' is a reserved keyword");
     }
     
