@@ -109,7 +109,7 @@
             fileInput.type = 'file';
             fileInput.onchange = () => {
                 formData.append('file', fileInput.files[0]);
-                fetch('/files', { method: 'POST', body: formData })
+                fetch('/upload', { method: 'POST', body: formData })
                     .then(response => {
                         if (response.ok) {
                             fetchFiles();
