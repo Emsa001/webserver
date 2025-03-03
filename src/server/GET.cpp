@@ -1,5 +1,22 @@
 #include "Server.hpp"
 
+std::string get_404() {
+    std::ifstream file("./pages/404.html");
+    if (!file) 
+        return "HTTP/1.1 404 Not Found\r\n\r\n";
+
+    std::string response =
+    "HTTP/1.1 404 Not Found\r\n"
+    "Content-Type: text/html\r\n\r\n";
+
+    std::string line;
+    while (std::getline(file, line)) {
+        response += line + "\n";
+    }
+    file.close();
+    return response;
+}
+
 std::vector<std::string> listFiles(const std::string &directory) {
     std::vector<std::string> files;
     DIR *dir;
@@ -34,7 +51,7 @@ std::string Server::GET(const std::string &request) {
         response += "]";
         return response;
     } 
-    else if (path == "") 
+    if (path == "") 
     {
         std::ifstream file("./pages/index.html");
         if (!file) 
@@ -52,5 +69,5 @@ std::string Server::GET(const std::string &request) {
         return response;
     }
     else 
-        return "HTTP/1.1 404 Not Found\r\n\r\n";
+        return get_404();
 }
