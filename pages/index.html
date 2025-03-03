@@ -70,16 +70,11 @@
 
         async function fetchFiles() {
             try {
-                const response = await fetch('/files', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
+                const response = await fetch('/files');
                 const files = await response.json();
                 const fileList = document.getElementById('fileList');
                 fileList.innerHTML = '';
-        
+
                 files.forEach(file => {
                     const li = document.createElement('li');
                     li.textContent = "📁 " + file;
