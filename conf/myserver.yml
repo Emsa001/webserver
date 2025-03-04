@@ -6,7 +6,7 @@ server1:
     max_client_body_size: 10
 
     location:
-        methods: "GET, POST, PUT"
+        methods: "GET POST UPDATE PUT"
         path: "/static"
 
         root: "./static"
@@ -14,6 +14,7 @@ server1:
         autoindex: false
 
     location:
+        methods: "GET"
         path: "/api"
         redirect: "https://google.com"
 
@@ -29,7 +30,7 @@ server1:
 
 server2:
     server_name: "myserver2"
-    listen: 81
+    listen: 8082
     max_client_body_size: 1000
 
     location:

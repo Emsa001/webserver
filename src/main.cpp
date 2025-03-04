@@ -1,5 +1,19 @@
 #include "Webserv.hpp"
 
+#include <iostream>
+#include <string>
+#include <vector>
+#include <pthread.h>
+#include <map>
+
+
+void* startServer(void* arg) {
+    config_map* data = static_cast<config_map*>(arg);
+    Server server(*data);
+    server.start();
+    return NULL;
+}
+
 int main()
 {
     std::cout << std::endl << std::endl << std::endl;
@@ -26,12 +40,20 @@ int main()
     config_array servers = config.getServers();
     config_array::iterator it = servers.begin();
 
-    for(;it != servers.end(); it++){
+    std::vector<pthread_t> threads;
+
+    for(; it != servers.end(); it++){
         std::string server_name = it->getMap()["server_name"];
         std::cout << "Server name: " << server_name << std::endl;
 
-        Server server(it->getMap());
-        server.start();
+
+        pthread_t thread;
+        pthread_create(&thread, NULL, startServer, &it->getMap());
+        threads.push_back(thread);
+    }
+
+    for(size_t i = 0; i < threads.size(); i++) {
+        pthread_join(threads[i], NULL);
     }
 
     return 0;
