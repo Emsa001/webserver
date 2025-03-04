@@ -6,7 +6,7 @@
 /*   By: escura <escura@student.42wolfsburg.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 14:45:07 by escura            #+#    #+#             */
-/*   Updated: 2025/02/28 16:40:18 by escura           ###   ########.fr       */
+/*   Updated: 2025/03/04 10:28:31 by escura           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
+#include "Utils.cpp"
 
-std::string intToString(int i);
 
 class ConfigValue;
 class ConfigSchema;
@@ -86,17 +86,16 @@ class ConfigValue {
         bool operator==(const bool &other) const;
 
         void print() const;
-        static ConfigValue detectType(const std::string &value);
+        static ConfigValue detectType(const std::string &value, bool forceString = false);
         
 };
 
 std::ostream& operator<<(std::ostream& os, const ConfigValue& cv);
 
-std::string typeToString(ValueType type);
+std::string type_to_string(ValueType type);
 
 class ConfigSchema {
     public:
-
         struct SchemaEntry {
             ValueType type;
             bool required;
@@ -110,7 +109,9 @@ class ConfigSchema {
         NestedSchemaMap nestedSchemas;
 
     public:
-        ConfigSchema();
+        ConfigSchema() {};
+        ~ConfigSchema() {};
+
         void addEntry(const std::string &key, ValueType type, bool required);
         void addNestedSchema(const std::string &key, const ConfigSchema &nestedSchema);
         bool validate(const std::string &key, ValueType type, int blockKind) const;
@@ -124,16 +125,15 @@ class ConfigSchema {
             SchemaMap::const_iterator it;
             for (it = schema.begin(); it != schema.end(); ++it) {
                 std::cout << indentStr << "Key: " << it->first
-                        << " (Type: " << typeToString(it->second.type)
+                        << " (Type: " << type_to_string(it->second.type)
                         << ", Required: " << (it->second.required ? "true" : "false")
                         << ")" << std::endl;
             }
 
-            // Iterate over nested schemas
             NestedSchemaMap::const_iterator nestedIt;
             for (nestedIt = nestedSchemas.begin(); nestedIt != nestedSchemas.end(); ++nestedIt) {
                 std::cout << indentStr << "Nested Schema: " << nestedIt->first << std::endl;
-                nestedIt->second.print(indent + 4); // Recursively print with increased indentation
+                nestedIt->second.print(indent + 4);
             }
         }
 };
@@ -165,10 +165,10 @@ class Config
         bool handleQuotes(char c, char &quote);
         int handleKeyValueSeparator(char c, char n, bool *isValue, size_t *i, std::string &key);
         void createNewBlock(const std::string &key);
-        bool validateAndSetKey(char quote, const std::string &key, const std::string &value);
+        bool validateAndSetKey(char quote, const std::string &key, const std::string &value, bool forceString);
         void setBlock();
 
-        bool setKey(std::string const &key, std::string const &value);
+        bool setKey(std::string const &key, std::string const &value, bool forceString);
         void updateParents();
 
         bool setKeyInBlock(const std::string &key, const ConfigValue &typedValue);
@@ -208,7 +208,7 @@ class Config
             std::string full_msg;
         public:
             ParseError(int line, const std::string& message) : ln(line), msg(message) {
-                full_msg = "Error at line: " + intToString(ln) + " - " + msg;
+                full_msg = "Error at line: " + int_to_string(ln) + " - " + msg;
             }
             virtual ~ParseError() throw() {}
             const char* what() const throw() {
@@ -217,5 +217,9 @@ class Config
     };
 };
 
+
+// functions
+
+ConfigSchema createSchema();
 
 #endif
