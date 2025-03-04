@@ -1,7 +1,7 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
-#include <iostream>
+#include "Webserv.hpp"
 
 // String operations
 void trim(std::string &s);

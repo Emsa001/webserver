@@ -24,8 +24,8 @@
 #include <fstream>
 
 // project headers
+#include "Utils.hpp"
 #include "Config.hpp"
 #include "Server.hpp"
-
 
 #endif
