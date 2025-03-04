@@ -1,126 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>File Upload and Management</title>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Example</title>
     <style>
         body {
-            background-color: #333;
-            color: white;
             font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-        }
-        .file-list {
-            width: 300px;
-            background-color: #444;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-        .file-list-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .file-list ul {
-            list-style-type: none;
+            margin: 0;
             padding: 0;
-        }
-        .file-list li {
             display: flex;
-            justify-content: space-between;
-            background-color: #555;
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 5px;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
         }
-        .button {
-            border: none;
+        .form-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin: 10px;
+        }
+        .form-container h2 {
+            margin-top: 0;
+        }
+        .form-container input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-container input[type="submit"] {
+            background-color: #4CAF50;
             color: white;
             padding: 10px 20px;
-            border-radius: 5px;
+            border: none;
+            border-radius: 4px;
             cursor: pointer;
         }
-        .button:hover {
-            background-color: #ff0000;
-        }
-        .file-list button {
-            background-color: #ff5555;
-            padding: 5px 10px;
+        .form-container input[type="submit"]:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <div>
-        <h1>File Upload and Management</h1>
-    </div>
-    <div class="file-list">
-        <div class="file-list-header">
-            <h2>Files</h2>
-            <button class="button upload-button" onclick="uploadFile()">Upload</button>
-        </div>
-        <ul id="fileList"></ul>
-        <button class="button refresh-button" onclick="location.reload()">Refresh File List</button>
+    <div class="form-container">
+        <h2>GET Form</h2>
+        <form action="/cgi-bin/cpp_get.cgi" method="get">
+            First Name: <input type="text" name="first_name"><br />
+            Last Name: <input type="text" name="last_name"><br />
+            <input type="submit" value="Submit">
+        </form>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', fetchFiles, uploadFile);
-
-        async function fetchFiles() {
-            try {
-                const response = await fetch('/files');
-                const files = await response.json();
-                const fileList = document.getElementById('fileList');
-                fileList.innerHTML = '';
-
-                files.forEach(file => {
-                    const li = document.createElement('li');
-                    li.textContent = "📁 " + file;
-                    const button = document.createElement('button');
-                    button.textContent = 'Delete';
-                    button.className = 'button';
-                    button.onclick = () => deleteFile(file);
-                    li.appendChild(button);
-                    fileList.appendChild(li);
-                });
-            } catch (error) {
-                console.error('Error fetching files:', error);
-            }
-        }
-
-        async function deleteFile(filename) {
-            try {
-                const response = await fetch(`${filename}`, { method: 'DELETE' });
-                if (response.ok) {
-                    fetchFiles();
-                } else {
-                    console.error('Error deleting file:', response.statusText);
-                }
-            } catch (error) {
-                console.error('Error deleting file:', error);
-            }
-        }
-
-        async function uploadFile() {
-            const formData = new FormData();
-            const fileInput = document.createElement('input');
-            fileInput.type = 'file';
-            fileInput.onchange = () => {
-                formData.append('file', fileInput.files[0]);
-                fetch('/upload', { method: 'POST', body: formData })
-                    .then(response => {
-                        if (response.ok) {
-                            fetchFiles();
-                        } else {
-                            console.error('Error uploading file:', response.statusText);
-                        }
-                    })
-                    .catch(error => console.error('Error uploading file:', error));
-            };
-            fileInput.click();
-        }
-    </script>
+    <div class="form-container">
+        <h2>POST Form</h2>
+        <form action="/cgi-bin/cpp_get.cgi" method="post">
+            First Name: <input type="text" name="first_name"><br />
+            Last Name: <input type="text" name="last_name"><br />
+            <input type="submit" value="Submit">
+        </form>
+    </div>
 </body>
 </html>
