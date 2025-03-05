@@ -38,6 +38,8 @@ int main()
 
 
     config_array servers = config.getServers();
+
+
     config_array::iterator it = servers.begin();
 
     std::vector<pthread_t> threads;

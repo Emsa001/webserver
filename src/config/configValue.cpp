@@ -1,4 +1,4 @@
-#include "Config.hpp"
+#include "Webserv.hpp"
 
 ConfigValue::ConfigValue() : type(INT), i(0) {}
 

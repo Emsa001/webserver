@@ -23,7 +23,7 @@ void trim(std::string &s) {
     rtrim(s);
 }
 
-std::string int_to_string(int i) {
+std::string intToString(int i) {
     std::stringstream ss;
     ss << i;
     return ss.str();

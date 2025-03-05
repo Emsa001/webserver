@@ -1,4 +1,4 @@
-#include "Config.hpp"
+#include "Webserv.hpp"
 
 void Config::createNewBlock(const std::string &key)
 {

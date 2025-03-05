@@ -1,10 +1,4 @@
 #include "Webserv.hpp"
-#include "Config.hpp"
-
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <cctype>
 
 bool Config::parse()
 {

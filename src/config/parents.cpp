@@ -1,4 +1,4 @@
-#include "Config.hpp"
+#include "Webserv.hpp"
 
 void Config::updateParents() {
     for (size_t i = 0; i < this->blocks.size(); i++) {

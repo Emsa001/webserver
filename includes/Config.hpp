@@ -6,32 +6,24 @@
 /*   By: escura <escura@student.42wolfsburg.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 14:45:07 by escura            #+#    #+#             */
-/*   Updated: 2025/03/04 15:29:55 by escura           ###   ########.fr       */
+/*   Updated: 2025/03/05 18:14:54 by escura           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include <iostream>
-#include <vector>
-#include <map>
-#include <stack>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <cstdlib>
-
+#include "Webserv.hpp"
 
 class ConfigValue;
 class ConfigSchema;
 class Config;
 
-typedef std::map<std::string, ConfigValue> config_map;
-typedef std::vector<ConfigValue> config_array;
-
 enum ValueType { INT, BOOL, STRING, ARRAY, MAP, ANY };
 enum blockKind { SERVER, LOCATION, ERRORS, UNKNOWN };
+
+typedef std::map<std::string, ConfigValue> config_map;
+typedef std::vector<ConfigValue> config_array;
 
 class ConfigValue {
 
@@ -207,7 +199,7 @@ class Config
             std::string full_msg;
         public:
             ParseError(int line, const std::string& message) : ln(line), msg(message) {
-                full_msg = "Error at line: " + int_to_string(ln) + " - " + msg;
+                full_msg = "Error at line: " + intToString(ln) + " - " + msg;
             }
             virtual ~ParseError() throw() {}
             const char* what() const throw() {

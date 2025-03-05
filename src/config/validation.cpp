@@ -1,4 +1,4 @@
-#include "Config.hpp"
+#include "Webserv.hpp"
 
 bool ConfigSchema::validate(const std::string &key, ValueType type, int blockKind) const {
     const SchemaMap *validSchema;
