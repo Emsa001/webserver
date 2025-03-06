@@ -6,9 +6,18 @@ server1:
     max_client_body_size: 10
 
     location:
+        path: "/"
+        root: "/"
+        index: "index.html"
+
+    location:
+        path: "/beqa"
+        root: "/1/"
+        index: "sad.html"
+
+    location:
         methods: "GET POST UPDATE PUT"
         path: "/static"
-
         root: "./static"
         index: "index.html"
         autoindex: false

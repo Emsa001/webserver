@@ -4,8 +4,14 @@
 // String operations
 void trim(std::string &s);
 std::string intToString(int i);
-std::vector<std::string> split(const std::string &s, char delim);
+StringVec split(const std::string &s, char delim);
+StringVec splitFirst(const std::string &s, char delim);
 
 // File operations
 std::string read_file(const std::string &path);
+
+// Containers
+void printVec(const StringVec &vec);
+void printMap(const StringMap &map);
+
 #endif

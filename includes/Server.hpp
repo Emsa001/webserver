@@ -3,6 +3,7 @@
 
 #include "Webserv.hpp"
 #include "HttpResponse.hpp"
+#include "HttpRequest.hpp"
 
 // Should be read from a configuration file.
 #define BUFFER_SIZE 1024
@@ -22,7 +23,8 @@ class Server {
         ~Server() {}
 
         int start();
-        std::string getBody(const std::string &path);
+        void buildResponse(int client_sock, char *buffer);
+        const config_map *getLocation(const std::string &path);
 };
 
 

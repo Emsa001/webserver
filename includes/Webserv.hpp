@@ -9,6 +9,7 @@
 #include <sys/select.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/stat.h> 
 
 // c headers
 #include <unistd.h>
@@ -37,7 +38,6 @@
 #include "Utils.hpp"
 #include "Config.hpp"
 #include "Server.hpp"
-
 
 // #include <iostream> // → Allows us to use std::cout and std::cerr for logging.
 // #include <fstream> // → Used to read files (to serve static files).

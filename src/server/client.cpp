@@ -1,5 +1,82 @@
 #include "Webserv.hpp"
 
+bool isDirectory(const std::string &path) {
+    struct stat sb;
+    if (stat(path.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)) {
+        return true;
+    }
+    return false;
+}
+
+std::string removeTrailingSlash(const std::string &path) {
+    if (path.empty()) return path;
+    std::string normalizedPath = path;
+    while (!normalizedPath.empty() && normalizedPath[normalizedPath.size() - 1] == '/') {
+        normalizedPath.erase(normalizedPath.size() - 1);
+    }
+    return normalizedPath;
+}
+
+const config_map* Server::getLocation(const std::string &path) {
+    const config_array& locations = this->config->at("locations").getArray();
+    StringVec pathSegments = split(removeTrailingSlash(path), '/');
+
+    const config_map* bestMatch = NULL;
+
+    for (config_array::const_iterator it = locations.begin(); it != locations.end(); ++it) {
+        const config_map* location = &it->getMap();
+
+        bool exact = location->count("exact") ? location->at("exact").getBool() : false;
+        StringVec locationSegments = split(removeTrailingSlash(location->at("path").getString()), '/');
+
+        if (exact) {
+            // Exact match: compare full segment vectors
+            if (locationSegments == pathSegments) return location;
+        } else {
+            // Non-exact match: check if locationSegments is a prefix of pathSegments
+            if (pathSegments.size() >= locationSegments.size() &&
+                std::equal(locationSegments.begin(), locationSegments.end(), pathSegments.begin())) {
+                if (!bestMatch || locationSegments.size() > split(bestMatch->at("path").getString(), '/').size()) {
+                    bestMatch = location; // Keep longest matching prefix
+                }
+            }
+        }
+    }
+
+    return bestMatch;
+}
+
+
+void Server::buildResponse(int client_sock, char *buffer) {
+
+    HttpRequest request(client_sock, buffer);
+    HttpResponse response(client_sock);
+
+    const config_map *location = this->getLocation(request.getURL()->getPath());
+
+    if(location == NULL) {
+        response.setBody("not_found.html");
+        response.respond();
+        return ;
+    }
+
+    const std::string &root = location->at("root");
+
+
+
+    std::string fullPath = std::string(ROOT_DIR) + root;
+    fullPath += request.getURL()->getPath().substr(location->at("path").getString().size());
+
+    if(isDirectory(fullPath)) {
+        fullPath += "/" + location->at("index").getString();
+    }
+
+    std::cout << "Full path: " << fullPath << std::endl;
+
+    response.setBody(fullPath);
+    response.respond();
+}
+
 void Server::handle_client(int client_sock) {
     char buffer[BUFFER_SIZE];
 
@@ -12,15 +89,8 @@ void Server::handle_client(int client_sock) {
             break;
         }
 
-        std::istringstream request(buffer);
-        std::string method, path;
-        request >> method >> path;
-
         // handle response
-
-        HttpResponse response(client_sock);
-        response.setBody(this->getBody(path));
-        response.respond(path);
+        this->buildResponse(client_sock, buffer);
 
         // handle connection close
         if (strstr(buffer, "Connection: close")) {

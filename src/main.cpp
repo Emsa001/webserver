@@ -10,7 +10,9 @@
 void* startServer(void* arg) {
     config_map* data = static_cast<config_map*>(arg);
     Server server(*data);
+    std::cout << std::endl;
     server.start();
+    std::cout << std::endl;
     return NULL;
 }
 
@@ -23,23 +25,7 @@ int main()
         return 1;
     }
 
-    // std::cout << std::endl << std::endl << std::endl;
-
-    // std::cout << config.getRoot() << std::endl;
-
-    // std::string log_format = config.getRoot()["log_format"];
-
-    // std::cout << std::endl << log_format << std::endl << std::endl;
-
-    // config_array servers = config.getServers();
-    // std::cout << servers[0] << std::endl;
-
-    // std::cout << std::endl << std::endl << std::endl;
-
-
     config_array servers = config.getServers();
-
-
     config_array::iterator it = servers.begin();
 
     std::vector<pthread_t> threads;
@@ -60,4 +46,3 @@ int main()
 
     return 0;
 }
-

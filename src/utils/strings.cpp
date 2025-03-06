@@ -39,12 +39,28 @@ std::string type_to_string(ValueType type) {
     }
 }
 
-std::vector<std::string> split(const std::string &s, char delim) {
-    std::vector<std::string> result;
+StringVec split(const std::string &s, char delim) {
+    StringVec result;
     std::stringstream ss(s);
     std::string item;
 
     while (std::getline(ss, item, delim)) {
+        result.push_back(item);
+    }
+
+    return result;
+}
+
+StringVec splitFirst(const std::string &s, char delim) {
+    StringVec result;
+    std::stringstream ss(s);
+    std::string item;
+
+    if (std::getline(ss, item, delim)) {
+        result.push_back(item);
+    }
+
+    if (std::getline(ss, item)) {
         result.push_back(item);
     }
 

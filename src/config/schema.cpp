@@ -26,6 +26,7 @@ ConfigSchema createSchema() {
     // Location Schema
     ConfigSchema locationSchema;
     locationSchema.addEntry("path", STRING, true);
+    locationSchema.addEntry("exact", BOOL, false);
     locationSchema.addEntry("methods", STRING, false); // TODO: implement array?
     locationSchema.addEntry("root", STRING, false);
     locationSchema.addEntry("index", STRING, false);
