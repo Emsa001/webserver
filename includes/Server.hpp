@@ -10,12 +10,8 @@
 #define MAX_CLIENTS 10
 #define ROOT_DIR "./www"
 
-extern bool SERVER_STOP;
-class Client;
-
 class Server {
     private:
-        Server() {};
         config_map *config;
 
         bool handle_client(int client_sock);

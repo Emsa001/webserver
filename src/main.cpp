@@ -18,33 +18,31 @@ void* startServer(void* arg) {
 
 int main()
 {
+    std::cout << std::endl << std::endl << std::endl;
+
     Config config("conf/myserver.yml");
-    if(!config.parse())
+    if(!config.parse()){
         return 1;
+    }
 
     config_array servers = config.getServers();
-    config_map first = servers[0];
+    config_array::iterator it = servers.begin();
 
-    Server server1(first);
-    server1.run();
+    std::vector<pthread_t> threads;
 
-    // config_array::iterator it = servers.begin();
-
-    // std::vector<pthread_t> threads;
-
-    // for(; it != servers.end(); it++){
-    //     std::string server_name = it->getMap()["server_name"];
-    //     std::cout << "Server name: " << server_name << std::endl;
+    for(; it != servers.end(); it++){
+        std::string server_name = it->getMap()["server_name"];
+        std::cout << "Server name: " << server_name << std::endl;
 
 
-    //     pthread_t thread;
-    //     pthread_create(&thread, NULL, startServer, &it->getMap());
-    //     threads.push_back(thread);
-    // }
+        pthread_t thread;
+        pthread_create(&thread, NULL, startServer, &it->getMap());
+        threads.push_back(thread);
+    }
 
-    // for(size_t i = 0; i < threads.size(); i++) {
-    //     pthread_join(threads[i], NULL);
-    // }
+    for(size_t i = 0; i < threads.size(); i++) {
+        pthread_join(threads[i], NULL);
+    }
 
     return 0;
 }

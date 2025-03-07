@@ -1,13 +1,11 @@
-log_format: "asdlkjaskdljasdlk"
+this_is_global: Hello
 
 server1:
     listen: 80
-    max_client_body_size: 1000
-
     location:
         path: "/public"
         root: "./public"
-        index: "start.html"
+        index: "index.html"
 
     location:
         path: "/profile"
