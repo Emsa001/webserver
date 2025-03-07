@@ -8,7 +8,9 @@ StringVec split(const std::string &s, char delim);
 StringVec splitFirst(const std::string &s, char delim);
 
 // File operations
-std::string read_file(const std::string &path);
+std::string readFile(const std::string &path);
+bool isDirectory(const std::string &path);
+bool fileExists(const std::string &path);
 
 // Containers
 void printVec(const StringVec &vec);

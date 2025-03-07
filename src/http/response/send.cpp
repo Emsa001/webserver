@@ -1,9 +1,21 @@
 #include "HttpResponse.hpp"
 
-void HttpResponse::respond(){
-
+void HttpResponse::respond() {
     this->setHeader("Connection", "keep-alive");
-    this->buildResponse();
+    this->setHeader("Keep-Alive", "timeout=10, max=100");
 
-    send(this->socket, this->response.c_str(), this->response.size(), 0);
+    this->build();
+
+    size_t total_sent = 0;
+    while (total_sent < this->response.size()) {
+        ssize_t sent = send(this->socket, this->response.c_str() + total_sent,
+                            this->response.size() - total_sent, 0);
+        if (sent <= 0) {
+            std::cerr << "Error sending response\n";
+            break;
+        }
+        total_sent += sent;
+    }
+
+    std::cout << "Response sent immediately for socket: " << this->socket << std::endl;
 }

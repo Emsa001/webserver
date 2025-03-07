@@ -11,6 +11,10 @@
 #include <sys/wait.h>
 #include <sys/stat.h> 
 
+// network headers (for TCP)
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+
 // c headers
 #include <unistd.h>
 #include <fcntl.h>
@@ -25,6 +29,7 @@
 #include <cstring>
 #include <algorithm>
 #include <fstream>
+#include <ctime>
 
 #include <vector>
 #include <map>

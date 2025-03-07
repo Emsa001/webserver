@@ -14,7 +14,7 @@ class Server {
     private:
         config_map *config;
 
-        void handle_client(int client_sock);
+        bool handle_client(int client_sock);
         void set_nonblocking(int sock);
         void listener(int server_sock);
         void send_response(int client_sock, const std::string &path);
@@ -23,8 +23,8 @@ class Server {
         ~Server() {}
 
         int start();
-        void buildResponse(int client_sock, char *buffer);
-        const config_map *getLocation(const std::string &path);
+        void handleResponse(int client_sock, char *buffer);
+        const config_map *findLocation(const std::string &path);
 };
 
 

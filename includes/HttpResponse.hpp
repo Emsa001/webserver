@@ -21,7 +21,7 @@ class HttpResponse {
 
         // Methods
         void respond();
-        void buildResponse();
+        void build();
         
         std::string getReasonPhrase(unsigned short code);
         static std::string getMimeType(const std::string &path);

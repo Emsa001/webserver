@@ -12,8 +12,8 @@ server1:
 
     location:
         path: "/beqa"
-        root: "/1/"
-        index: "sad.html"
+        root: "/"
+        index: "image.png"
 
     location:
         methods: "GET POST UPDATE PUT"

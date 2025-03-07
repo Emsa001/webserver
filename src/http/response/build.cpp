@@ -1,6 +1,6 @@
 #include "HttpResponse.hpp"
 
-void HttpResponse::buildResponse() {
+void HttpResponse::build() {
     this->setHeader("Server", PROJECT_NAME);
 
     this->response = this->statusLine + "\r\n";
