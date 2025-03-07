@@ -2,13 +2,22 @@ log_format: "123"
 
 server1:
     server_name: "127.0.0.1"
-    listen: 8081
+    listen: 8080
     max_client_body_size: 10
+
+    location:
+        path: "/"
+        root: "/"
+        index: "index.html"
+
+    location:
+        path: "/beqa"
+        root: "/"
+        index: "image.png"
 
     location:
         methods: "GET POST UPDATE PUT"
         path: "/static"
-
         root: "./static"
         index: "index.html"
         autoindex: false

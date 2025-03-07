@@ -1,17 +1,19 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
-#include <iostream>
-#include <vector>
-
 // String operations
 void trim(std::string &s);
-std::string int_to_string(int i);
-std::vector<std::string> split(const std::string &s, char delim);
+std::string intToString(int i);
+StringVec split(const std::string &s, char delim);
+StringVec splitFirst(const std::string &s, char delim);
 
 // File operations
-std::string read_file(const std::string &path);
+std::string readFile(const std::string &path);
+bool isDirectory(const std::string &path);
+bool fileExists(const std::string &path);
 
-void handle_signal();
+// Containers
+void printVec(const StringVec &vec);
+void printMap(const StringMap &map);
 
 #endif

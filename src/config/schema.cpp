@@ -1,4 +1,4 @@
-#include "Config.hpp"
+#include "Webserv.hpp"
 
 void ConfigSchema::addEntry(const std::string &key, ValueType type, bool required) {
     SchemaEntry entry;
@@ -26,6 +26,7 @@ ConfigSchema createSchema() {
     // Location Schema
     ConfigSchema locationSchema;
     locationSchema.addEntry("path", STRING, true);
+    locationSchema.addEntry("exact", BOOL, false);
     locationSchema.addEntry("methods", STRING, false); // TODO: implement array?
     locationSchema.addEntry("root", STRING, false);
     locationSchema.addEntry("index", STRING, false);

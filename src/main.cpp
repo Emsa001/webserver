@@ -7,25 +7,20 @@
 #include <map>
 
 
-// void* startServer(void* arg) {
-//     config_map* data = static_cast<config_map*>(arg);
-//     Server server(*data);
-//     server.start();
-//     return NULL;
-// }
+void* startServer(void* arg) {
+    config_map* data = static_cast<config_map*>(arg);
+    Server server(*data);
+    std::cout << std::endl;
+    server.start();
+    std::cout << std::endl;
+    return NULL;
+}
 
 int main()
 {
     Config config("conf/myserver.yml");
     if(!config.parse())
         return 1;
-
-    // std::cout << std::endl << std::endl << std::endl;
-    // std::cout << config.getRoot() << std::endl;
-    // std::cout << std::endl << std::endl << std::endl;
-    
-    handle_signal();
-
 
     config_array servers = config.getServers();
     config_map first = servers[0];
@@ -53,4 +48,3 @@ int main()
 
     return 0;
 }
-

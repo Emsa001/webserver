@@ -1,8 +1,11 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "Config.hpp"
-#include "Client.hpp"
+#include "Webserv.hpp"
+#include "HttpResponse.hpp"
+#include "HttpRequest.hpp"
+
+// Should be read from a configuration file.
 #define BUFFER_SIZE 1024
 #define MAX_CLIENTS 10
 #define ROOT_DIR "./www"
@@ -14,21 +17,19 @@ class Server {
     private:
         Server() {};
         config_map *config;
-        int fd;
-        
-        std::string get_response(Client &client);
-        void send_response(int client_fd, const std::string &response);
-    public:
-        Server(config_map &config);
-        ~Server();
-        void run();
+
+        bool handle_client(int client_sock);
         void set_nonblocking(int sock);
-        std::string GET(const std::string &request);
-        std::string POST(const std::string &request);
-        std::string DELETE(const std::string &request);
-        
+        void listener(int server_sock);
+        void send_response(int client_sock, const std::string &path);
+    public:
+        Server(config_map &config) : config(&config) {}
+        ~Server() {}
+
+        int start();
+        void handleResponse(int client_sock, char *buffer);
+        const config_map *findLocation(const std::string &path);
 };
 
-std::string get_mime_type(const std::string &path);
 
 #endif
