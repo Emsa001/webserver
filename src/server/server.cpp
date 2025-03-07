@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-Server::Server(int port)
+Server::Server(config_map &config) : config(&config) 
 {
     // AF_UNIX, AF_LOCAL - Local communication
     // AF_INET - IPv4 Internet protocols
@@ -10,7 +10,6 @@ Server::Server(int port)
     // SOCK_STREAM - Two-way reliable communication (TCP)
     // SOCK_DGRAM - Connectionless, unreliable (UDP)
 
-    this->port = port; 
     this->fd = socket(AF_INET, SOCK_STREAM, 0);
     if (this->fd == -1) 
         return;
@@ -25,7 +24,7 @@ Server::Server(int port)
 
     sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(this->port);
+    server_addr.sin_port = htons(this->config->at("listen").getInt());
     server_addr.sin_addr.s_addr = INADDR_ANY;
 
     if (bind(this->fd, (sockaddr *)&server_addr, sizeof(server_addr)) == -1) 
@@ -51,7 +50,9 @@ Server::~Server()
 
 void Server::run()
 {
-    std::cout << "Server is running on http://localhost:" << this->port << std::endl;
+    const int port = this->config->at("listen");
+
+    std::cout << "Server is running on http://localhost:" << port << std::endl;
 
     struct pollfd fds[200];
     bzero(fds, sizeof(fds));

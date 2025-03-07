@@ -6,6 +6,8 @@ bool Config::processLine()
     std::string key, value;
 
     char quote = '\0';
+    bool forceString = false;
+
     bool isValue = false;
 
     int previousIndent = this->indent;
@@ -23,8 +25,10 @@ bool Config::processLine()
         if (handleIndentation(c, quote, key, previousIndent))
             continue;
 
-        if (handleQuotes(c, quote))
+        if (handleQuotes(c, quote)){
+            forceString = true;
             continue;
+        }
 
         int separator = handleKeyValueSeparator(c, n, &isValue, &i, key);
         if (separator == 1) return true;
@@ -34,7 +38,7 @@ bool Config::processLine()
         else key += c;
     }
 
-    return validateAndSetKey(quote, key, value);
+    return validateAndSetKey(quote, key, value, forceString);
 }
 
 int Config::handleKeyValueSeparator(char c, char n, bool *isValue, size_t *i, std::string &key)
@@ -96,7 +100,7 @@ bool Config::handleQuotes(char c, char &quote)
     return false;
 }
 
-bool Config::validateAndSetKey(char quote, const std::string &key, const std::string &value)
+bool Config::validateAndSetKey(char quote, const std::string &key, const std::string &value, bool forceString)
 {
     if(key.empty() && value.empty())
         return true;
@@ -111,16 +115,16 @@ bool Config::validateAndSetKey(char quote, const std::string &key, const std::st
 
     int blockKind = this->block ? this->block->at("blockKind").getInt() : -1;
 
-    if(!this->schema.validate(key, ConfigValue::detectType(value).getType(), blockKind)){
+    if(!this->schema.validate(key, ConfigValue::detectType(value, forceString).getType(), blockKind)){
         throw ParseError(this->ln, "Key '" + key + "' is not allowed in this context or it's not of the correct type");
     }
 
-    return setKey(key, value);
+    return setKey(key, value, forceString);
 }
 
-bool Config::setKey(const std::string &key, const std::string &value) {
+bool Config::setKey(const std::string &key, const std::string &value, bool forceString) {
     this->setBlock();
-    ConfigValue typedValue = ConfigValue::detectType(value);
+    ConfigValue typedValue = ConfigValue::detectType(value, forceString);
     
     if (Config::isReserved(key)) {
         throw ParseError(this->ln, "'" + key + "' is a reserved keyword");

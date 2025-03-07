@@ -37,4 +37,5 @@ std::string Server::POST(const std::string &request)
         else
             return "HTTP/1.1 500 Internal Server Error\r\n\r\n";
     }
+    return "HTTP/1.1 404 Not Found\r\n\r\n";
 }

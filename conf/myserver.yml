@@ -1,30 +1,36 @@
-log_format: "combined"
+log_format: "123"
 
 server1:
-    listen: 80
-    max_client_body_size: 1000
+    server_name: "127.0.0.1"
+    listen: 8081
+    max_client_body_size: 10
 
     location:
+        methods: "GET POST UPDATE PUT"
         path: "/static"
+
         root: "./static"
         index: "index.html"
+        autoindex: false
 
     location:
+        methods: "GET"
         path: "/api"
-        root: "./api"
-        index: "api.html"
+        redirect: "https://google.com"
 
     location:
         path: "/uploads"
         root: "./uploads"
         index: "index.html"
+        upload_path: "./tmp/uploads"
 
     errors:
         500: "500.html"
         404: "404.html"
 
 server2:
-    listen: 81
+    server_name: "myserver2"
+    listen: 8082
     max_client_body_size: 1000
 
     location:

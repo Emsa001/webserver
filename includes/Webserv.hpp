@@ -26,22 +26,9 @@
 #include <vector>
 
 // project headers
-#include "Server.hpp"
-#include "Client.hpp"
 #include "Config.hpp"
+#include "Server.hpp"
+#include "Utils.hpp"
 
-#define PORT 8080
-extern bool SERVER_STOP;
-
-std::string cgi_execute(const std::string &scriptPath);
-void handle_signal();
-
-void trim(std::string &s);
-void removeNewLines(std::string &s);
-std::string getFirstWord(std::string const s);
-
-bool firstChar(std::string const &s, char c);
-std::string intToString(int i);
-ConfigSchema createSchema();
 
 #endif

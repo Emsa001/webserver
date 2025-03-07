@@ -13,4 +13,5 @@ std::string Server::get_response(Client &client)
     } else {
         return "HTTP/1.1 400 Bad Request\r\n\r\n";
     }
+    return "HTTP/1.1 500 Internal Server Error\r\n\r\n";
 }

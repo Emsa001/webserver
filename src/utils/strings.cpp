@@ -23,38 +23,30 @@ void trim(std::string &s) {
     rtrim(s);
 }
 
-std::string getFirstWord(std::string const s) {
-    if (s.empty())
-        return "";
-    std::string::size_type pos = s.find(' ');
-    if (pos != std::string::npos) {
-        return s.substr(0, pos);
-    }
-    return s;
-}
-
-bool firstChar(std::string const &s, char c) {
-    for (size_t i = 0; i < s.size(); i++) {
-        if (s[i] == c)
-            return true;
-        if (!std::isspace(s[i]))
-            return false;
-    }
-    return false;
-}
-
-std::string intToString(int i) {
+std::string int_to_string(int i) {
     std::stringstream ss;
     ss << i;
     return ss.str();
 }
 
 // Helper function to convert enum to string
-std::string typeToString(ValueType type) {
+std::string type_to_string(ValueType type) {
     switch (type) {
         case STRING: return "STRING";
         case INT: return "INT";
         case BOOL: return "BOOL";
         default: return "UNKNOWN";
     }
+}
+
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> result;
+    std::stringstream ss(s);
+    std::string item;
+
+    while (std::getline(ss, item, delim)) {
+        result.push_back(item);
+    }
+
+    return result;
 }

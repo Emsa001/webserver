@@ -156,8 +156,11 @@ std::ostream& operator<<(std::ostream& os, const ConfigValue& cv) {
 
 // Member functions
 
-ConfigValue ConfigValue::detectType(const std::string &value)
+ConfigValue ConfigValue::detectType(const std::string &value, bool forceString)
 {
+    if (forceString)
+        return ConfigValue(value);
+
     if (value == "true")
         return ConfigValue(true);
     if (value == "false")
