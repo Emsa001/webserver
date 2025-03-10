@@ -16,7 +16,7 @@ class Server {
     private:
         config_map *config;
 
-        bool handle_client(int client_sock);
+        bool handleClient(int client_sock);
         void set_nonblocking(int sock);
         void listener(int server_sock);
         void send_response(int client_sock, const std::string &path);

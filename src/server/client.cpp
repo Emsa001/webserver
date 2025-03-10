@@ -1,25 +1,5 @@
 #include "Webserv.hpp"
 
-const FileData Server::createFileData(const config_map *location, HttpRequest &request) const{
-    const std::string &root = location->at("root");
-    const std::string &locationPath = location->at("path").getString();
-    const std::string &requestPath = request.getURL()->getPath();
-
-    std::string fullPath = std::string(ROOT_DIR) + root;
-    fullPath += requestPath.substr(locationPath.size());
-
-    // std::cout << std::endl;
-    // std::cout << "Full path: " << fullPath << std::endl;
-    // std::cout << "Request Path: " << requestPath << std::endl;
-    // std::cout << "Location Path: " << locationPath << std::endl;
-    // std::cout << std::endl;
-
-    if(fullPath[fullPath.size() - 1] == '/' && locationPath == requestPath)
-        fullPath += "/" + location->at("index").getString();
-
-    return getFileData(fullPath);
-}
-
 void Server::handleResponse(int client_sock, char *buffer) {
     HttpRequest request(client_sock, buffer);
     HttpResponse response(client_sock);
@@ -30,17 +10,19 @@ void Server::handleResponse(int client_sock, char *buffer) {
         response.respondStatusPage(404);
         return ;
     }
+    
+    std::cout << "Request: " << request.getMethod() << " " << request.getURL()->getPath() << std::endl;
 
-    const FileData fileData = this->createFileData(location, request);
+    FileData fileData = this->createFileData(location, request);
 
-    if(this->isDirectoryListing(location, fileData))
+    if(Config::getSafe(*location, "autoindex", false))
         response.setListing(true);
 
     response.setBody(fileData);
     response.respond();
 }
 
-bool Server::handle_client(int client_sock) {
+bool Server::handleClient(int client_sock) {
     char buffer[BUFFER_SIZE];
 
     memset(buffer, 0, BUFFER_SIZE);

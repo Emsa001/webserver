@@ -15,6 +15,7 @@ server1:
         path: "/beqa"
         root: "/"
         index: "image.png"
+        autoindex: false
 
     location:
         methods: "GET POST UPDATE PUT"
