@@ -34,6 +34,8 @@ ConfigSchema createSchema() {
     locationSchema.addEntry("autoindex", BOOL, false);
     locationSchema.addEntry("upload_path", STRING, false);
 
+    locationSchema.addEntry("cgi", BOOL, false);
+
     rootSchema.addNestedSchema("location", locationSchema);
 
     // Error Schema

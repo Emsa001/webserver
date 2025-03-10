@@ -1,48 +1,14 @@
 #include "Webserv.hpp"
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <pthread.h>
-#include <map>
-
-
-void* startServer(void* arg) {
-    config_map* data = static_cast<config_map*>(arg);
-    Server server(*data);
-    std::cout << std::endl;
-    server.start();
-    std::cout << std::endl;
-    return NULL;
-}
-
 int main()
 {
-    std::cout << std::endl << std::endl << std::endl;
 
-    Config config("conf/myserver.yml");
-    if(!config.parse()){
-        return 1;
-    }
+    std::string scripts[] = {
+        "./www/cgi-bin/hello.py",
+        "./www/cgi-bin/hello.php",
+        "./www/cgi-bin/hello.sh"};
 
-    config_array servers = config.getServers();
-    config_array::iterator it = servers.begin();
-
-    std::vector<pthread_t> threads;
-
-    for(; it != servers.end(); it++){
-        std::string server_name = it->getMap()["server_name"];
-        std::cout << "Server name: " << server_name << std::endl;
-
-
-        pthread_t thread;
-        pthread_create(&thread, NULL, startServer, &it->getMap());
-        threads.push_back(thread);
-    }
-
-    for(size_t i = 0; i < threads.size(); i++) {
-        pthread_join(threads[i], NULL);
-    }
+        std::cout << Cgi::execute(scripts[0]) << std::endl;
 
     return 0;
 }
