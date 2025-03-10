@@ -2,9 +2,9 @@
 
 ConfigValue::ConfigValue() : type(INT), i(0) {}
 
-ConfigValue::ConfigValue(int i) : type(INT), i(i) {}
-
 ConfigValue::ConfigValue(bool b) : type(BOOL), b(b) {}
+
+ConfigValue::ConfigValue(int i) : type(INT), i(i) {}
 
 ConfigValue::ConfigValue(std::string const &str) : type(STRING)
 {
@@ -26,11 +26,11 @@ ConfigValue::ConfigValue(ConfigValue const &other)
     type = other.type;
     switch (type)
     {
-        case INT:
-            i = other.i;
-            break;
         case BOOL:
             b = other.b;
+            break;
+        case INT:
+            i = other.i;
             break;
         case STRING:
             s = other.s;

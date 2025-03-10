@@ -2,7 +2,6 @@
 
 int main()
 {
-
     std::string scripts[] = {
         "./www/cgi-bin/hello.py",
         "./www/cgi-bin/hello.php",

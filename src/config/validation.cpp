@@ -3,7 +3,7 @@
 bool ConfigSchema::validate(const std::string &key, ValueType type, int blockKind) const {
     const SchemaMap *validSchema;
 
-    if(Config::isReserved(key)) return true;
+    if(ConfigParser::isReserved(key)) return true;
 
     switch(blockKind){
         case SERVER:
@@ -74,28 +74,31 @@ bool ConfigSchema::validateMap(config_map &map) const {
 
     SchemaMap::const_iterator it;
     for (it = nestedSchemas.find(schemaName)->second.schema.begin(); it != nestedSchemas.find(schemaName)->second.schema.end(); ++it) {
-        if (it->second.required && map.find(it->first) == map.end()) {
+        if(map.find(it->first) != map.end()) continue;
+
+        if (it->second.required) {
             std::cerr << "Error: Required key '" << it->first << "' not found" << std::endl;
             return false;
-        }        
-    }
+        }
+    }      
 
     return true;
 }
 
-bool ConfigSchema::validateRequired(const Config *config) const {
+bool ConfigSchema::validateRequired(const ConfigParser *config) const {
 
     config_map root = config->getRoot();
     config_array servers = config->getServers();
 
     SchemaMap::const_iterator it;
     for (it = schema.begin(); it != schema.end(); ++it) {
-        if (it->second.required && root.find(it->first) == root.end()) {
+        if(root.find(it->first) != root.end()) continue;
+
+        if (it->second.required) {
             std::cerr << "Error: Required key '" << it->first << "' not found" << std::endl;
             return false;
         }
     }
-
 
     for(size_t i = 0; i < servers.size(); i++){
         config_map server = servers[i].getMap();

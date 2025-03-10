@@ -1,6 +1,6 @@
 #include "Webserv.hpp"
 
-void Config::init(){
+void ConfigParser::init(){
     this->block = NULL;
     this->blockId = 0;
     this->indent = 0;
@@ -11,21 +11,21 @@ void Config::init(){
     this->ln = 0;
 }
 
-Config::Config()
+ConfigParser::ConfigParser()
 {
     this->init();
     std::cout << "Config is created" << std::endl;
     this->file.open("conf/default.yml");
 }
 
-Config::Config(std::string const &filename)
+ConfigParser::ConfigParser(std::string const &filename)
 {
     this->init();
     std::cout << "Config is created" << std::endl;
     this->file.open(filename.c_str());
 }
 
-Config::~Config()
+ConfigParser::~ConfigParser()
 {
     std::cout << "Config destructor called, resources freed successfully." << std::endl;
 }

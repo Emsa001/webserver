@@ -6,7 +6,6 @@
 #include <map>
 #include <vector>
 
-
 // maps
 
 typedef std::map<std::string, std::string> StringMap;
@@ -19,5 +18,6 @@ typedef std::vector<std::string> StringVec;
 
 typedef std::pair<std::string, std::string> StringPair;
 typedef std::pair<std::string, unsigned short> StringUIntPair;
+
 
 #endif 

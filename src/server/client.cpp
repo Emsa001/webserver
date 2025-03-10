@@ -1,43 +1,24 @@
 #include "Webserv.hpp"
 
-std::string removeTrailingSlash(const std::string &path) {
-    if (path.empty()) return path;
-    std::string normalizedPath = path;
-    while (!normalizedPath.empty() && normalizedPath[normalizedPath.size() - 1] == '/') {
-        normalizedPath.erase(normalizedPath.size() - 1);
-    }
-    return normalizedPath;
+const FileData Server::createFileData(const config_map *location, HttpRequest &request) const{
+    const std::string &root = location->at("root");
+    const std::string &locationPath = location->at("path").getString();
+    const std::string &requestPath = request.getURL()->getPath();
+
+    std::string fullPath = std::string(ROOT_DIR) + root;
+    fullPath += requestPath.substr(locationPath.size());
+
+    // std::cout << std::endl;
+    // std::cout << "Full path: " << fullPath << std::endl;
+    // std::cout << "Request Path: " << requestPath << std::endl;
+    // std::cout << "Location Path: " << locationPath << std::endl;
+    // std::cout << std::endl;
+
+    if(fullPath[fullPath.size() - 1] == '/' && locationPath == requestPath)
+        fullPath += "/" + location->at("index").getString();
+
+    return getFileData(fullPath);
 }
-
-const config_map* Server::findLocation(const std::string &path) {
-    const config_array& locations = this->config->at("locations").getArray();
-    StringVec pathSegments = split(removeTrailingSlash(path), '/');
-
-    const config_map* bestMatch = NULL;
-
-    for (config_array::const_iterator it = locations.begin(); it != locations.end(); ++it) {
-        const config_map* location = &it->getMap();
-
-        bool exact = location->count("exact") ? location->at("exact").getBool() : false;
-        StringVec locationSegments = split(removeTrailingSlash(location->at("path").getString()), '/');
-
-        if (!exact) {
-            // Non-exact match: check if locationSegments is a prefix of pathSegments
-            if (pathSegments.size() >= locationSegments.size() &&
-                std::equal(locationSegments.begin(), locationSegments.end(), pathSegments.begin())) {
-                if (!bestMatch || locationSegments.size() > split(bestMatch->at("path").getString(), '/').size()) {
-                    bestMatch = location; // Keep longest matching prefix
-                }
-            }
-
-        } else if (locationSegments == pathSegments){
-            return location;
-        }
-    }
-
-    return bestMatch;
-}
-
 
 void Server::handleResponse(int client_sock, char *buffer) {
     HttpRequest request(client_sock, buffer);
@@ -46,20 +27,16 @@ void Server::handleResponse(int client_sock, char *buffer) {
     const config_map *location = this->findLocation(request.getURL()->getPath());
 
     if(location == NULL) {
-        response.setBody("not_found.html");
-        response.respond();
+        response.respondStatusPage(404);
         return ;
     }
 
-    const std::string &root = location->at("root");
+    const FileData fileData = this->createFileData(location, request);
 
-    std::string fullPath = std::string(ROOT_DIR) + root;
-    fullPath += request.getURL()->getPath().substr(location->at("path").getString().size());
+    if(this->isDirectoryListing(location, fileData))
+        response.setListing(true);
 
-    if(isDirectory(fullPath)) 
-        fullPath += "/" + location->at("index").getString();
-
-    response.setBody(fullPath);
+    response.setBody(fileData);
     response.respond();
 }
 

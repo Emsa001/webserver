@@ -9,6 +9,7 @@ server1:
         path: "/"
         root: "/"
         index: "index.html"
+        autoindex: true
 
     location:
         path: "/beqa"
@@ -18,7 +19,7 @@ server1:
     location:
         methods: "GET POST UPDATE PUT"
         path: "/static"
-        root: "./static"
+        root: "/static"
         index: "index.html"
         autoindex: false
 
@@ -32,6 +33,7 @@ server1:
         root: "./uploads"
         index: "index.html"
         upload_path: "./tmp/uploads"
+
 
     errors:
         500: "500.html"

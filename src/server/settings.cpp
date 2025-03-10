@@ -17,9 +17,10 @@ void Server::set_nonblocking(int sock) {
     int optval = 1;
     setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval));
 
-    int keep_idle = 5;  // Start checking after 5 seconds of inactivity
-    int keep_interval = 2; // Send keepalive probes every 2 seconds
+    int keep_idle = 1;  // Start checking after 1 second of inactivity
+    int keep_interval = 1; // Send keep-alive probes every 1 second
     int keep_count = 3;  // Disconnect after 3 failed probes
+
 
     setsockopt(sock, IPPROTO_TCP, TCP_KEEPIDLE, &keep_idle, sizeof(keep_idle));
     setsockopt(sock, IPPROTO_TCP, TCP_KEEPINTVL, &keep_interval, sizeof(keep_interval));

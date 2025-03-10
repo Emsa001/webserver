@@ -1,6 +1,6 @@
 #include "Webserv.hpp"
 
-bool Config::parse()
+bool ConfigParser::parse()
 {
     if (!this->file.is_open())
     {
@@ -38,11 +38,11 @@ bool Config::parse()
     return true;
 }
 
-bool Config::isReserved(const std::string &key){
+bool ConfigParser::isReserved(const std::string &key){
     return (key == "blockId" || key == "blockName" || key == "blockType" || key == "blockLevel" || key == "blockKind");
 }
 
-config_map Config::cleanTemp(config_map *temp) {
+config_map ConfigParser::cleanTemp(config_map *temp) {
     config_map::iterator it = temp->begin();
     
     while(it != temp->end()){
@@ -60,7 +60,7 @@ config_map Config::cleanTemp(config_map *temp) {
             it->second = ConfigValue(temp);
         }
 
-        if (Config::isReserved(it->first)) temp->erase(it++);
+        if (ConfigParser::isReserved(it->first)) temp->erase(it++);
         else it++;
     }
 

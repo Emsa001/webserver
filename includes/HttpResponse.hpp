@@ -8,6 +8,7 @@ class HttpResponse {
         std::string statusLine;  // Stores "HTTP/1.1 200 OK"
         StringMap headers;      // Stores key-value pairs like "Content-Type: text/html"
         std::string body;        // Stores the response body (usually html)
+        bool listing;           // If true, the body will be a directory listing
 
         std::string response;    // Stores the entire response to be sent to the client
 
@@ -15,7 +16,12 @@ class HttpResponse {
         int socket;
     
     public:
-        HttpResponse(int socket) : socket(socket) {};
+        HttpResponse(int socket) : socket(socket) {
+            statusLine = "HTTP/1.1 200 OK";
+            listing = false;
+            statusCode = 200;
+            body = "";
+        };
         ~HttpResponse() {};
 
 
@@ -26,19 +32,17 @@ class HttpResponse {
         std::string getReasonPhrase(unsigned short code);
         static std::string getMimeType(const std::string &path);
         
-        // Setters
+        void directoryListing(const FileData &fileData);
+        void respondStatusPage(unsigned short code);
 
-        void setHeader(const std::string &key, const std::string &value) {
-            headers[key] = value;
-        }
-
-        void setBody(const std::string &body);
-
+        void setBody(const FileData &fileData);
         void setStatusCode(unsigned short code) {
             this->statusCode = code;
             statusLine = "HTTP/1.1 " + intToString(code) + " " + this->getReasonPhrase(code);
         }
 
+        void setHeader(const std::string &key, const std::string &value) { headers[key] = value; }
+        void setListing(bool listing) { this->listing = listing; }
 };
 
 #endif

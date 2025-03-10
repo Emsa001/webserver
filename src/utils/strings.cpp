@@ -66,3 +66,12 @@ StringVec splitFirst(const std::string &s, char delim) {
 
     return result;
 }
+
+std::string trimChar(const std::string &str, char c) {
+    if (str.empty()) return str;
+    std::string trimmed = str;
+    while (!trimmed.empty() && trimmed[trimmed.size() - 1] == c) {
+        trimmed.erase(trimmed.size() - 1);
+    }
+    return trimmed;
+}

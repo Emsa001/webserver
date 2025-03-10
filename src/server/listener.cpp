@@ -9,8 +9,9 @@ void Server::listener(int server_sock) {
 
     fds.push_back((pollfd){server_sock, POLLIN, 0});
 
+    int timeout_ms = 5000;
+
     while (true) {
-        int timeout_ms = 1000; // Reduce timeout to 1s for better responsiveness
         int ret = poll(&fds[0], fds.size(), timeout_ms);
 
         if (ret < 0) {
@@ -27,19 +28,20 @@ void Server::listener(int server_sock) {
                     int client_sock = accept(server_sock, NULL, NULL);
                     if (client_sock >= 0) {
                         this->set_nonblocking(client_sock);
-                        fds.push_back((pollfd){client_sock, POLLIN | POLLOUT, 0});
+                        fds.push_back((pollfd){client_sock, POLLIN, 0}); // Only POLLIN
                         client_timestamps[client_sock] = now;
                         std::cout << "New client connected: " << client_sock << std::endl;
                     }
                 } else {
-                    // Handle client request immediately
                     if (!handle_client(fds[i].fd)) {
-                        close(fds[i].fd);
+                        int closed_fd = fds[i].fd;
+                        shutdown(closed_fd, SHUT_WR);
+                        close(closed_fd);
                         fds.erase(fds.begin() + i);
-                        client_timestamps.erase(fds[i].fd);
+                        client_timestamps.erase(closed_fd);
                         i--;
                     } else {
-                        client_timestamps[fds[i].fd] = now; // Update activity time
+                        client_timestamps[fds[i].fd] = now;
                     }
                 }
             }
@@ -47,14 +49,15 @@ void Server::listener(int server_sock) {
 
         // Cleanup idle connections
         for (size_t i = 1; i < fds.size(); i++) {
-            if (now - client_timestamps[fds[i].fd] > 10) { // 10 seconds timeout
-                std::cout << "Closing idle connection: " << fds[i].fd << std::endl;
-                close(fds[i].fd);
+            int fd = fds[i].fd;
+            if (now - client_timestamps[fd] > 10) { // 10 seconds timeout
+                std::cout << "Closing idle connection: " << fd << std::endl;
+                shutdown(fd, SHUT_WR);
+                close(fd);
                 fds.erase(fds.begin() + i);
-                client_timestamps.erase(fds[i].fd);
+                client_timestamps.erase(fd);
                 i--;
             }
         }
     }
 }
-

@@ -84,3 +84,26 @@ std::string HttpResponse::getReasonPhrase(unsigned short code) {
         default: return "Unknown Status";
     }
 }
+
+void HttpResponse::respondStatusPage(unsigned short code) {
+    std::string errorMessage = this->getReasonPhrase(code);
+
+    this->body = "<html>"
+                 "<head>"
+                 "<title>" + intToString(code) + " " + errorMessage + "</title>"
+                 "</head>"
+                 "<body>"
+                 "<h1>" + intToString(code) + " " + errorMessage + "</h1>"
+                 "<p>" + errorMessage + "</p>"
+                 "<hr>"
+                 "<address>" + PROJECT_NAME + "</address>"
+                 "</body>"
+                 "</html>";
+
+    this->setStatusCode(code);
+    this->setHeader("Content-Type", "text/html");
+    this->setHeader("Content-Length", intToString(this->body.size()));
+
+    this->respond();
+}
+
