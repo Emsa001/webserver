@@ -44,7 +44,6 @@ FileData getFileData(const std::string &path) {
     if (!fileData.exists) {
         fileData.isDirectory = false;
         fileData.lastModified = "";
-        fileData.content = "";
         return fileData;
     }
 
@@ -52,11 +51,6 @@ FileData getFileData(const std::string &path) {
 
     if (!fileData.isDirectory) {
         fileData.lastModified = getLastModifiedTime(path);
-        fileData.content = readFileContent(path);
-        fileData.size = fileData.content.size();
-    } else {
-        fileData.lastModified = "";
-        fileData.content = "";
     }
 
     return fileData;

@@ -23,7 +23,7 @@ void HttpResponse::directoryListing(const FileData &fileData) {
     this->setHeader("Content-Length", intToString(this->body.size()));
 }
 
-void HttpResponse::setBody(const FileData &fileData) {
+void HttpResponse::setBody(FileData &fileData) {
 
     // std::cout << "Setting body" << std::endl;
     // std::cout << "File exists: " << fileData->exists << std::endl;
@@ -45,7 +45,7 @@ void HttpResponse::setBody(const FileData &fileData) {
         return ;
     }
 
-    this->body = fileData.content;
+    this->body = fileData.getContent();
     this->setStatusCode(200);
     // this->setHeader("Last-Modified", fileData.lastModified); << I'm not handling caching, no way
     this->setHeader("Content-Type", HttpResponse::getMimeType(fileData.path));

@@ -1,5 +1,20 @@
 #include "Server.hpp"
 
+/*
+
+    This needs to be restructured.
+
+    - Handle multiple clients without any blocking
+    - Handle persistent connections
+    - Handle idle connections
+    - Handle timeouts
+    - Handle disconnections
+
+
+    (for tobi)
+
+*/
+
 void Server::listener(int server_sock) {
     listen(server_sock, MAX_CLIENTS);
     this->set_nonblocking(server_sock);
@@ -33,7 +48,7 @@ void Server::listener(int server_sock) {
                         std::cout << "New client connected: " << client_sock << std::endl;
                     }
                 } else {
-                    if (!handle_client(fds[i].fd)) {
+                    if (!handleClient(fds[i].fd)) {
                         int closed_fd = fds[i].fd;
                         shutdown(closed_fd, SHUT_WR);
                         close(closed_fd);

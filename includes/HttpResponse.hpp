@@ -35,7 +35,7 @@ class HttpResponse {
         void directoryListing(const FileData &fileData);
         void respondStatusPage(unsigned short code);
 
-        void setBody(const FileData &fileData);
+        void setBody(FileData &fileData);
         void setStatusCode(unsigned short code) {
             this->statusCode = code;
             statusLine = "HTTP/1.1 " + intToString(code) + " " + this->getReasonPhrase(code);

@@ -55,9 +55,9 @@ class HttpRequest {
         std::string uri;
         std::string version;  
 
-        HttpURL *url;     
+        HttpURL *url;
 
-        int socket;
+        int socket; // Do we need this here?
     public:
         HttpRequest(int socket, char *buffer);
         ~HttpRequest() {

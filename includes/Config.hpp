@@ -6,7 +6,7 @@
 /*   By: escura <escura@student.42wolfsburg.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 14:45:07 by escura            #+#    #+#             */
-/*   Updated: 2025/03/10 13:53:42 by escura           ###   ########.fr       */
+/*   Updated: 2025/03/10 18:50:58 by escura           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -234,6 +234,12 @@ class Config{
 
         const config_map &getRoot() const { return this->root; }
         const config_array &getServers() const { return this->servers; }
+
+        // Will return the value of the key if it exists, otherwise it will return the default value
+        static ConfigValue getSafe(const config_map &map, const std::string &key, const ConfigValue &defaultValue = ConfigValue()){
+            config_map::const_iterator it = map.find(key);
+            return (it != map.end()) ? it->second : defaultValue;
+        }
 };
 
 // functions
