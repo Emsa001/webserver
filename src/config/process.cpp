@@ -1,6 +1,6 @@
 #include "Webserv.hpp"
 
-bool Config::processLine()
+bool ConfigParser::processLine()
 {
     std::string &line = this->line;
     std::string key, value;
@@ -41,7 +41,7 @@ bool Config::processLine()
     return validateAndSetKey(quote, key, value, forceString);
 }
 
-int Config::handleKeyValueSeparator(char c, char n, bool *isValue, size_t *i, std::string &key)
+int ConfigParser::handleKeyValueSeparator(char c, char n, bool *isValue, size_t *i, std::string &key)
 {
     if ((c == ':') && !(*isValue))
     {
@@ -59,14 +59,14 @@ int Config::handleKeyValueSeparator(char c, char n, bool *isValue, size_t *i, st
     return -1;
 }
 
-bool Config::handleComment(char p, char c, char quote, size_t i)
+bool ConfigParser::handleComment(char p, char c, char quote, size_t i)
 {
     if (c == '#' && (std::isspace(p) || i == 0) && quote == '\0')
         return true;
     return false;
 }
 
-bool Config::handleIndentation(char c, char quote, const std::string &key, int previousIndent)
+bool ConfigParser::handleIndentation(char c, char quote, const std::string &key, int previousIndent)
 {
     if (std::isspace(c) && quote == '\0' && key.empty())
     {
@@ -87,7 +87,7 @@ bool Config::handleIndentation(char c, char quote, const std::string &key, int p
     return false;
 }
 
-bool Config::handleQuotes(char c, char &quote)
+bool ConfigParser::handleQuotes(char c, char &quote)
 {
     if (c == '"' || c == '\'')
     {
@@ -100,7 +100,7 @@ bool Config::handleQuotes(char c, char &quote)
     return false;
 }
 
-bool Config::validateAndSetKey(char quote, const std::string &key, const std::string &value, bool forceString)
+bool ConfigParser::validateAndSetKey(char quote, const std::string &key, const std::string &value, bool forceString)
 {
     if(key.empty() && value.empty())
         return true;
@@ -122,11 +122,11 @@ bool Config::validateAndSetKey(char quote, const std::string &key, const std::st
     return setKey(key, value, forceString);
 }
 
-bool Config::setKey(const std::string &key, const std::string &value, bool forceString) {
+bool ConfigParser::setKey(const std::string &key, const std::string &value, bool forceString) {
     this->setBlock();
     ConfigValue typedValue = ConfigValue::detectType(value, forceString);
     
-    if (Config::isReserved(key)) {
+    if (ConfigParser::isReserved(key)) {
         throw ParseError(this->ln, "'" + key + "' is a reserved keyword");
     }
     

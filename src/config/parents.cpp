@@ -1,6 +1,6 @@
 #include "Webserv.hpp"
 
-void Config::updateParents() {
+void ConfigParser::updateParents() {
     for (size_t i = 0; i < this->blocks.size(); i++) {
         config_map &block = this->blocks[i]; 
 
@@ -13,7 +13,7 @@ void Config::updateParents() {
     }
 }
 
-config_map* Config::findParentBlock(int blockId, int level) {
+config_map* ConfigParser::findParentBlock(int blockId, int level) {
     config_map* parent = &this->root;
 
     if (blockId <= 0 || blockId > static_cast<int>(this->blocks.size())) {
@@ -43,7 +43,7 @@ config_map* Config::findParentBlock(int blockId, int level) {
 }
 
 
-void Config::updateParentBlock(config_map* parent, const std::string &blockName, int blockId) {
+void ConfigParser::updateParentBlock(config_map* parent, const std::string &blockName, int blockId) {
     if (blockName == "location") {
         if (!parent->count("locations"))
             (*parent)["locations"] = ConfigValue(config_array());

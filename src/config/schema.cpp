@@ -4,8 +4,10 @@ void ConfigSchema::addEntry(const std::string &key, ValueType type, bool require
     SchemaEntry entry;
     entry.type = type;
     entry.required = required;
+
     schema[key] = entry;
 }
+
 void ConfigSchema::addNestedSchema(const std::string &key, const ConfigSchema &nestedSchema) {
     nestedSchemas[key] = nestedSchema;
 }
@@ -27,7 +29,7 @@ ConfigSchema createSchema() {
     ConfigSchema locationSchema;
     locationSchema.addEntry("path", STRING, true);
     locationSchema.addEntry("exact", BOOL, false);
-    locationSchema.addEntry("methods", STRING, false); // TODO: implement array?
+    locationSchema.addEntry("methods", STRING, false); // TODO: implement array? (I'm not doing it, too lazy)
     locationSchema.addEntry("root", STRING, false);
     locationSchema.addEntry("index", STRING, false);
     locationSchema.addEntry("redirect", STRING, false);

@@ -20,10 +20,8 @@ int main()
 {
     std::cout << std::endl << std::endl << std::endl;
 
-    Config config("conf/myserver.yml");
-    if(!config.parse()){
-        return 1;
-    }
+    Config config = Config::instance();
+    config.parse("conf/myserver.yml");
 
     config_array servers = config.getServers();
     config_array::iterator it = servers.begin();
@@ -33,7 +31,6 @@ int main()
     for(; it != servers.end(); it++){
         std::string server_name = it->getMap()["server_name"];
         std::cout << "Server name: " << server_name << std::endl;
-
 
         pthread_t thread;
         pthread_create(&thread, NULL, startServer, &it->getMap());

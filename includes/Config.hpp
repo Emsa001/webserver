@@ -6,7 +6,7 @@
 /*   By: escura <escura@student.42wolfsburg.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 14:45:07 by escura            #+#    #+#             */
-/*   Updated: 2025/03/05 18:14:54 by escura           ###   ########.fr       */
+/*   Updated: 2025/03/10 13:53:42 by escura           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 
 class ConfigValue;
 class ConfigSchema;
-class Config;
+class ConfigParser;
 
 enum ValueType { INT, BOOL, STRING, ARRAY, MAP, ANY };
 enum blockKind { SERVER, LOCATION, ERRORS, UNKNOWN };
@@ -85,6 +85,7 @@ std::ostream& operator<<(std::ostream& os, const ConfigValue& cv);
 
 std::string type_to_string(ValueType type);
 
+
 class ConfigSchema {
     public:
         struct SchemaEntry {
@@ -106,7 +107,7 @@ class ConfigSchema {
         void addEntry(const std::string &key, ValueType type, bool required);
         void addNestedSchema(const std::string &key, const ConfigSchema &nestedSchema);
         bool validate(const std::string &key, ValueType type, int blockKind) const;
-        bool validateRequired(const Config *config) const;
+        bool validateRequired(const ConfigParser *config) const;
         bool validateMap(config_map &map) const;
 
         void print(int indent = 0) const {
@@ -129,7 +130,7 @@ class ConfigSchema {
         }
 };
 
-class Config
+class ConfigParser
 {
     private:        
         config_map root;
@@ -169,9 +170,9 @@ class Config
         config_map cleanTemp(config_map *temp);
                 
     public:
-        Config();
-        Config(std::string const &filename);
-        ~Config();
+        ConfigParser();
+        ConfigParser(std::string const &filename);
+        ~ConfigParser();
 
         bool parse();
         static bool isReserved(std::string const &key);
@@ -208,6 +209,32 @@ class Config
     };
 };
 
+class Config{
+    private:
+        Config() { };
+        config_map root;
+        config_array servers;
+
+    public:
+        ~Config() {};
+
+        static Config& instance(){
+            static Config instance;
+            return instance;
+        }
+
+        void parse(std::string const &filename){
+            ConfigParser parser(filename);
+            if (!parser.parse()) {
+                throw std::runtime_error("Error parsing config file");
+            }
+            this->root = parser.getRoot();
+            this->servers = parser.getServers();
+        }
+
+        const config_map &getRoot() const { return this->root; }
+        const config_array &getServers() const { return this->servers; }
+};
 
 // functions
 

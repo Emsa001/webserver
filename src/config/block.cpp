@@ -1,6 +1,6 @@
 #include "Webserv.hpp"
 
-void Config::createNewBlock(const std::string &key)
+void ConfigParser::createNewBlock(const std::string &key)
 {
     config_map newBlock = config_map();
     int level = this->indent / 4;
@@ -22,7 +22,7 @@ void Config::createNewBlock(const std::string &key)
     this->block = &(blocks.back());
 }
 
-void Config::setBlock()
+void ConfigParser::setBlock()
 {
     if (this->block == NULL)
         return;
@@ -46,7 +46,7 @@ void Config::setBlock()
     return;
 }
 
-bool Config::setKeyInBlock(const std::string &key, const ConfigValue &typedValue) {
+bool ConfigParser::setKeyInBlock(const std::string &key, const ConfigValue &typedValue) {
 
     std::string blockName = this->block->at("blockName");
     int blockId = this->block->at("blockId");

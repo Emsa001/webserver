@@ -10,6 +10,8 @@
 #define MAX_CLIENTS 10
 #define ROOT_DIR "./www"
 
+class HttpRequest;
+
 class Server {
     private:
         config_map *config;
@@ -24,6 +26,11 @@ class Server {
 
         int start();
         void handleResponse(int client_sock, char *buffer);
+
+        bool isDirectoryListing(const config_map *location, const FileData &fileData);
+
+        const FileData createFileData(const config_map *location, HttpRequest &request) const;
+
         const config_map *findLocation(const std::string &path);
 };
 

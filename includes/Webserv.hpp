@@ -36,6 +36,9 @@
 #include <stack>
 #include <string>
 #include <cstdlib>
+#include <list>
+#include <dirent.h>
+
 
 #include "Aliases.hpp"
 
