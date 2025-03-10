@@ -12,7 +12,7 @@ server1:
         autoindex: true
 
     location:
-        path: "/beqa"
+        path: "/beqa/"
         root: "/"
         index: "image.png"
         autoindex: false

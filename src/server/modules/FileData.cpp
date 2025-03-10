@@ -2,11 +2,10 @@
 
 const FileData Server::createFileData(const config_map *location, HttpRequest &request) const{
     const std::string &root = location->at("root");
-    const std::string &locationPath = location->at("path").getString();
+    const std::string &locationPath = trimChar(location->at("path").getString(), '/');
     std::string requestPath = trimChar(request.getURL()->getPath(), '/');
 
     if(requestPath.empty()) requestPath = "/";
-
 
     std::string fullPath = std::string(ROOT_DIR) + root;
     fullPath += requestPath.substr(locationPath.size());
@@ -18,7 +17,7 @@ const FileData Server::createFileData(const config_map *location, HttpRequest &r
     std::cout << std::endl;
 
     if(fullPath[fullPath.size() - 1] == '/' && locationPath == requestPath)
-        fullPath += "/" + location->at("index").getString();
+        fullPath += "/" + Config::getSafe(*location, "index", "index.html").getString();
 
     return getFileData(fullPath);
 }
