@@ -50,4 +50,5 @@ void HttpResponse::setBody(FileData &fileData) {
     // this->setHeader("Last-Modified", fileData.lastModified); << I'm not handling caching, no way
     this->setHeader("Content-Type", HttpResponse::getMimeType(fileData.path));
     this->setHeader("Content-Length", intToString(this->body.size()));
+    this->build();
 }

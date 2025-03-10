@@ -9,7 +9,7 @@ server1:
         path: "/"
         root: "/"
         index: "index.html"
-        autoindex: true
+        autoindex: false
 
     location:
         path: "/beqa/"
