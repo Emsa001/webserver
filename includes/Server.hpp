@@ -2,23 +2,37 @@
 #define SERVER_HPP
 
 #include "Webserv.hpp"
+#include "HttpResponse.hpp"
+#include "HttpRequest.hpp"
 
-class Client;
+// Should be read from a configuration file.
+#define BUFFER_SIZE 1024
+#define MAX_CLIENTS 10
+#define ROOT_DIR "./www"
 
-class Server
-{
+class HttpRequest;
+
+class Server {
     private:
-        int fd;
-        int port;
-        
-    public:
-        Server(int port);
-        ~Server();
+        config_map *config;
 
-        void run();
-        void simple_run();
-        std::string get_response(Client &client);
-        void send_response(int client_fd, const std::string &response);
+        bool handle_client(int client_sock);
+        void set_nonblocking(int sock);
+        void listener(int server_sock);
+        void send_response(int client_sock, const std::string &path);
+    public:
+        Server(config_map &config) : config(&config) {}
+        ~Server() {}
+
+        int start();
+        void handleResponse(int client_sock, char *buffer);
+
+        bool isDirectoryListing(const config_map *location, const FileData &fileData);
+
+        const FileData createFileData(const config_map *location, HttpRequest &request) const;
+
+        const config_map *findLocation(const std::string &path);
 };
+
 
 #endif

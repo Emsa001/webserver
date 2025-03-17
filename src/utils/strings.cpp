@@ -18,28 +18,55 @@ void trim(std::string& s) {
     rtrim(s);
 }
 
-std::string getFirstWord(std::string const s) {
-    if (s.empty())
-        return "";
-    std::string::size_type pos = s.find(' ');
-    if (pos != std::string::npos) {
-        return s.substr(0, pos);
-    }
-    return s;
-}
-
-bool firstChar(std::string const& s, char c) {
-    for (size_t i = 0; i < s.size(); i++) {
-        if (s[i] == c)
-            return true;
-        if (!std::isspace(s[i]))
-            return false;
-    }
-    return false;
-}
-
 std::string intToString(int i) {
     std::stringstream ss;
     ss << i;
     return ss.str();
+}
+
+// Helper function to convert enum to string
+std::string type_to_string(ValueType type) {
+    switch (type) {
+        case STRING: return "STRING";
+        case INT: return "INT";
+        case BOOL: return "BOOL";
+        default: return "UNKNOWN";
+    }
+}
+
+StringVec split(const std::string &s, char delim) {
+    StringVec result;
+    std::stringstream ss(s);
+    std::string item;
+
+    while (std::getline(ss, item, delim)) {
+        result.push_back(item);
+    }
+
+    return result;
+}
+
+StringVec splitFirst(const std::string &s, char delim) {
+    StringVec result;
+    std::stringstream ss(s);
+    std::string item;
+
+    if (std::getline(ss, item, delim)) {
+        result.push_back(item);
+    }
+
+    if (std::getline(ss, item)) {
+        result.push_back(item);
+    }
+
+    return result;
+}
+
+std::string trimChar(const std::string &str, char c) {
+    if (str.empty()) return str;
+    std::string trimmed = str;
+    while (!trimmed.empty() && trimmed[trimmed.size() - 1] == c) {
+        trimmed.erase(trimmed.size() - 1);
+    }
+    return trimmed;
 }

@@ -1,0 +1,65 @@
+#include "Webserv.hpp"
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <pthread.h>
+#include <map>
+
+
+void* startServer(void* arg) {
+    config_map* data = static_cast<config_map*>(arg);
+    Server server(*data);
+    std::cout << std::endl;
+    server.start();
+    std::cout << std::endl;
+    return NULL;
+}
+
+// config_array locations = it->getMap()["locations"];
+// config_array cgis;
+
+// config_array::iterator it2 = locations.begin();
+// for(; it2 != locations.end(); it2++){
+//     std::string path = it2->getMap()["path"];
+
+//     if(it2->getMap().find("cgi") != it2->getMap().end()){
+//         if(it2->getMap()["cgi"] == true)
+//             cgis.push_back(*it2);
+//     }
+// }
+
+// std::cout << cgis << std::endl << std::endl;
+// std::string scriptPath = cgis[0].getMap().at("script");
+// std::cout << "Executing CGI script: " << scriptPath << std::endl;
+
+int main()
+{
+    std::cout << std::endl << std::endl << std::endl;
+
+    Config config("conf/cgi.yml");
+    if(!config.parse()){
+        return 1;
+    }
+
+    config_array servers = config.getServers();
+    config_array::iterator it = servers.begin();
+
+    std::vector<pthread_t> threads;
+
+    for(; it != servers.end(); it++){
+        std::string server_name = it->getMap()["server_name"];
+        std::cout << "Server name: " << server_name << std::endl;
+
+
+        pthread_t thread;
+        pthread_create(&thread, NULL, startServer, &it->getMap());
+        threads.push_back(thread);
+    }
+
+    for(size_t i = 0; i < threads.size(); i++) {
+        pthread_join(threads[i], NULL);
+    }
+
+    return 0;
+}

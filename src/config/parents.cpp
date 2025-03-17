@@ -1,10 +1,10 @@
-#include "Config.hpp"
+#include "Webserv.hpp"
 
-void Config::updateParents() {
+void ConfigParser::updateParents() {
     for (size_t i = 0; i < this->blocks.size(); i++) {
         config_map& block = this->blocks[i];
 
-        int level = block.at("level").getInt();
+        int level = block.at("blockLevel").getInt();
 
         if (level == 0) {
             this->root[block.at("blockName")] = block;
@@ -13,7 +13,7 @@ void Config::updateParents() {
     }
 }
 
-config_map* Config::findParentBlock(int blockId, int level) {
+config_map* ConfigParser::findParentBlock(int blockId, int level) {
     config_map* parent = &this->root;
 
     if (blockId <= 0 || blockId > static_cast<int>(this->blocks.size())) {
@@ -31,9 +31,8 @@ config_map* Config::findParentBlock(int blockId, int level) {
             continue;
         }
 
-        config_map::iterator it = this->blocks[i].find("level");
-        if (it != this->blocks[i].end() &&
-            it->second.getType() == ConfigValue::INT) {
+        config_map::iterator it = this->blocks[i].find("blockLevel");
+        if (it != this->blocks[i].end() && it->second.getType() == INT) {
             int foundLevel = it->second.getInt();
             if (foundLevel == level - 1) {
                 return &this->blocks[i];
@@ -44,8 +43,8 @@ config_map* Config::findParentBlock(int blockId, int level) {
     return parent;
 }
 
-void Config::updateParentBlock(config_map* parent, const std::string& blockName,
-                               int blockId) {
+
+void ConfigParser::updateParentBlock(config_map* parent, const std::string &blockName, int blockId) {
     if (blockName == "location") {
         if (!parent->count("locations"))
             (*parent)["locations"] = ConfigValue(config_array());

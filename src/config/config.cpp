@@ -1,12 +1,9 @@
 #include "Webserv.hpp"
 
-#include <algorithm>
-#include <cctype>
-#include <iostream>
-#include <string>
-
-bool Config::parse() {
-    if (!this->file.is_open()) {
+bool ConfigParser::parse()
+{
+    if (!this->file.is_open())
+    {
         std::cerr << "Error: Could not open file" << std::endl;
         return false;
     }
@@ -27,6 +24,13 @@ bool Config::parse() {
             return false;
         }
     }
+    
+    if(this->schema.validateRequired(this) == false){
+        this->file.close();
+        this->root.clear();
+        this->blocks.clear();
+        return false;
+    }
 
     this->cleanTemp(&this->root);
     this->file.close();
@@ -34,33 +38,30 @@ bool Config::parse() {
     return true;
 }
 
-bool Config::isReserved(const std::string& key) {
-    return (key == "blockId" || key == "blockName" || key == "blockType" ||
-            key == "level");
+bool ConfigParser::isReserved(const std::string &key){
+    return (key == "blockId" || key == "blockName" || key == "blockType" || key == "blockLevel" || key == "blockKind");
 }
 
-config_map Config::cleanTemp(config_map* temp) {
+config_map ConfigParser::cleanTemp(config_map *temp) {
     config_map::iterator it = temp->begin();
-
-    while (it != temp->end()) {
-        if (it->second.getType() == ConfigValue::MAP)
+    
+    while(it != temp->end()){
+        if (it->second.getType() == MAP)
             cleanTemp(&(it->second.getMap()));
 
-        if (it->second.getType() == ConfigValue::ARRAY) {
+        if(it->second.getType() == ARRAY){
             config_array array = it->second.getArray();
             config_array temp;
 
-            for (size_t i = 0; i < array.size(); i++) {
-                if (array[i].getType() == ConfigValue::MAP)
+            for(size_t i = 0; i < array.size(); i++){
+                if(array[i].getType() == MAP)
                     temp.push_back(cleanTemp(&(array[i].getMap())));
             }
             it->second = ConfigValue(temp);
         }
 
-        if (this->isReserved(it->first))
-            temp->erase(it++);
-        else
-            it++;
+        if (ConfigParser::isReserved(it->first)) temp->erase(it++);
+        else it++;
     }
 
     return *temp;

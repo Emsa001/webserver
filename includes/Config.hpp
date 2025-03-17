@@ -6,34 +6,29 @@
 /*   By: escura <escura@student.42wolfsburg.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 14:45:07 by escura            #+#    #+#             */
-/*   Updated: 2025/02/21 18:28:06 by escura           ###   ########.fr       */
+/*   Updated: 2025/03/10 13:53:42 by escura           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include <iostream>
-#include <vector>
-#include <map>
-#include <stack>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <cstdlib>
+#include "Webserv.hpp"
 
-std::string intToString(int i);
 class ConfigValue;
+class ConfigSchema;
+class ConfigParser;
+
+enum ValueType { INT, BOOL, STRING, ARRAY, MAP, ANY };
+enum blockKind { SERVER, LOCATION, ERRORS, UNKNOWN };
 
 typedef std::map<std::string, ConfigValue> config_map;
 typedef std::vector<ConfigValue> config_array;
 
 class ConfigValue {
-    public:
-        enum Type { INT, BOOL, STRING, ARRAY, MAP };
 
     private:
-        Type type;
+        ValueType type;
 
         int i;
         bool b;
@@ -54,10 +49,17 @@ class ConfigValue {
         ConfigValue& operator=(const ConfigValue &other);
         ~ConfigValue();
 
-        Type getType() const { return type; }
+        ValueType getType() const { return type; }
+        bool isEmpty() const {
+            if (type == STRING) return s.empty();
+            if (type == ARRAY) return a.empty();
+            if (type == MAP) return m.empty();
+            if (type == INT) return i == 0;
+            return true;
+        }
+
         int getInt() const { return (type == INT) ? i : 0; }
         bool getBool() const { return (type == BOOL) ? b : false; }
-
         const std::string &getString() const { return s; }
         const config_array &getArray() const { return a; }
         const config_map& getMap() const { return m; }
@@ -75,15 +77,64 @@ class ConfigValue {
         bool operator==(const bool &other) const;
 
         void print() const;
-        static ConfigValue detectType(const std::string &value);
+        static ConfigValue detectType(const std::string &value, bool forceString = false);
+        
 };
 
 std::ostream& operator<<(std::ostream& os, const ConfigValue& cv);
 
-class Config
+std::string type_to_string(ValueType type);
+
+
+class ConfigSchema {
+    public:
+        struct SchemaEntry {
+            ValueType type;
+            bool required;
+        };
+
+        typedef std::map<std::string, SchemaEntry> SchemaMap;
+        typedef std::map<std::string, ConfigSchema> NestedSchemaMap;
+
+    private:
+        SchemaMap schema;
+        NestedSchemaMap nestedSchemas;
+
+    public:
+        ConfigSchema() {};
+        ~ConfigSchema() {};
+
+        void addEntry(const std::string &key, ValueType type, bool required);
+        void addNestedSchema(const std::string &key, const ConfigSchema &nestedSchema);
+        bool validate(const std::string &key, ValueType type, int blockKind) const;
+        bool validateRequired(const ConfigParser *config) const;
+        bool validateMap(config_map &map) const;
+
+        void print(int indent = 0) const {
+            std::string indentStr(indent, ' ');
+
+            // Iterate over schema entries
+            SchemaMap::const_iterator it;
+            for (it = schema.begin(); it != schema.end(); ++it) {
+                std::cout << indentStr << "Key: " << it->first
+                        << " (Type: " << type_to_string(it->second.type)
+                        << ", Required: " << (it->second.required ? "true" : "false")
+                        << ")" << std::endl;
+            }
+
+            NestedSchemaMap::const_iterator nestedIt;
+            for (nestedIt = nestedSchemas.begin(); nestedIt != nestedSchemas.end(); ++nestedIt) {
+                std::cout << indentStr << "Nested Schema: " << nestedIt->first << std::endl;
+                nestedIt->second.print(indent + 4);
+            }
+        }
+};
+
+class ConfigParser
 {
     private:        
         config_map root;
+        ConfigSchema schema;
 
         // temp
         std::vector<config_map> blocks;
@@ -106,11 +157,10 @@ class Config
         bool handleQuotes(char c, char &quote);
         int handleKeyValueSeparator(char c, char n, bool *isValue, size_t *i, std::string &key);
         void createNewBlock(const std::string &key);
-        bool validateAndSetKey(char quote, const std::string &key, const std::string &value);
+        bool validateAndSetKey(char quote, const std::string &key, const std::string &value, bool forceString);
         void setBlock();
 
-        bool isReserved(std::string const &key);
-        bool setKey(std::string const &key, std::string const &value);
+        bool setKey(std::string const &key, std::string const &value, bool forceString);
         void updateParents();
 
         bool setKeyInBlock(const std::string &key, const ConfigValue &typedValue);
@@ -120,13 +170,13 @@ class Config
         config_map cleanTemp(config_map *temp);
                 
     public:
-        Config();
-        Config(std::string const &filename);
-        ~Config();
+        ConfigParser();
+        ConfigParser(std::string const &filename);
+        ~ConfigParser();
 
         bool parse();
-        bool validate();
-        
+        static bool isReserved(std::string const &key);
+
         config_map getRoot() const { return root; }
         config_array getServers() const {
             config_array servers = config_array();
@@ -147,7 +197,7 @@ class Config
         private:
             int ln;
             std::string msg;
-            std::string full_msg; // Store the full message as a member variable
+            std::string full_msg;
         public:
             ParseError(int line, const std::string& message) : ln(line), msg(message) {
                 full_msg = "Error at line: " + intToString(ln) + " - " + msg;
@@ -159,5 +209,35 @@ class Config
     };
 };
 
+class Config{
+    private:
+        Config() { };
+        config_map root;
+        config_array servers;
+
+    public:
+        ~Config() {};
+
+        static Config& instance(){
+            static Config instance;
+            return instance;
+        }
+
+        void parse(std::string const &filename){
+            ConfigParser parser(filename);
+            if (!parser.parse()) {
+                throw std::runtime_error("Error parsing config file");
+            }
+            this->root = parser.getRoot();
+            this->servers = parser.getServers();
+        }
+
+        const config_map &getRoot() const { return this->root; }
+        const config_array &getServers() const { return this->servers; }
+};
+
+// functions
+
+ConfigSchema createSchema();
 
 #endif

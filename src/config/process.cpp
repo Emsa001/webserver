@@ -1,10 +1,13 @@
 #include "Webserv.hpp"
 
-bool Config::processLine() {
-    std::string& line = this->line;
+bool ConfigParser::processLine()
+{
+    std::string &line = this->line;
     std::string key, value;
 
     char quote = '\0';
+    bool forceString = false;
+
     bool isValue = false;
 
     int previousIndent = this->indent;
@@ -21,8 +24,10 @@ bool Config::processLine() {
         if (handleIndentation(c, quote, key, previousIndent))
             continue;
 
-        if (handleQuotes(c, quote))
+        if (handleQuotes(c, quote)){
+            forceString = true;
             continue;
+        }
 
         int separator = handleKeyValueSeparator(c, n, &isValue, &i, key);
         if (separator == 1)
@@ -36,13 +41,14 @@ bool Config::processLine() {
             key += c;
     }
 
-    return validateAndSetKey(quote, key, value);
+    return validateAndSetKey(quote, key, value, forceString);
 }
 
-int Config::handleKeyValueSeparator(char c, char n, bool* isValue, size_t* i,
-                                    std::string& key) {
-    if ((c == ':') && !(*isValue)) {
-        if (n == '\0' || n == '\n') {
+int ConfigParser::handleKeyValueSeparator(char c, char n, bool *isValue, size_t *i, std::string &key)
+{
+    if ((c == ':') && !(*isValue))
+    {
+        if (n == '\0' || n == '\n'){
             this->expectedIndent = this->indent + 4;
             return (createNewBlock(key), 1);
         } else if (std::isspace(n)) {
@@ -55,15 +61,17 @@ int Config::handleKeyValueSeparator(char c, char n, bool* isValue, size_t* i,
     return -1;
 }
 
-bool Config::handleComment(char p, char c, char quote, size_t i) {
+bool ConfigParser::handleComment(char p, char c, char quote, size_t i)
+{
     if (c == '#' && (std::isspace(p) || i == 0) && quote == '\0')
         return true;
     return false;
 }
 
-bool Config::handleIndentation(char c, char quote, const std::string& key,
-                               int previousIndent) {
-    if (std::isspace(c) && quote == '\0' && key.empty()) {
+bool ConfigParser::handleIndentation(char c, char quote, const std::string &key, int previousIndent)
+{
+    if (std::isspace(c) && quote == '\0' && key.empty())
+    {
         this->indent++;
         return true;
     }
@@ -81,8 +89,10 @@ bool Config::handleIndentation(char c, char quote, const std::string& key,
     return false;
 }
 
-bool Config::handleQuotes(char c, char& quote) {
-    if (c == '"' || c == '\'') {
+bool ConfigParser::handleQuotes(char c, char &quote)
+{
+    if (c == '"' || c == '\'')
+    {
         if (quote == '\0')
             quote = c;
         else if (quote == c)
@@ -92,9 +102,9 @@ bool Config::handleQuotes(char c, char& quote) {
     return false;
 }
 
-bool Config::validateAndSetKey(char quote, const std::string& key,
-                               const std::string& value) {
-    if (key.empty() && value.empty())
+bool ConfigParser::validateAndSetKey(char quote, const std::string &key, const std::string &value, bool forceString)
+{
+    if(key.empty() && value.empty())
         return true;
     if (this->indent > 0 && this->block == NULL)
         throw ParseError(this->ln, "Indentation not matching");
@@ -106,14 +116,20 @@ bool Config::validateAndSetKey(char quote, const std::string& key,
     if (value.empty())
         throw ParseError(this->ln, "Value not found");
 
-    return setKey(key, value);
+    int blockKind = this->block ? this->block->at("blockKind").getInt() : -1;
+
+    if(!this->schema.validate(key, ConfigValue::detectType(value, forceString).getType(), blockKind)){
+        throw ParseError(this->ln, "Key '" + key + "' is not allowed in this context or it's not of the correct type");
+    }
+
+    return setKey(key, value, forceString);
 }
 
-bool Config::setKey(const std::string& key, const std::string& value) {
+bool ConfigParser::setKey(const std::string &key, const std::string &value, bool forceString) {
     this->setBlock();
-    ConfigValue typedValue = ConfigValue::detectType(value);
-
-    if (isReserved(key)) {
+    ConfigValue typedValue = ConfigValue::detectType(value, forceString);
+    
+    if (ConfigParser::isReserved(key)) {
         throw ParseError(this->ln, "'" + key + "' is a reserved keyword");
     }
 
