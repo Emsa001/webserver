@@ -2,6 +2,8 @@
 
 import cgi
 
-print("Content-Type: text/html\n") 
+print("Content-Type: text/html")
+print("Content-Length: 42")
+print("")
 
 print("<html><body><h1>Python!</h1></body></html>")

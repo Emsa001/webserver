@@ -13,7 +13,7 @@ server:
     location:
         cgi: true
         path: "/cgi-bin"
-        root: "./www/cgi-bin/"
+        root: "/cgi-bin"
 
     errors:
         500: "500.html"

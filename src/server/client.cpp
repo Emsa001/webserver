@@ -17,6 +17,8 @@ void Server::handleResponse(int client_sock, char *buffer) {
 
     if(Config::getSafe(*location, "autoindex", false))
         response.setListing(true);
+    if(Config::getSafe(*location, "cgi", false))
+        response.setCGI(true);
 
     response.setBody(fileData);
     response.respond();
