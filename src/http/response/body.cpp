@@ -45,6 +45,12 @@ void HttpResponse::setBody(FileData &fileData) {
         return ;
     }
 
+    if(this->cgi){
+        std::string resp = Cgi::execute(fileData.path);
+        this->setResponse(resp);
+        return ;
+    }
+
     this->body = fileData.getContent();
     this->setStatusCode(200);
     // this->setHeader("Last-Modified", fileData.lastModified); << I'm not handling caching, no way

@@ -104,6 +104,7 @@ void HttpResponse::respondStatusPage(unsigned short code) {
     this->setHeader("Content-Type", "text/html");
     this->setHeader("Content-Length", intToString(this->body.size()));
 
+    this->build();
     this->respond();
 }
 
