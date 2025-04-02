@@ -46,6 +46,11 @@ void HttpResponse::buildBody(FileData &fileData) {
         return ;
     }
 
+    if(this->cgi){
+        Cgi::execute(fileData.path, this);
+        return ;
+    }
+
     this->body = fileData.getContent();
     this->setStatusCode(200);
     // this->setHeader("Last-Modified", fileData.lastModified); << I'm not handling caching, no way

@@ -18,10 +18,8 @@ void HttpResponse::respond() {
     }
 
     std::cout 
-    << "Response sent successfully for socket: " << this->socket << std::endl
+    << " Response sent successfully for socket: " << this->socket << std::endl
     << " Total: " << total_sent << std::endl
     << " Response size: " << response_size << std::endl
-    << " Response: " << this->response
-    << " Body: " << this->body
     << std::endl;
 }
