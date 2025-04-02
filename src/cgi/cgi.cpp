@@ -82,9 +82,15 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response)
         response->build();
         return;
     }
+
+
+    FileData fileData;
+    fileData.exists = true;
+    fileData.isDirectory = false;
+
     response->setStatusCode(200);
     response->setHeader("Content-Type", "text/html");
     response->setHeader("Content-Length", intToString(body.size()));
-    response->setResponse(body);
+    response->setBody(body);
     response->build();
 }
