@@ -59,7 +59,7 @@ class HttpRequest {
 
         int socket; // Do we need this here?
     public:
-        HttpRequest(int socket, char *buffer);
+        HttpRequest(int socket, const char *buffer);
         ~HttpRequest() {
             delete url;
         };
@@ -79,7 +79,6 @@ class HttpRequest {
         HttpURL *getURL() const { return this->url; }
         const StringMap &getHeaders() const { return this->headers; }
 };
-
 
 
 

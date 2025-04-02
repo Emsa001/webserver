@@ -21,15 +21,16 @@ void HttpResponse::directoryListing(const FileData &fileData) {
     this->setStatusCode(200);
     this->setHeader("Content-Type", "text/html");
     this->setHeader("Content-Length", intToString(this->body.size()));
+    this->build();
 }
 
 void HttpResponse::setBody(FileData &fileData) {
 
     // std::cout << "Setting body" << std::endl;
-    // std::cout << "File exists: " << fileData->exists << std::endl;
-    // std::cout << "Is directory: " << fileData->isDirectory << std::endl;
+    // std::cout << "File exists: " << fileData.exists << std::endl;
+    // std::cout << "Is directory: " << fileData.isDirectory << std::endl;
     // std::cout << "Listing: " << this->listing << std::endl;
-    // std::cout << "Path: " << fileData->path << std::endl;
+    // std::cout << "Path: " << fileData.path << std::endl;
 
     if (fileData.exists == false) {
         this->respondStatusPage(404);
