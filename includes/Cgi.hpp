@@ -2,6 +2,8 @@
 #define CGI_HPP
 
 #include "Webserv.hpp"
+#include "HttpResponse.hpp"
+class HttpResponse;
 
 class Cgi
 {
@@ -19,7 +21,7 @@ class Cgi
         static std::string get_interpreter(Type type);
 
     public:
-        static std::string execute(const std::string &scriptPath);
+        static void execute(const std::string &scriptPath, HttpResponse *response);
 };
 
 #endif

@@ -46,8 +46,11 @@ void HttpResponse::setBody(FileData &fileData) {
     }
 
     if(this->cgi){
-        std::string resp = Cgi::execute(fileData.path);
-        this->setResponse(resp);
+        Cgi::execute(fileData.path, this);
+        StringMap headers = this->getHeaders();
+        for (StringMap::iterator it = headers.begin(); it != headers.end(); ++it) {
+            std::cout << it->first << ": " << it->second << std::endl;
+        }
         return ;
     }
 

@@ -5,21 +5,54 @@ static char *str_char(const std::string &str)
     return const_cast<char *>(str.c_str());
 }
 
-std::string Cgi::execute(const std::string &scriptPath)
+std::string read_output(int pipe_fd)
+{
+    char buffer[1024];
+    std::stringstream response;
+    ssize_t bytesRead;
+    while ((bytesRead = read(pipe_fd, buffer, sizeof(buffer) - 1)) > 0)
+    {
+        buffer[bytesRead] = '\0';
+        response << buffer;
+    }
+    return response.str();
+}
+
+void Cgi::execute(const std::string &scriptPath, HttpResponse *response)
 {
     Type scriptType = detect_type(scriptPath);
     std::string interpreter = get_interpreter(scriptType);
 
     if (scriptType == UNKNOWN)
-        return "HTTP/1.1 415 Unsupported Media Type\n\nUnsupported script type.";
+    {
+        response->setStatusCode(500);
+        response->setHeader("Content-Type", "text/plain");
+        response->setResponse("Unsupported script type");
+        response->build();
+        return;
+    }
 
     int pipe_fd[2];
     if (pipe(pipe_fd) == -1)
-        return "HTTP/1.1 500 Internal Server Error\n\nFailed to create pipe.";
+    {
+        response->setStatusCode(500);
+        response->setHeader("Content-Type", "text/plain");
+        response->setResponse("Failed to create pipe");
+        response->build();
+        return;
+    }
 
     pid_t pid = fork();
     if (pid < 0)
-        return "HTTP/1.1 500 Internal Server Error\n\nFork failed.";
+    {
+        close(pipe_fd[0]);
+        close(pipe_fd[1]);
+        response->setStatusCode(500);
+        response->setHeader("Content-Type", "text/plain");
+        response->setResponse("Failed to fork process");
+        response->build();
+        return;
+    }
 
     if (pid == 0)
     {
@@ -32,26 +65,26 @@ std::string Cgi::execute(const std::string &scriptPath)
         char **env = convert_env(envMap);
 
         execve(str_char(interpreter), argv, env);
-        exit(1);
     }
 
     close(pipe_fd[1]);
-
-    char buffer[1024];
-    std::stringstream response;
-    ssize_t bytesRead;
-    while ((bytesRead = read(pipe_fd[0], buffer, sizeof(buffer) - 1)) > 0)
-    {
-        buffer[bytesRead] = '\0';
-        response << buffer;
-    }
+    std::string body = read_output(pipe_fd[0]);
     close(pipe_fd[0]);
 
     int status;
     waitpid(pid, &status, 0);
 
     if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
-        return "HTTP/1.1 500 Internal Server Error\n\nCGI script execution failed.";
-
-    return "HTTP/1.1 200 OK\n" + response.str();
+    {
+        response->setStatusCode(500);
+        response->setHeader("Content-Type", "text/plain");
+        response->setResponse("CGI script execution failed");
+        response->build();
+        return;
+    }
+    response->setStatusCode(200);
+    response->setHeader("Content-Type", "text/html");
+    response->setHeader("Content-Length", intToString(body.size()));
+    response->setResponse(body);
+    response->build();
 }

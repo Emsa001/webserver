@@ -1,6 +1,7 @@
 <?php
 
 echo "Content-type: text/html\n\n";
+echo "Content-Length: 42\n\n";
 
 echo "";
 
