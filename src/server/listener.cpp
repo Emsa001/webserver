@@ -38,7 +38,7 @@ void Server::listener(int server_sock) {
             }
         }
 
-        std::cout <<  "Active clients: " << this->client_timestamps.size() << std::endl;
+        // std::cout <<  "Active clients: " << this->client_timestamps.size() << std::endl;
     }
 }
 
