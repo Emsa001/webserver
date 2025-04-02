@@ -37,32 +37,37 @@ bool Server::handleClient(int client_sock) {
     char buffer[BUFFER_SIZE];
     memset(buffer, 0, BUFFER_SIZE);
 
-    int bytes_received = recv(client_sock, buffer, BUFFER_SIZE, 0);
+    while (true) {
+        int bytes_received = recv(client_sock, buffer, BUFFER_SIZE - 1, 0);
 
-    if (bytes_received < 0) {
-        if (errno == EAGAIN || errno == EWOULDBLOCK) {
-            return true;
-        } else {
-            std::cerr << "[ERROR] recv() failed on socket " << client_sock << ": " << strerror(errno) << ". Closing." << std::endl;
+        if (bytes_received < 0) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                return true;
+            } else {
+                std::cerr << "[ERROR] recv() failed on socket " << client_sock << ": " << strerror(errno) << ". Closing." << std::endl;
+                this->closeConnection(&client_sock);
+                return false;
+            }
+        }
+
+        if (bytes_received == 0) {
             this->closeConnection(&client_sock);
-
             return false;
         }
-    }
 
-    if (bytes_received == 0) {
-        std::cout << "Client disconnected: " << client_sock << std::endl;
-        this->closeConnection(&client_sock);
-        return false;
-    }
+        buffer[bytes_received] = '\0';
 
-    this->handleResponse(client_sock, buffer);
+        this->handleResponse(client_sock, buffer);
 
-    if (strstr(buffer, "Connection: close")) {
-        std::cout << "Client requested to close connection: " << client_sock << std::endl;
-        this->closeConnection(&client_sock);
-        return false;
+        if (strstr(buffer, "Connection: close")) {
+            std::cout << "Client requested to close connection: " << client_sock << std::endl;
+            this->closeConnection(&client_sock);
+            return false;
+        }
+
     }
 
     return true;
 }
+
+

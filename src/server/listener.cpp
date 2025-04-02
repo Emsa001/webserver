@@ -4,10 +4,9 @@ void Server::listener(int server_sock) {
     listen(server_sock, MAX_CLIENTS);
     this->set_nonblocking(server_sock);
 
-
     fds.push_back((pollfd){server_sock, POLLIN, 0});
 
-    int timeout_ms = 1000;
+    int timeout_ms = 5000;
 
     while (true) {
         int ret = poll(&fds[0], fds.size(), timeout_ms);
@@ -34,6 +33,8 @@ void Server::listener(int server_sock) {
 
                 if (handleClient(fds[i].fd)) {
                     this->client_timestamps[fds[i].fd] = now;
+                }else{
+                    this->closeConnection(&fds[i].fd);
                 }
             }
         }

@@ -16,11 +16,11 @@ const FileData Server::createFileData(const config_map *location, HttpRequest &r
         fullPath += "/" + index;
     }
 
-    std::cout << std::endl;
-    std::cout << "Full path: " << fullPath << std::endl;
-    std::cout << "Request path: " << requestPath << std::endl;
-    std::cout << "Location path: " << locationPath << std::endl;
-    std::cout << std::endl;
+    // std::cout << std::endl;
+    // std::cout << "Full path: " << fullPath << std::endl;
+    // std::cout << "Request path: " << requestPath << std::endl;
+    // std::cout << "Location path: " << locationPath << std::endl;
+    // std::cout << std::endl;
     return getFileData(fullPath);
 }
 

@@ -13,7 +13,7 @@ server:
     location:
         cgi: true
         path: "/cgi-bin"
-        root: "/cgi-bin"
+        root: "/cgi-bin/"
         autoindex: true
 
     errors:
