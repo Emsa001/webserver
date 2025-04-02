@@ -14,7 +14,7 @@ int main()
     std::cout << std::endl << std::endl << std::endl;
 
     Config config = Config::instance();
-    config.parse("conf/cgi.yml");
+    config.parse("conf/myserver.yml");
 
     config_array servers = config.getServers();
     config_array::iterator it = servers.begin();

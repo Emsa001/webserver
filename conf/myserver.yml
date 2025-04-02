@@ -9,10 +9,9 @@ server1:
         path: "/"
         root: "/"
         index: "index.html"
-        autoindex: true
 
     location:
-        path: "/beqa"
+        path: "/beqa/"
         root: "/"
         index: "image.png"
         autoindex: false
@@ -35,20 +34,6 @@ server1:
         index: "index.html"
         upload_path: "./tmp/uploads"
 
-
-    errors:
-        500: "500.html"
-        404: "404.html"
-
-server2:
-    server_name: "myserver2"
-    listen: 8082
-    max_client_body_size: 1000
-
-    location:
-        path: "/static"
-        root: "./static"
-        index: "index.html"
 
     errors:
         500: "500.html"

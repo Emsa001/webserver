@@ -1,6 +1,6 @@
 #include "HttpRequest.hpp"
 
-HttpRequest::HttpRequest(int socket, char *buffer) {
+HttpRequest::HttpRequest(int socket, const char *buffer) {
     
     this->socket = socket;
     std::string request(buffer);

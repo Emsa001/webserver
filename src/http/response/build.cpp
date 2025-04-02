@@ -4,7 +4,7 @@ void HttpResponse::build() {
 
     this->setHeader("Server", PROJECT_NAME);
     this->setHeader("Connection", "keep-alive");
-    this->setHeader("Keep-Alive", "timeout=10, max=100");
+    this->setHeader("Keep-Alive", "timeout=1, max=50");
 
     this->response = this->statusLine + "\r\n";
     for (StringMap::iterator it = headers.begin(); it != headers.end(); ++it) {
