@@ -22,7 +22,6 @@ class Cgi
 
     public:
         static void execute(const std::string &scriptPath, HttpResponse *response);
-        static std::string Cgi::execute_string(const std::string &scriptPath, HttpResponse *response);
 };
 
 #endif

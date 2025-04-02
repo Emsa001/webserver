@@ -10,7 +10,7 @@ class HttpResponse {
         std::string body;        // Stores the response body (usually html)
 
         bool listing;           // If true, the body will be a directory listing
-        bool cgi;               // If true, the body will be the output of a CGI script
+        // bool cgi;               // If true, the body will be the output of a CGI script
 
         std::string response;    // Stores the entire response to be sent to the client
 
@@ -23,7 +23,7 @@ class HttpResponse {
             listing = false;
             statusCode = 200;
             body = "";
-            cgi = false;
+            // cgi = false;
         };
         ~HttpResponse() {};
 
@@ -38,7 +38,8 @@ class HttpResponse {
         void directoryListing(const FileData &fileData);
         void respondStatusPage(unsigned short code);
 
-        void setBody(FileData &fileData);
+        void buildBody(FileData &fileData);
+        void setBody(std::string &body) { this->body = body; }
         void setStatusCode(unsigned short code) {
             this->statusCode = code;
             statusLine = "HTTP/1.1 " + intToString(code) + " " + this->getReasonPhrase(code);
@@ -47,7 +48,7 @@ class HttpResponse {
         void setResponse(const std::string &response) { this->response = response; }
         void setHeader(const std::string &key, const std::string &value) { headers[key] = value; }
         void setListing(bool listing) { this->listing = listing; }
-        void setCGI(bool cgi) { this->cgi = cgi; }
+        // void setCGI(bool cgi) { this->cgi = cgi; }
 
         StringMap getHeaders() const { return headers; }
 };

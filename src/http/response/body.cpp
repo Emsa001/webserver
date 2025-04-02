@@ -24,7 +24,7 @@ void HttpResponse::directoryListing(const FileData &fileData) {
     this->build();
 }
 
-void HttpResponse::setBody(FileData &fileData) {
+void HttpResponse::buildBody(FileData &fileData) {
 
     // std::cout << "Setting body" << std::endl;
     // std::cout << "File exists: " << fileData.exists << std::endl;
@@ -43,20 +43,6 @@ void HttpResponse::setBody(FileData &fileData) {
             return ;
         }
         this->respondStatusPage(403);
-        return ;
-    }
-
-    if(this->cgi){
-        // Cgi::execute(fileData.path, this);
-
-        // StringMap headers = this->getHeaders();
-        // for (StringMap::iterator it = headers.begin(); it != headers.end(); ++it) {
-        //     std::cout << it->first << ": " << it->second << std::endl;
-        // }
-
-        std::string output = Cgi::execute_string(fileData.path, this);
-
-
         return ;
     }
 
