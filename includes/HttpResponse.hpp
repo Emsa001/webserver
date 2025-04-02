@@ -39,7 +39,7 @@ class HttpResponse {
         void respondStatusPage(unsigned short code);
 
         void buildBody(FileData &fileData);
-        void setBody(std::string &body) { this->body = body; }
+        void setBody(const std::string &body) { this->body = body; }
         void setStatusCode(unsigned short code) {
             this->statusCode = code;
             statusLine = "HTTP/1.1 " + intToString(code) + " " + this->getReasonPhrase(code);

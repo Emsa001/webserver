@@ -5,7 +5,6 @@ static char *str_char(const std::string &str)
     return const_cast<char *>(str.c_str());
 }
 
-
 std::string read_output(int pipe_fd)
 {
     char buffer[1024];
@@ -19,6 +18,14 @@ std::string read_output(int pipe_fd)
     return response.str();
 }
 
+void server_error(const std::string &message, HttpResponse *response)
+{
+    response->setStatusCode(500);
+    response->setHeader("Content-Type", "text/plain");
+    response->setBody(message);
+    response->build();
+}
+
 void Cgi::execute(const std::string &scriptPath, HttpResponse *response)
 {
     Type scriptType = detect_type(scriptPath);
@@ -26,20 +33,14 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response)
 
     if (scriptType == UNKNOWN)
     {
-        response->setStatusCode(500);
-        response->setHeader("Content-Type", "text/plain");
-        response->setResponse("Unsupported script type");
-        response->build();
+        server_error("Unknown script type", response);
         return;
     }
 
     int pipe_fd[2];
     if (pipe(pipe_fd) == -1)
     {
-        response->setStatusCode(500);
-        response->setHeader("Content-Type", "text/plain");
-        response->setResponse("Failed to create pipe");
-        response->build();
+        server_error("Failed to create pipe", response);
         return;
     }
 
@@ -48,10 +49,7 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response)
     {
         close(pipe_fd[0]);
         close(pipe_fd[1]);
-        response->setStatusCode(500);
-        response->setHeader("Content-Type", "text/plain");
-        response->setResponse("Failed to fork process");
-        response->build();
+        server_error("Failed to fork process", response);
         return;
     }
 
@@ -69,7 +67,8 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response)
     }
 
     close(pipe_fd[1]);
-    std::string body = read_output(pipe_fd[0]);
+    std::string output = read_output(pipe_fd[0]);
+    std::cout << "Body: (" << output << ")" << std::endl;
     close(pipe_fd[0]);
 
     int status;
@@ -77,21 +76,17 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response)
 
     if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
     {
-        response->setStatusCode(500);
-        response->setHeader("Content-Type", "text/plain");
-        response->setResponse("CGI script execution failed");
-        response->build();
+        server_error("Script execution failed", response);
         return;
     }
 
-
-    FileData fileData;
-    fileData.exists = true;
-    fileData.isDirectory = false;
+    std::string body = output;
+    StringMap headers;
+    (void)headers; // Suppress unused variable warning
 
     response->setStatusCode(200);
     response->setHeader("Content-Type", "text/html");
-    response->setHeader("Content-Length", intToString(body.size()));
-    response->setBody(body);
+    response->setHeader("Content-Length", intToString(output.size()));
+    response->setBody(output);
     response->build();
 }
