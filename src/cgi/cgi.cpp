@@ -26,6 +26,60 @@ void server_error(const std::string &message, HttpResponse *response)
     response->build();
 }
 
+// headers in cgi response
+// echo "Content-Type: text/html"
+// echo "test: test"
+// echo "test2: test2"
+// echo ""
+
+// body in cgi response
+// echo "<html><body><h1>Shell!</h1></body></html>"
+
+std::string get_body(const std::string &output)
+{
+    std::string body;
+    std::istringstream stream(output);
+    std::string line;
+    bool isBody = false;
+
+    while (std::getline(stream, line))
+    {
+        if (line.empty())
+        {
+            isBody = true;
+            body += "\n";
+            continue;
+        }
+        if (isBody)
+        {
+            body += line + "\n";
+        }
+    }
+    return body;
+}
+
+StringMap get_headers(const std::string &output)
+{
+    StringMap headers;
+    std::istringstream stream(output);
+    std::string line;
+
+    while (std::getline(stream, line))
+    {
+        if (line.empty())
+            break;
+
+        size_t pos = line.find(':');
+        if (pos != std::string::npos)
+        {
+            std::string key = line.substr(0, pos);
+            std::string value = line.substr(pos + 1);
+            headers[key] = value;
+        }
+    }
+    return headers;
+}
+
 void Cgi::execute(const std::string &scriptPath, HttpResponse *response)
 {
     Type scriptType = detect_type(scriptPath);
@@ -68,7 +122,6 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response)
 
     close(pipe_fd[1]);
     std::string output = read_output(pipe_fd[0]);
-    std::cout << "Body: (" << output << ")" << std::endl;
     close(pipe_fd[0]);
 
     int status;
@@ -80,13 +133,22 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response)
         return;
     }
 
-    std::string body = output;
-    StringMap headers;
-    (void)headers; // Suppress unused variable warning
+    std::string body = get_body(output);
+    if (body.empty())
+    {
+        server_error("Empty response body", response);
+        return;
+    }
+    std::cout << "Body: (" << body << ")" << std::endl;
+    StringMap headers = get_headers(output);
+    for (StringMap::iterator it = headers.begin(); it != headers.end(); ++it)
+    {
+        response->setHeader(it->first, it->second);
+    }
 
     response->setStatusCode(200);
     response->setHeader("Content-Type", "text/html");
     response->setHeader("Content-Length", intToString(output.size()));
-    response->setBody(output);
+    response->setBody(body);
     response->build();
 }
