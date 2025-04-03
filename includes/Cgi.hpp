@@ -24,4 +24,7 @@ class Cgi
         static void execute(const std::string &scriptPath, HttpResponse *response);
 };
 
+std::string get_body(const std::string &output);
+StringMap get_headers(const std::string &output);
+
 #endif

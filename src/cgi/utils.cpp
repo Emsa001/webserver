@@ -33,3 +33,45 @@ std::string Cgi::get_interpreter(Type type)
             return "";
     }
 }
+
+std::string get_body(const std::string &output)
+{
+    std::string body = "\n";
+    std::istringstream stream(output);
+    std::string line;
+    bool is_body = false;
+
+    while (std::getline(stream, line))
+    {
+        if (line.empty())
+        {
+            is_body = true;
+            continue;
+        }
+        if (is_body)
+            body += line + "\n";
+    }
+    return body;
+}
+
+StringMap get_headers(const std::string &output)
+{
+    StringMap headers;
+    std::istringstream stream(output);
+    std::string line;
+
+    while (std::getline(stream, line))
+    {
+        if (line.empty())
+            break;
+
+        size_t pos = line.find(':');
+        if (pos != std::string::npos)
+        {
+            std::string key = line.substr(0, pos);
+            std::string value = line.substr(pos + 1);
+            headers[key] = value;
+        }
+    }
+    return headers;
+}
