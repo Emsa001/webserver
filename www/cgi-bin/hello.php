@@ -32,7 +32,7 @@ $current_date = get_current_date();
             display: inline-block;
         }
         h1 {
-            color: #4CAF50;
+            color: #6a0dad;
         }
         p {
             color: #333;
@@ -43,21 +43,19 @@ $current_date = get_current_date();
         .button a {
             text-decoration: none;
             color: white;
-            background-color: #4CAF50;
+            background-color: #6a0dad;
             padding: 10px 20px;
             border-radius: 5px;
             font-size: 16px;
         }
         .button a:hover {
-            background-color: #45a049;
+            background-color: #5a0c9d;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>PHP CGI</h1>
-        <p>This page is generated using a PHP CGI script.</p>
-        <p><strong>What is CGI?</strong> Common Gateway Interface (CGI) is a protocol that allows web servers to execute scripts and dynamically generate web content.</p>
         <p><strong>Current CGI Script:</strong> PHP is handling this request!</p>
         <p><strong>Server Time:</strong> <?php echo $current_date; ?></p>
         <div class="button">

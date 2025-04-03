@@ -34,7 +34,7 @@ print(f"""
             display: inline-block;
         }}
         h1 {{
-            color: #4CAF50;
+            color: #007BFF;
         }}
         p {{
             color: #333;
@@ -45,21 +45,19 @@ print(f"""
         .button a {{
             text-decoration: none;
             color: white;
-            background-color: #4CAF50;
+            background-color: #007BFF;
             padding: 10px 20px;
             border-radius: 5px;
             font-size: 16px;
         }}
         .button a:hover {{
-            background-color: #45a049;
+            background-color: #0056b3;
         }}
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Python CGI</h1>
-        <p>This page is generated using a Python CGI script.</p>
-        <p><strong>What is CGI?</strong> Common Gateway Interface (CGI) is a protocol that allows web servers to execute scripts and dynamically generate web content.</p>
         <p><strong>Current CGI Script:</strong> Python is handling this request!</p>
         <p><strong>Server Time:</strong> {current_date}</p>
         <div class="button">

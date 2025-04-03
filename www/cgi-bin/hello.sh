@@ -51,8 +51,6 @@ cat <<EOF
 <body>
     <div class="container">
         <h1>Bash CGI</h1>
-        <p>This page is generated using a Bash CGI script.</p>
-        <p><strong>What is CGI?</strong> Common Gateway Interface (CGI) is a protocol that allows web servers to execute scripts and dynamically generate web content.</p>
         <p><strong>Current CGI Script:</strong> Bash is handling this request!</p>
         <p><strong>Server Time:</strong> ${current_date}</p>
         <div class="button">
