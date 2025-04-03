@@ -3,7 +3,14 @@
 echo "Content-Type: text/html";
 echo "\n\n";
 
+function get_current_date() {
+    return date("Y-m-d H:i:s");
+}
+
+$current_date = get_current_date();
+
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,7 +59,7 @@ echo "\n\n";
         <p>This page is generated using a PHP CGI script.</p>
         <p><strong>What is CGI?</strong> Common Gateway Interface (CGI) is a protocol that allows web servers to execute scripts and dynamically generate web content.</p>
         <p><strong>Current CGI Script:</strong> PHP is handling this request!</p>
-        <p><strong>Server Time:</strong> <?php echo date('Y-m-d H:i:s'); ?></p>
+        <p><strong>Server Time:</strong> <?php echo $current_date; ?></p>
         <div class="button">
             <a href="http://localhost:8080/cgi-bin/hello.py">Go to Python CGI Script</a>
         </div>

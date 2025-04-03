@@ -1,5 +1,7 @@
 #!/bin/bash
 
+current_date=$(date +"%Y-%m-%d %H:%M:%S")
+
 echo "Content-Type: text/html"
 echo ""
 
@@ -52,7 +54,7 @@ cat <<EOF
         <p>This page is generated using a Bash CGI script.</p>
         <p><strong>What is CGI?</strong> Common Gateway Interface (CGI) is a protocol that allows web servers to execute scripts and dynamically generate web content.</p>
         <p><strong>Current CGI Script:</strong> Bash is handling this request!</p>
-        <p><strong>Server Time:</strong> $(date)</p>
+        <p><strong>Server Time:</strong> ${current_date}</p>
         <div class="button">
             <a href="http://localhost:8080/cgi-bin/hello.php">Go to PHP CGI Script</a>
         </div>
