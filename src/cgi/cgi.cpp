@@ -26,18 +26,9 @@ void server_error(const std::string &message, HttpResponse *response)
     response->build();
 }
 
-// headers in cgi response
-// echo "Content-Type: text/html"
-// echo "test: test"
-// echo "test2: test2"
-// echo ""
-
-// body in cgi response
-// echo "<html><body><h1>Shell!</h1></body></html>"
-
 std::string get_body(const std::string &output)
 {
-    std::string body;
+    std::string body = "\n";
     std::istringstream stream(output);
     std::string line;
     bool isBody = false;
@@ -47,7 +38,6 @@ std::string get_body(const std::string &output)
         if (line.empty())
         {
             isBody = true;
-            body += "\n";
             continue;
         }
         if (isBody)
@@ -139,7 +129,6 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response)
         server_error("Empty response body", response);
         return;
     }
-    std::cout << "Body: (" << body << ")" << std::endl;
     StringMap headers = get_headers(output);
     for (StringMap::iterator it = headers.begin(); it != headers.end(); ++it)
     {
@@ -148,7 +137,7 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response)
 
     response->setStatusCode(200);
     response->setHeader("Content-Type", "text/html");
-    response->setHeader("Content-Length", intToString(output.size()));
+    response->setHeader("Content-Length", intToString(body.size()));
     response->setBody(body);
     response->build();
 }
