@@ -24,6 +24,10 @@ class Server {
         void set_nonblocking(int sock);
         void listener(int server_sock);
         void send_response(int client_sock, const std::string &path);
+
+        int receiveBytes(int client_sock, char *buffer);
+        void closeConnectionRequest(int client_sock, char *buffer);
+
     public:
         Server(config_map &config) : config(&config) {}
         ~Server() {}

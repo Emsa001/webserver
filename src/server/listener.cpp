@@ -1,11 +1,16 @@
 #include "Server.hpp"
 
+/*
+
+Something is really wrong here
+
+*/
+
 void Server::listener(int server_sock) {
     listen(server_sock, MAX_CLIENTS);
     this->set_nonblocking(server_sock);
 
     fds.push_back((pollfd){server_sock, POLLIN, 0});
-
     int timeout_ms = 5000;
 
     while (true) {

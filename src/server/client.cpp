@@ -29,42 +29,51 @@ void Server::handleResponse(int client_sock, const char *buffer) {
     response.respond();
 }
 
-bool Server::handleClient(int client_sock) {
-    if (client_sock == -1) {
-        return false;
+int Server::receiveBytes(int client_sock, char *buffer) {
+    int bytes_received = recv(client_sock, buffer, BUFFER_SIZE - 1, 0);
+
+    if (bytes_received < 0) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK)
+            throw std::runtime_error("recv() would block");
+
+        std::cerr << "[ERROR] recv() failed on socket " << client_sock << ": " << strerror(errno) << ". Closing." << std::endl;
+        this->closeConnection(&client_sock);
+        throw std::runtime_error("recv() failed");
     }
+
+    if (bytes_received == 0) {
+        this->closeConnection(&client_sock);
+        throw std::runtime_error("Connection closed by client");
+    }
+
+    return bytes_received;
+}
+
+void Server::closeConnectionRequest(int client_sock,char *buffer) {
+    if (!strstr(buffer, "Connection: close")) return ;
+
+    std::cout << "Client requested to close connection: " << client_sock << std::endl;
+    this->closeConnection(&client_sock);
+    throw std::runtime_error("Connection closed by client");
+}
+
+bool Server::handleClient(int client_sock) {
+    if (client_sock == -1) return false;
 
     char buffer[BUFFER_SIZE];
     memset(buffer, 0, BUFFER_SIZE);
 
     while (true) {
-        int bytes_received = recv(client_sock, buffer, BUFFER_SIZE - 1, 0);
+        try{
+            const int bytes_received = this->receiveBytes(client_sock, buffer);
+            buffer[bytes_received] = '\0';
 
-        if (bytes_received < 0) {
-            if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                return true;
-            } else {
-                std::cerr << "[ERROR] recv() failed on socket " << client_sock << ": " << strerror(errno) << ". Closing." << std::endl;
-                this->closeConnection(&client_sock);
-                return false;
-            }
-        }
-
-        if (bytes_received == 0) {
-            this->closeConnection(&client_sock);
+            this->handleResponse(client_sock, buffer);
+            this->closeConnectionRequest(client_sock, buffer);
+        }catch(const std::runtime_error &e){
+            std::cerr << e.what() << std::endl;
             return false;
         }
-
-        buffer[bytes_received] = '\0';
-
-        this->handleResponse(client_sock, buffer);
-
-        if (strstr(buffer, "Connection: close")) {
-            std::cout << "Client requested to close connection: " << client_sock << std::endl;
-            this->closeConnection(&client_sock);
-            return false;
-        }
-
     }
 
     return true;
