@@ -21,7 +21,7 @@ std::string read_output(int pipe_fd)
 void cgi_response(const std::string &message, HttpResponse *response, short code)
 {
     response->setStatusCode(code);
-    if(code == 500)
+    if(code != 200)
         response->setHeader("Content-Type", "text/plain");
     else
         response->setHeader("Content-Type", "text/html");
@@ -32,14 +32,29 @@ void cgi_response(const std::string &message, HttpResponse *response, short code
     response->build();
 }
 
-void Cgi::execute(const std::string &scriptPath, HttpResponse *response)
+static std::string build_query_string(const StringMap &query)
 {
+    std::string queryString;
+    for (StringMap::const_iterator it = query.begin(); it != query.end(); ++it)
+    {
+        if (!queryString.empty())
+            queryString += "&";
+        queryString += it->first + "=" + it->second;
+    }
+    return queryString;
+}
+
+void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const HttpRequest &request) 
+{
+    std::string query = build_query_string(request.getURL()->getQueryMap());
+    std::cout << "Query: " << query << std::endl;
+
     Type scriptType = detect_type(scriptPath);
     std::string interpreter = get_interpreter(scriptType);
 
     if (scriptType == UNKNOWN)
     {
-        cgi_response("Unknown script type", response, 500);
+        cgi_response("Not Implemented", response, 501);
         return;
     }
 
@@ -66,7 +81,7 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response)
         close(pipe_fd[1]);
 
         char *argv[3] = {str_char(interpreter), str_char(scriptPath), NULL};
-        std::map<std::string, std::string> envMap = get_env(scriptPath);
+        std::map<std::string, std::string> envMap = get_env(scriptPath, query);
         char **env = convert_env(envMap);
 
         execve(str_char(interpreter), argv, env);
@@ -96,7 +111,7 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response)
         response->setHeader(it->first, it->second);
     }
     std::string body = get_body(output);
-    if (body.empty())
+    if (body.empty() || body.size() <= 1)
     {
         cgi_response("Empty response body", response, 500);
         return;

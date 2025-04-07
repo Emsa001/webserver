@@ -14,7 +14,6 @@ server:
         cgi: true
         path: "/cgi-bin"
         root: "/cgi-bin"
-        autoindex: true
 
     errors:
         500: "500.html"

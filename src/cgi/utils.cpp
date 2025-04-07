@@ -62,7 +62,7 @@ StringMap get_headers(const std::string &output)
 
     while (std::getline(stream, line))
     {
-        if (line.empty())
+        if (line.empty() || line == "\n")
             break;
 
         size_t pos = line.find(':');

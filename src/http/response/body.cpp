@@ -24,7 +24,7 @@ void HttpResponse::directoryListing(const FileData &fileData) {
     this->build();
 }
 
-void HttpResponse::buildBody(FileData &fileData) {
+void HttpResponse::buildBody(FileData &fileData, const HttpRequest &request) {
 
     // std::cout << "Setting body" << std::endl;
     // std::cout << "File exists: " << fileData.exists << std::endl;
@@ -47,7 +47,7 @@ void HttpResponse::buildBody(FileData &fileData) {
     }
 
     if(this->cgi){
-        Cgi::execute(fileData.path, this);
+        Cgi::execute(fileData.path, this, request);
         return ;
     }
 

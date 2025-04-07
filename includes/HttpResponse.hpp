@@ -2,6 +2,9 @@
 #define HTTP_RESPONSE_HPP
 
 #include "Webserv.hpp"
+#include "HttpRequest.hpp"
+
+class HttpRequest;
 
 class HttpResponse {
     private:
@@ -38,7 +41,7 @@ class HttpResponse {
         void directoryListing(const FileData &fileData);
         void respondStatusPage(unsigned short code);
 
-        void buildBody(FileData &fileData);
+        void buildBody(FileData &fileData, const HttpRequest &request);
         void setBody(const std::string &body) { this->body = body; }
         void setStatusCode(unsigned short code) {
             this->statusCode = code;

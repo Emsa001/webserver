@@ -12,7 +12,7 @@ void Server::handleResponse(int client_sock, const char *buffer) {
     }
     
     std::cout << "Request: " << request.getMethod() << " " << request.getURL()->getPath() << std::endl;
-
+    
     FileData fileData = this->createFileData(location, request);
 
     if (!fileData.exists) {
@@ -25,7 +25,7 @@ void Server::handleResponse(int client_sock, const char *buffer) {
     if(Config::getSafe(*location, "cgi", false))
         response.setCGI(true);
     
-    response.buildBody(fileData);
+    response.buildBody(fileData, request);
     response.respond();
 }
 

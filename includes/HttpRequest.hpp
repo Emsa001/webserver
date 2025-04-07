@@ -57,7 +57,7 @@ class HttpRequest {
 
         HttpURL *url;
 
-        int socket; // Do we need this here?
+        int socket;
     public:
         HttpRequest(int socket, const char *buffer);
         ~HttpRequest() {
