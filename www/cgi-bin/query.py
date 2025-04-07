@@ -12,12 +12,8 @@ print("Content-Type: text/html\n")
 print(f"""
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Hello CGI</title>
-</head>
 <body>
-    <h1>Hello from CGI!</h1>
-    <h2>Received Parameters:</h2>
+    <h1>Received Parameters:</h1>
     <ul>
 """)
 

@@ -32,21 +32,19 @@ void cgi_response(const std::string &message, HttpResponse *response, short code
     response->build();
 }
 
-static std::string build_query_string(const StringMap &query)
+std::string get_query(const std::string &uri)
 {
-    std::string queryString;
-    for (StringMap::const_iterator it = query.begin(); it != query.end(); ++it)
+    size_t pos = uri.find('?');
+    if (pos != std::string::npos)
     {
-        if (!queryString.empty())
-            queryString += "&";
-        queryString += it->first + "=" + it->second;
+        return uri.substr(pos + 1);
     }
-    return queryString;
+    return "";
 }
 
 void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const HttpRequest &request) 
 {
-    std::string query = build_query_string(request.getURL()->getQueryMap());
+    std::string query = get_query(request.getURI());
     std::cout << "Query: " << query << std::endl;
 
     Type scriptType = detect_type(scriptPath);

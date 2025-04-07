@@ -3,6 +3,7 @@
 current_date=$(date +"%Y-%m-%d %H:%M:%S")
 
 echo "Content-Type: text/html"
+echo "something: test"
 echo ""
 
 cat <<EOF

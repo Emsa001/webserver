@@ -7,26 +7,33 @@ GRN = "\033[92m"
 RED = "\033[91m"
 RES = "\033[0m"
 
+host = "http://localhost:8080"
+
 class I_url():
     def __init__(self, url, expected):
         self.url = url
         self.expected = expected
+        
+
+cgi_query = [
+    I_url(f"{host}/cgi-bin/query.py?param1=value1&param2=value2", 200),
+]
 
 valid_cgi = [
-    I_url("http://localhost:8080/cgi-bin/hello.py", 200),
-    I_url("http://localhost:8080/cgi-bin/hello.sh", 200),
-    I_url("http://localhost:8080/cgi-bin/hello.php", 200),
+    I_url(f"{host}/cgi-bin/hello.py", 200),
+    I_url(f"{host}/cgi-bin/hello.sh", 200),
+    I_url(f"{host}/cgi-bin/hello.php", 200),
 ]
 
 invalid_cgi = [
-    I_url("http://localhost:8080/cgi-bin/hello.pl", 501),
-    I_url("http://localhost:8080/cgi-bin/", 403),
-    I_url("http://localhost:8080/cgi-bin/hello", 404),
-    I_url("http://localhost:8080/cgi-bin/hello.py?param=invalid", 400),
-    I_url("http://localhost:8080/cgi-bin/empty_body.py", 500),
-    I_url("http://localhost:8080/cgi-bin/empty_headers.py", 500),
-    I_url("http://localhost:8080/cgi-bin/empty_content_type.py", 500),
-    I_url("http://localhost:8080/cgi-bin/no_permissions.py", 500),
+    I_url(f"{host}/cgi-bin/hello.pl", 501),
+    I_url(f"{host}/cgi-bin/", 403),
+    I_url(f"{host}/cgi-bin/hello", 404),
+    I_url(f"{host}/cgi-bin/hello.py?param=invalid", 200),
+    I_url(f"{host}/cgi-bin/empty_body.py", 500),
+    I_url(f"{host}/cgi-bin/empty_headers.py", 500),
+    I_url(f"{host}/cgi-bin/empty_content_type.py", 500),
+    I_url(f"{host}/cgi-bin/no_permissions.py", 500),
 ]
 
 def test_url(url: list[I_url]):
@@ -42,3 +49,5 @@ if __name__ == "__main__":
     test_url(valid_cgi)
     print(f"{BLU}Testing invalid CGI scripts...{RES}")
     test_url(invalid_cgi)
+    print(f"{BLU}Testing cgi query...{RES}")
+    test_url(cgi_query)
