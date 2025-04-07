@@ -31,3 +31,5 @@ print("""
 </body>
 </html>
 """)
+
+# http://localhost:8080/cgi-bin/query.py?param1=value1&param2=value2
