@@ -1,82 +1,61 @@
 #include "Webserv.hpp"
 
-void Server::handleResponse(int client_sock, const char *buffer) {
+void Server::logs(HttpRequest &request) {
+    std::cout
+        << RED300
+        << "Request: " RESET
+        << request.getMethod() << " " 
+        << request.getURL()->getPath() << std::endl
+        << std::endl;
+}
+
+bool Server::handleResponse(int client_sock, const char *buffer) {
     HttpRequest request(client_sock, buffer);
     HttpResponse response(client_sock);
 
-    const config_map *location = this->findLocation(request.getURL()->getPath());
+    this->logs(request);
 
-    if(location == NULL) {
-        response.respondStatusPage(404);
-        return;
+    if (request.getHeader("Connection") == "close") {
+        response.setHeader("Connection", "close");
+    } else {
+        response.setHeader("Connection", "keep-alive");
     }
-    
-    std::cout << "Request: " << request.getMethod() << " " << request.getURL()->getPath() << std::endl;
+
+    const config_map *location = this->findLocation(request.getURL()->getPath());
+    if (location == NULL) {
+        response.respondStatusPage(404);
+        return false;
+    }
 
     FileData fileData = this->createFileData(location, request);
-
     if (!fileData.exists) {
         response.respondStatusPage(404);
-        return;
+    }else{
+        response.setSettings(location);
+        response.buildBody(fileData);
+        response.respond();
     }
 
-    if(Config::getSafe(*location, "autoindex", false))
-        response.setListing(true);
-    if(Config::getSafe(*location, "cgi", false))
-        response.setCGI(true);
-    
-    response.buildBody(fileData);
-    response.respond();
-}
-
-int Server::receiveBytes(int client_sock, char *buffer) {
-    int bytes_received = recv(client_sock, buffer, BUFFER_SIZE - 1, 0);
-
-    if (bytes_received < 0) {
-        if (errno == EAGAIN || errno == EWOULDBLOCK)
-            throw std::runtime_error("recv() would block");
-
-        std::cerr << "[ERROR] recv() failed on socket " << client_sock << ": " << strerror(errno) << ". Closing." << std::endl;
-        this->closeConnection(&client_sock);
-        throw std::runtime_error("recv() failed");
-    }
-
-    if (bytes_received == 0) {
-        this->closeConnection(&client_sock);
-        throw std::runtime_error("Connection closed by client");
-    }
-
-    return bytes_received;
-}
-
-void Server::closeConnectionRequest(int client_sock,char *buffer) {
-    if (!strstr(buffer, "Connection: close")) return ;
-
-    std::cout << "Client requested to close connection: " << client_sock << std::endl;
-    this->closeConnection(&client_sock);
-    throw std::runtime_error("Connection closed by client");
-}
-
-bool Server::handleClient(int client_sock) {
-    if (client_sock == -1) return false;
-
-    char buffer[BUFFER_SIZE];
-    memset(buffer, 0, BUFFER_SIZE);
-
-    while (true) {
-        try{
-            const int bytes_received = this->receiveBytes(client_sock, buffer);
-            buffer[bytes_received] = '\0';
-
-            this->handleResponse(client_sock, buffer);
-            this->closeConnectionRequest(client_sock, buffer);
-        }catch(const std::runtime_error &e){
-            std::cerr << e.what() << std::endl;
-            return false;
-        }
-    }
-
+    this->client_timestamps[client_sock] = time(NULL);
     return true;
 }
 
+void Server::handleClientRead(size_t index) {
+    int fd = this->fds[index].fd;
+    char buffer[4096];
+    int bytes_read = recv(fd, buffer, sizeof(buffer) - 1, 0);
 
+    if (bytes_read <= 0) {
+        std::cout << "Closing connection (recv <= 0): " << fd << std::endl;
+        this->removeClient(index);
+        return;
+    }
+
+    buffer[bytes_read] = '\0';
+
+    if (this->handleResponse(fd, buffer) == false) {
+        std::cout << "Closing connection (handleResponse == false): " << fd << std::endl;
+        this->removeClient(index);
+        return;
+    }
+}

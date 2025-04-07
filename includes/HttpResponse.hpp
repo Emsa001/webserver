@@ -47,8 +47,7 @@ class HttpResponse {
 
         void setResponse(const std::string &response) { this->response = response; }
         void setHeader(const std::string &key, const std::string &value) { headers[key] = value; }
-        void setListing(bool listing) { this->listing = listing; }
-        void setCGI(bool cgi) { this->cgi = cgi; }
+        void setSettings(const config_map *location);
 
         StringMap getHeaders() const { return headers; }
 };

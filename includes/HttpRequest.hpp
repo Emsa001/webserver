@@ -78,6 +78,13 @@ class HttpRequest {
         const std::string &getVersion() const { return this->version; }
         HttpURL *getURL() const { return this->url; }
         const StringMap &getHeaders() const { return this->headers; }
+        const std::string getHeader(const std::string &key) const {
+            StringMap::const_iterator it = this->headers.find(key);
+            if (it != this->headers.end()) {
+                return it->second;
+            }
+            return "";
+        }
 };
 
 
