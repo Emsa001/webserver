@@ -53,7 +53,7 @@ class HttpRequest {
 
         std::string method;
         std::string uri;
-        std::string version;  
+        std::string version;
 
         HttpURL *url;
 
@@ -85,6 +85,7 @@ class HttpRequest {
             }
             return "";
         }
+
 };
 
 

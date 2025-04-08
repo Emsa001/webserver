@@ -1,13 +1,13 @@
 #include "HttpRequest.hpp"
 
 HttpRequest::HttpRequest(int socket, const char *buffer) {
-    
     this->socket = socket;
+
     std::string request(buffer);
     std::string line;
     std::istringstream requestStream(request);
 
-    // Parse the first line
+    // Parse the first line (method, URI, version)
     std::getline(requestStream, line);
     std::istringstream lineStream(line);
     lineStream >> this->method >> this->uri >> this->version;

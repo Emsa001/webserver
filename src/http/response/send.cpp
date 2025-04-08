@@ -9,12 +9,17 @@ void HttpResponse::respond() {
         ssize_t sent = send(this->socket, response_ptr + total_sent, response_size - total_sent, MSG_NOSIGNAL);
         
         if (sent < 0) {
-            std::cerr << "Error sending response on socket: " << this->socket << " (" << strerror(errno) << ")" << std::endl;
+            Logger::error(
+                "Error sending response on socket: "
+                + intToString(this->socket)
+                + " (" + strerror(errno) + ")"
+            );
             return;
         }
 
         total_sent += sent;
     }
 
-    std::cout << "Finished sending response on socket: " << this->socket << std::endl;
+
+    this->log();
 }

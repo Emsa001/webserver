@@ -1,9 +1,10 @@
-log_format: "123"
+log_format: "[date] [time] [method]: [uri] - [status] ([size])"
 
 server:
     server_name: "127.0.0.1"
     listen: 8080
     max_client_body_size: 10
+    keep_alive: 3
 
     location:
         path: "/"

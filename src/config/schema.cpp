@@ -22,6 +22,7 @@ ConfigSchema createSchema() {
     serverSchema.addEntry("server_name", STRING, true);
     serverSchema.addEntry("listen", INT, true);
     serverSchema.addEntry("max_client_body_size", INT, true);
+    serverSchema.addEntry("keep_alive", INT, false);
 
     rootSchema.addNestedSchema("server", serverSchema);
 

@@ -24,7 +24,7 @@ void Server::listener(int server_sock) {
 
         this->checkIdleClients();
 
-        std::cout << "Active clients: " << (fds.size() - 1) << std::endl;
+        Logger::info("Active clients: " + intToString(fds.size() - 1));
     }
 }
 
@@ -40,9 +40,9 @@ void Server::acceptNewConnections(int server_sock) {
             return;
         }
 
-        std::cout << "New connection: " << client_fd << std::endl;
-        this->setNonBlocking(client_fd);
+        Logger::clientConnect(client_fd);
 
+        this->setNonBlocking(client_fd);
         fds.push_back({client_fd, POLLIN, 0});
         client_timestamps[client_fd] = time(NULL);
     }
@@ -50,23 +50,17 @@ void Server::acceptNewConnections(int server_sock) {
 
 void Server::checkIdleClients() {
     time_t now = time(NULL);
+    static const int IDLE_TIMEOUT = Config::getSafe(*(this->config), "keep_alive", 30).getInt();
 
     for (size_t i = 1; i < fds.size(); ++i) {
         int fd = fds[i].fd;
 
-        if (now - client_timestamps[fd] > 30) {
-            std::cout << "Idle timeout, closing fd: " << fd << std::endl;
+        if (now - client_timestamps[fd] > IDLE_TIMEOUT) {
+            // std::cout << "Idle timeout, closing fd: " << fd << std::endl;
+            Logger::clientIdle(fd);
             this->removeClient(i);
             --i;
         }
-    }
-}
-
-void Server::closeConnection(int* client_sock) {
-    if (client_sock && *client_sock >= 0) {
-        std::cout << "Closed socket " << *client_sock << std::endl;
-        close(*client_sock);
-        *client_sock = -1;
     }
 }
 
@@ -78,3 +72,12 @@ void Server::removeClient(size_t index) {
     fds.erase(fds.begin() + index);
     client_timestamps.erase(fd_copy);
 }
+
+void Server::closeConnection(int* client_sock) {
+    if (client_sock && *client_sock >= 0) {
+        Logger::clientDisconnect(*client_sock);
+        close(*client_sock);
+        *client_sock = -1;
+    }
+}
+

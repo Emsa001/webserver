@@ -13,7 +13,7 @@ int main()
 {
     std::cout << std::endl << std::endl << std::endl;
 
-    Config config = Config::instance();
+    Config& config = Config::instance();
     config.parse("conf/cgi.yml");
 
     config_array servers = config.getServers();

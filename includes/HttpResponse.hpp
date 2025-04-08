@@ -3,8 +3,13 @@
 
 #include "Webserv.hpp"
 
+class HttpRequest;
+
 class HttpResponse {
     private:
+
+        HttpRequest *request; // Pointer to the request object
+
         std::string statusLine;  // Stores "HTTP/1.1 200 OK"
         StringMap headers;      // Stores key-value pairs like "Content-Type: text/html"
         std::string body;        // Stores the response body (usually html)
@@ -18,7 +23,7 @@ class HttpResponse {
         int socket;
     
     public:
-        HttpResponse(int socket) : socket(socket) {
+        HttpResponse(int socket, HttpRequest *request) : socket(socket), request(request) {
             statusLine = "HTTP/1.1 200 OK";
             listing = false;
             statusCode = 200;
@@ -31,6 +36,7 @@ class HttpResponse {
         // Methods
         void respond();
         void build();
+        void log();
         
         std::string getReasonPhrase(unsigned short code);
         static std::string getMimeType(const std::string &path);
@@ -45,9 +51,13 @@ class HttpResponse {
             statusLine = "HTTP/1.1 " + intToString(code) + " " + this->getReasonPhrase(code);
         }
 
+        // Setters
+ 
         void setResponse(const std::string &response) { this->response = response; }
         void setHeader(const std::string &key, const std::string &value) { headers[key] = value; }
         void setSettings(const config_map *location);
+
+        // Getters
 
         StringMap getHeaders() const { return headers; }
 };

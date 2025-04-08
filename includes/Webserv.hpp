@@ -49,6 +49,7 @@
 #include "Config.hpp"
 #include "Server.hpp"
 #include "Cgi.hpp"
+#include "Logger.hpp"
 
 
 // #include <iostream> // → Allows us to use std::cout and std::cerr for logging.

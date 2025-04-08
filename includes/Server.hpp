@@ -26,9 +26,6 @@ class Server {
         void checkIdleClients();
         void removeClient(size_t index);
         bool handleResponse(int client_sock, const char *buffer);
-
-        void logs(HttpRequest &request);
-
     public:
         Server(config_map &config) : config(&config) {}
         ~Server() {}

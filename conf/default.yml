@@ -1,4 +1,4 @@
-this_is_global: Hello
+log_format: Hello
 
 server1:
     listen: 80
