@@ -54,15 +54,23 @@ class HttpRequest {
         std::string method;
         std::string uri;
         std::string version;
+        std::string body;
+
+        const char *buffer;
+
+        int maxHeaderSize = 8192; // 8KB
+        int maxBodySize = 8192; // 8KB
 
         HttpURL *url;
 
         int socket; // Do we need this here?
     public:
-        HttpRequest(int socket, const char *buffer);
+        HttpRequest(int socket, const char *buffer) : socket(socket), buffer(buffer) {};
         ~HttpRequest() {
             delete url;
         };
+
+        void parse();
         
         // Setters
 
@@ -70,6 +78,8 @@ class HttpRequest {
         void setMethod(const std::string &method) { this->method = method; }
         void setUri(const std::string &uri) { this->uri = uri; }
         void setVersion(const std::string &version) { this->version = version; }
+        void setMaxHeaderSize(int size) { this->maxHeaderSize = size; }
+        void setMaxBodySize(int size) { this->maxBodySize = size; }
 
         // Getters
 
@@ -88,6 +98,14 @@ class HttpRequest {
 
 };
 
+class HttpRequestException : public std::exception {
+    private:
+        int statusCode;
+
+    public:
+        explicit HttpRequestException(int statusCode) : statusCode(statusCode) {}
+        int getStatusCode() const { return statusCode; }
+};
 
 
 #endif

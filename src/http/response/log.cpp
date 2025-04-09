@@ -35,6 +35,9 @@ void HttpResponse::log() {
     while ((pos = logMessage.find("[status]")) != std::string::npos) {
         logMessage.replace(pos, 8, status);
     }
+    while ((pos = logMessage.find("[reason]")) != std::string::npos) {
+        logMessage.replace(pos, 8, this->getReasonPhrase(this->statusCode));
+    }
     while ((pos = logMessage.find("[size]")) != std::string::npos) {
         logMessage.replace(pos, 6, size);
     }

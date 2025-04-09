@@ -10,6 +10,18 @@ bool Server::handleResponse(int client_sock, const char *buffer) {
     HttpRequest request(client_sock, buffer);
     HttpResponse response(client_sock, &request);
 
+    request.setMaxHeaderSize(Config::getSafe(*this->config, "max_client_header_size", 8192));
+    request.setMaxBodySize(Config::getSafe(*this->config, "max_client_body_size", 8192));
+
+    try{
+        request.parse();
+    }catch(const HttpRequestException &e){
+        response.respondStatusPage(e.getStatusCode());
+        // Logger::error("HTTP request parsing error occurred: " + response.getReasonPhrase(e.getStatusCode()));
+        return false;
+    }
+
+
     std::string connectionHeader = request.getHeader("Connection");
 
     if (connectionHeader == "close") {
@@ -61,7 +73,6 @@ void Server::handleClientRead(size_t index) {
         buffer[bytes_read] = '\0';
 
         if (!this->handleResponse(fd, buffer)) {
-            std::cout << "Closing connection (handleResponse returned false): " << fd << std::endl;
             this->removeClient(index);
             return;
         }
