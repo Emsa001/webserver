@@ -1,4 +1,4 @@
-log_format: "[time] [[method]]: [uri] - [status] ([reason])"
+log_format: "[time] [[method]]: [uri] - [status] ([reason]) - [size]"
 
 server:
     server_name: "127.0.0.1"
@@ -8,6 +8,7 @@ server:
     keep_alive: 30
 
     location:
+        methods: "GET"
         path: "/"
         root: "/"
         index: "index.html"

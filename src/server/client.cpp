@@ -6,46 +6,54 @@
 
 */
 
+void Server::isValidMethod(HttpRequest &request, const config_map &location){
+    const std::string defaultMethods = "GET POST DELETE";
+    std::string availableMethods = Config::getSafe(location, "methods", defaultMethods);
+    if (availableMethods.find(request.getMethod()) == std::string::npos) {
+        throw HttpRequestException(405);
+    }
+}
+
 bool Server::handleResponse(int client_sock, const char *buffer) {
     HttpRequest request(client_sock, buffer);
     HttpResponse response(client_sock, &request);
 
     request.setMaxHeaderSize(Config::getSafe(*this->config, "max_client_header_size", 8192));
     request.setMaxBodySize(Config::getSafe(*this->config, "max_client_body_size", 8192));
+    std::string connectionHeader = "close";
 
     try{
         request.parse();
+        connectionHeader = request.getHeader("Connection");
+
+        if (connectionHeader == "close") {
+            response.setHeader("Connection", "close");
+        } else {
+            response.setHeader("Connection", "keep-alive");
+        }
+
+        const config_map *location = this->findLocation(request.getURL()->getPath());
+        if (location == NULL) {
+            throw HttpRequestException(404);
+        }
+
+        this->isValidMethod(request, *location);
+
+        FileData fileData = this->createFileData(location, request);
+        if (!fileData.exists) {
+            response.respondStatusPage(404);
+        } else {
+            response.setSettings(location);
+            response.buildBody(fileData);
+            response.respond();
+        }
+        this->client_timestamps[client_sock] = time(NULL);
+        
     }catch(const HttpRequestException &e){
         response.respondStatusPage(e.getStatusCode());
-        // Logger::error("HTTP request parsing error occurred: " + response.getReasonPhrase(e.getStatusCode()));
-        return false;
-    }
-
-
-    std::string connectionHeader = request.getHeader("Connection");
-
-    if (connectionHeader == "close") {
-        response.setHeader("Connection", "close");
-    } else {
-        response.setHeader("Connection", "keep-alive");
-    }
-
-    const config_map *location = this->findLocation(request.getURL()->getPath());
-    if (location == NULL) {
-        response.respondStatusPage(404);
         return (connectionHeader != "close");
     }
 
-    FileData fileData = this->createFileData(location, request);
-    if (!fileData.exists) {
-        response.respondStatusPage(404);
-    } else {
-        response.setSettings(location);
-        response.buildBody(fileData);
-        response.respond();
-    }
-
-    this->client_timestamps[client_sock] = time(NULL);
     return (connectionHeader != "close");
 }
 

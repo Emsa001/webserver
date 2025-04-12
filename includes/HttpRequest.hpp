@@ -58,14 +58,17 @@ class HttpRequest {
 
         const char *buffer;
 
-        int maxHeaderSize = 8192; // 8KB
-        int maxBodySize = 8192; // 8KB
+        size_t maxHeaderSize;
+        size_t maxBodySize;
 
         HttpURL *url;
 
         int socket; // Do we need this here?
     public:
-        HttpRequest(int socket, const char *buffer) : socket(socket), buffer(buffer) {};
+        HttpRequest(int socket, const char *buffer) : buffer(buffer), socket(socket) {
+            this->maxHeaderSize = 8192;
+            this->maxBodySize = 8192;
+        };
         ~HttpRequest() {
             delete url;
         };

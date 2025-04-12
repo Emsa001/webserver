@@ -14,6 +14,7 @@ class HttpRequest;
 
 class Server {
     private:
+       
         config_map *config;
 
         std::vector<pollfd> fds;
@@ -26,15 +27,23 @@ class Server {
         void checkIdleClients();
         void removeClient(size_t index);
         bool handleResponse(int client_sock, const char *buffer);
+
+        void isValidMethod(HttpRequest &request, const config_map &location);
     public:
         Server(config_map &config) : config(&config) {}
         ~Server() {}
 
         int start();
+
         bool isDirectoryListing(const config_map *location, const FileData &fileData);
         const FileData createFileData(const config_map *location, HttpRequest &request) const;
         const config_map *findLocation(const std::string &path);
         void closeConnection(int *client_sock);
+
+        std::string const getServerName() const {
+            return this->config->at("server_name");
+        }
+
 };
 
 

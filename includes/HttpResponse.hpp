@@ -23,7 +23,7 @@ class HttpResponse {
         int socket;
     
     public:
-        HttpResponse(int socket, HttpRequest *request) : socket(socket), request(request) {
+        HttpResponse(int socket, HttpRequest *request) : request(request), socket(socket) {
             statusLine = "HTTP/1.1 200 OK";
             listing = false;
             statusCode = 200;

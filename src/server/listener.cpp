@@ -3,11 +3,17 @@
 void Server::listener(int server_sock) {
     listen(server_sock, MAX_CLIENTS);
     this->setNonBlocking(server_sock);
-    fds.push_back({server_sock, POLLIN, 0});
+
+    pollfd fd;
+    fd.fd = server_sock;
+    fd.events = POLLIN;
+    fd.revents = 0;
+
+    fds.push_back(fd);
 
     const int timeout_ms = 1000;
 
-    while (true) {
+    while (!g_stop) {
         int ret = poll(fds.data(), fds.size(), timeout_ms);
         if (ret < 0) {
             perror("poll");
@@ -23,9 +29,10 @@ void Server::listener(int server_sock) {
         }
 
         this->checkIdleClients();
-
         Logger::info("Active clients: " + intToString(fds.size() - 1));
     }
+
+    Logger::info("server: " + this->getServerName() + " stopped");
 }
 
 void Server::acceptNewConnections(int server_sock) {
@@ -41,9 +48,14 @@ void Server::acceptNewConnections(int server_sock) {
         }
 
         Logger::clientConnect(client_fd);
-
         this->setNonBlocking(client_fd);
-        fds.push_back({client_fd, POLLIN, 0});
+
+        pollfd fd;
+        fd.fd = client_fd;
+        fd.events = POLLIN;
+        fd.revents = 0;
+        fds.push_back(fd);
+
         client_timestamps[client_fd] = time(NULL);
     }
 }
