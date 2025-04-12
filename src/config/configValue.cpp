@@ -46,9 +46,7 @@ ConfigValue::ConfigValue(ConfigValue const &other)
     }
 }
 
-ConfigValue::~ConfigValue()
-{}
-
+ConfigValue::~ConfigValue() {}
 
 // Operators
 

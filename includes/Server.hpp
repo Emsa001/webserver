@@ -14,26 +14,36 @@ class HttpRequest;
 
 class Server {
     private:
+       
         config_map *config;
 
         std::vector<pollfd> fds;
         std::map<int, time_t> client_timestamps;
 
-
-        bool handleClient(int client_sock);
-        void set_nonblocking(int sock);
         void listener(int server_sock);
-        void send_response(int client_sock, const std::string &path);
+        void setNonBlocking(int sock);
+        void acceptNewConnections(int server_sock);
+        void handleClientRead(size_t index);
+        void checkIdleClients();
+        void removeClient(size_t index);
+        bool handleResponse(int client_sock, const char *buffer);
+
+        void isValidMethod(HttpRequest &request, const config_map &location);
     public:
         Server(config_map &config) : config(&config) {}
         ~Server() {}
 
         int start();
-        void handleResponse(int client_sock, const char *buffer);
+
         bool isDirectoryListing(const config_map *location, const FileData &fileData);
         const FileData createFileData(const config_map *location, HttpRequest &request) const;
         const config_map *findLocation(const std::string &path);
         void closeConnection(int *client_sock);
+
+        std::string const getServerName() const {
+            return this->config->at("server_name");
+        }
+
 };
 
 

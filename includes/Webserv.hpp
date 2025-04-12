@@ -3,6 +3,8 @@
 
 #define PROJECT_NAME "webserv"
 
+#include "Colors.hpp"
+
 // system headers
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -47,6 +49,9 @@
 #include "Config.hpp"
 #include "Server.hpp"
 #include "Cgi.hpp"
+#include "Logger.hpp"
+
+extern bool g_stop;
 
 // #include <iostream> // → Allows us to use std::cout and std::cerr for logging.
 // #include <fstream> // → Used to read files (to serve static files).

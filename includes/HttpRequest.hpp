@@ -53,16 +53,27 @@ class HttpRequest {
 
         std::string method;
         std::string uri;
-        std::string version;  
+        std::string version;
+        std::string body;
+
+        const char *buffer;
+
+        size_t maxHeaderSize;
+        size_t maxBodySize;
 
         HttpURL *url;
 
         int socket;
     public:
-        HttpRequest(int socket, const char *buffer);
+        HttpRequest(int socket, const char *buffer) : buffer(buffer), socket(socket) {
+            this->maxHeaderSize = 8192;
+            this->maxBodySize = 8192;
+        };
         ~HttpRequest() {
             delete url;
         };
+
+        void parse();
         
         // Setters
 
@@ -70,6 +81,8 @@ class HttpRequest {
         void setMethod(const std::string &method) { this->method = method; }
         void setUri(const std::string &uri) { this->uri = uri; }
         void setVersion(const std::string &version) { this->version = version; }
+        void setMaxHeaderSize(int size) { this->maxHeaderSize = size; }
+        void setMaxBodySize(int size) { this->maxBodySize = size; }
 
         // Getters
 
@@ -78,8 +91,24 @@ class HttpRequest {
         const std::string &getVersion() const { return this->version; }
         HttpURL *getURL() const { return this->url; }
         const StringMap &getHeaders() const { return this->headers; }
+        const std::string getHeader(const std::string &key) const {
+            StringMap::const_iterator it = this->headers.find(key);
+            if (it != this->headers.end()) {
+                return it->second;
+            }
+            return "";
+        }
+
 };
 
+class HttpRequestException : public std::exception {
+    private:
+        int statusCode;
+
+    public:
+        explicit HttpRequestException(int statusCode) : statusCode(statusCode) {}
+        int getStatusCode() const { return statusCode; }
+};
 
 
 #endif

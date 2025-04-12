@@ -1,5 +1,7 @@
 #include "Webserv.hpp"
 
+bool g_stop = false;
+
 void* startServer(void* arg) {
     config_map* data = static_cast<config_map*>(arg);
     Server server(*data);
@@ -9,11 +11,18 @@ void* startServer(void* arg) {
     return NULL;
 }
 
+void signalHandler( int signum ) {
+    g_stop = true;
+    std::cout << "Interrupt signal (" << signum << ") received.\n";
+}
+
 int main()
 {
+    signal(SIGINT, signalHandler);
+
     std::cout << std::endl << std::endl << std::endl;
 
-    Config config = Config::instance();
+    Config& config = Config::instance();
     config.parse("conf/cgi.yml");
 
     config_array servers = config.getServers();
