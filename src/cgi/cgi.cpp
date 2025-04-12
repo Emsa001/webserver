@@ -55,8 +55,10 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const H
     pid_t pid = fork();
     if (pid < 0)
     {
-        close(output_pipe[0]); close(output_pipe[1]);
-        close(input_pipe[0]); close(input_pipe[1]);
+        close(output_pipe[0]); 
+        close(output_pipe[1]);
+        close(input_pipe[0]); 
+        close(input_pipe[1]);
         cgi_response("Failed to fork process", response, 500);
         return;
     }

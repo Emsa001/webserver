@@ -3,6 +3,7 @@ import cgi
 import os
 import datetime
 import sys
+import urllib.parse
 
 print("Content-Type: text/html\n")
 
@@ -30,27 +31,43 @@ def delete_file(filename):
     except Exception as e:
         return f"Error deleting file: {e}"
 
+def parse_post_body():
+    if os.environ.get('REQUEST_METHOD', '') != 'POST':
+        return {}
+
+    # Read the POST body from stdin
+    try:
+        content_length = int(os.environ.get('CONTENT_LENGTH', 0))
+    except (ValueError, TypeError):
+        content_length = 0
+
+    post_data = sys.stdin.read(content_length)
+    return urllib.parse.parse_qs(post_data)
+
 if os.environ['REQUEST_METHOD'] == 'POST':
-    form = cgi.FieldStorage()
-    action = form.getvalue("action")
-    filename = form.getvalue("filename")
+    post_fields = parse_post_body()
+
+    action = post_fields.get('action', [None])[0]
+    filename = post_fields.get('filename', [None])[0]
 elif os.environ['REQUEST_METHOD'] == 'DELETE':
     input_data = sys.stdin.read()
     filename = input_data.split("=")[-1]
     action = "delete"
 else:
-    form = cgi.FieldStorage()
-    action = form.getvalue("action")
-    filename = form.getvalue("filename")
+    # Parse only the query string for GET requests
+    query_params = urllib.parse.parse_qs(os.environ.get("QUERY_STRING", ""))
+    action = query_params.get("action", [None])[0]
+    filename = query_params.get("filename", [None])[0]
+
 
 response_message = ""
-if action == "list":
-    response_message = list_files()
-elif action == "create" and filename:
-    response_message = create_file(filename)
-elif action == "delete" and filename:
-    response_message = delete_file(filename)
 
+if action == "create" and filename:
+    create_file(filename)
+elif action == "delete" and filename:
+    delete_file(filename)
+
+response_message = list_files()
 current_date = get_date()
 
 print(f"""
@@ -116,9 +133,7 @@ print(f"""
                 }}
             }})
             .then(response => response.text())
-            .then(data => {{
-                document.getElementById('response').innerHTML = data;
-            }})
+
             .catch(error => {{
                 console.error('Error:', error);
             }});
