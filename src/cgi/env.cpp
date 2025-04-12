@@ -6,7 +6,7 @@ StringMap Cgi::get_env(const std::string& scriptPath, std::string query)
     env["GATEWAY_INTERFACE"] = "CGI/1.1";
     env["SCRIPT_FILENAME"] = scriptPath;
     env["REQUEST_METHOD"] = "GET";  // Modify based on request type
-    env["QUERY_STRING"] = query;       // Extract from request URL
+    env["QUERY_STRING"] = query;
     env["CONTENT_LENGTH"] = "";     // Required for POST
     env["CONTENT_TYPE"] = "";       // Required for POST
     env["SERVER_PROTOCOL"] = "HTTP/1.1";

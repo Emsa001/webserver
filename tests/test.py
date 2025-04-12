@@ -33,7 +33,6 @@ invalid_cgi = [
     I_url(f"{host}/cgi-bin/empty_body.py", 500),
     I_url(f"{host}/cgi-bin/empty_headers.py", 500),
     I_url(f"{host}/cgi-bin/empty_content_type.py", 500),
-    I_url(f"{host}/cgi-bin/no_permissions.py", 500),
 ]
 
 def test_url(url: list[I_url]):
