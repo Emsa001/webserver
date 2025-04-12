@@ -16,23 +16,23 @@ class I_url():
         
 
 cgi_query = [
-    I_url(f"{host}/cgi-bin/query.py?param1=value1&param2=value2", 200),
+    I_url(f"{host}/cgi-test/query.py?param1=value1&param2=value2", 200),
 ]
 
 valid_cgi = [
-    I_url(f"{host}/cgi-bin/hello.py", 200),
-    I_url(f"{host}/cgi-bin/hello.sh", 200),
-    I_url(f"{host}/cgi-bin/hello.php", 200),
+    I_url(f"{host}/cgi-test/hello.py", 200),
+    I_url(f"{host}/cgi-test/hello.sh", 200),
+    I_url(f"{host}/cgi-test/hello.php", 200),
 ]
 
 invalid_cgi = [
-    I_url(f"{host}/cgi-bin/hello.pl", 501),
-    I_url(f"{host}/cgi-bin/", 403),
-    I_url(f"{host}/cgi-bin/hello", 404),
-    I_url(f"{host}/cgi-bin/hello.py?param=invalid", 200),
-    I_url(f"{host}/cgi-bin/empty_body.py", 500),
-    I_url(f"{host}/cgi-bin/empty_headers.py", 500),
-    I_url(f"{host}/cgi-bin/empty_content_type.py", 500),
+    I_url(f"{host}/cgi-test/hello.pl", 501),
+    I_url(f"{host}/cgi-test/", 403),
+    I_url(f"{host}/cgi-test/hello", 404),
+    I_url(f"{host}/cgi-test/hello.py?param=invalid", 200),
+    I_url(f"{host}/cgi-test/empty_body.py", 500),
+    I_url(f"{host}/cgi-test/empty_headers.py", 500),
+    I_url(f"{host}/cgi-test/empty_content_type.py", 500),
 ]
 
 def test_url(url: list[I_url]):

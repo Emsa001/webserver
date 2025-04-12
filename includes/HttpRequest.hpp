@@ -50,18 +50,17 @@ class HttpURL {
 class HttpRequest {
     private:
         StringMap headers;
-
+        
+        HttpURL *url;
         std::string method;
         std::string uri;
         std::string version;
         std::string body;
-
+        
         const char *buffer;
 
         size_t maxHeaderSize;
         size_t maxBodySize;
-
-        HttpURL *url;
 
         int socket;
     public:
@@ -91,6 +90,7 @@ class HttpRequest {
         const std::string &getVersion() const { return this->version; }
         HttpURL *getURL() const { return this->url; }
         const StringMap &getHeaders() const { return this->headers; }
+        const std::string &getBody() const { return this->body; }
         const std::string getHeader(const std::string &key) const {
             StringMap::const_iterator it = this->headers.find(key);
             if (it != this->headers.end()) {

@@ -6,7 +6,7 @@
 class Logger {
 public:
     static void info(const std::string& message) {
-        std::cout << BOLD << BLUE500 << "[INFO] " << RESET << message << std::endl;
+        // std::cout << BOLD << BLUE500 << "[INFO] " << RESET << message << std::endl;
     }
 
     static void warning(const std::string& message) {
@@ -33,15 +33,15 @@ public:
     }
 
     static void clientConnect(const int clientId) {
-        std::cout << BOLD << GREEN500 << "[CONNECT] " << RESET << "Client " << clientId << " has connected." << std::endl;
+        // std::cout << BOLD << GREEN500 << "[CONNECT] " << RESET << "Client " << clientId << " has connected." << std::endl;
     }
 
     static void clientDisconnect(const int clientId) {
-        std::cout << BOLD << ORANGE500 << "[DISCONNECT] " << RESET << "Client " << clientId << " has disconnected." << std::endl;
+        // std::cout << BOLD << ORANGE500 << "[DISCONNECT] " << RESET << "Client " << clientId << " has disconnected." << std::endl;
     }
 
     static void clientIdle(const int clientId) {
-        std::cout << BOLD << ORANGE300 << "[IDLE] " << RESET << "Client " << clientId << " is idle." << std::endl;
+        // std::cout << BOLD << ORANGE300 << "[IDLE] " << RESET << "Client " << clientId << " is idle." << std::endl;
     }
 
 };

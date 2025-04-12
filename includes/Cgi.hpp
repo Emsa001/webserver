@@ -16,7 +16,7 @@ class Cgi
         };
 
         static char **convert_env(const std::map<std::string, std::string>& env_map);
-        static std::map<std::string, std::string> get_env(const std::string& scriptPath, std::string query);
+        static std::map<std::string, std::string> get_env(const std::string& scriptPath, const HttpRequest& request);
         static Type detect_type(const std::string &scriptPath);
         static std::string get_interpreter(Type type);
 

@@ -55,7 +55,7 @@ cat <<EOF
         <p><strong>Current CGI Script:</strong> Bash is handling this request!</p>
         <p><strong>Server Time:</strong> ${current_date}</p>
         <div class="button">
-            <a href="http://localhost:8080/cgi-bin/hello.php">Go to PHP CGI Script</a>
+            <a href="http://localhost:8080/cgi-test/hello.php">Go to PHP CGI Script</a>
         </div>
     </div>
 </body>

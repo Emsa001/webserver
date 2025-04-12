@@ -44,7 +44,7 @@ bool Server::handleResponse(int client_sock, const char *buffer) {
             response.respondStatusPage(404);
         } else {
             response.setSettings(location);
-            response.buildBody(fileData);
+            response.buildBody(fileData, request);
             response.respond();
         }
         this->client_timestamps[client_sock] = time(NULL);

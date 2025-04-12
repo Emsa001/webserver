@@ -1,24 +1,22 @@
-#!/usr/bin/env perl
-# filepath: /home/btvildia/Desktop/webserver/www/cgi-bin/hello.pl
+<?php
 
-use strict;
-use warnings;
-use POSIX qw(strftime);
+echo "Content-Type: text/html";
+echo "\n\n";
 
-# Print the HTTP header
-print "Content-Type: text/html\n\n";
+function get_current_date() {
+    return date("Y-m-d H:i:s");
+}
 
-# Get the current date and time
-my $current_date = strftime "%Y-%m-%d %H:%M:%S", localtime;
+$current_date = get_current_date();
 
-# Print the HTML content
-print <<HTML;
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perl CGI</title>
+    <title>PHP CGI</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -34,7 +32,7 @@ print <<HTML;
             display: inline-block;
         }
         h1 {
-            color: #007BFF;
+            color: #6a0dad;
         }
         p {
             color: #333;
@@ -45,25 +43,24 @@ print <<HTML;
         .button a {
             text-decoration: none;
             color: white;
-            background-color: #007BFF;
+            background-color: #6a0dad;
             padding: 10px 20px;
             border-radius: 5px;
             font-size: 16px;
         }
         .button a:hover {
-            background-color: #0056b3;
+            background-color: #5a0c9d;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Perl CGI</h1>
-        <p><strong>Current CGI Script:</strong> Perl is handling this request!</p>
-        <p><strong>Server Time:</strong> $current_date</p>
+        <h1>PHP CGI</h1>
+        <p><strong>Current CGI Script:</strong> PHP is handling this request!</p>
+        <p><strong>Server Time:</strong> <?php echo $current_date; ?></p>
         <div class="button">
-            <a href="http://localhost:8080/cgi-bin/hello.sh">Go to Shell CGI Script</a>
+            <a href="http://localhost:8080/cgi-test/hello.py">Go to Python CGI Script</a>
         </div>
     </div>
 </body>
 </html>
-HTML

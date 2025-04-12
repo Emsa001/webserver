@@ -32,21 +32,8 @@ void cgi_response(const std::string &message, HttpResponse *response, short code
     response->build();
 }
 
-std::string get_query(const std::string &uri)
-{
-    size_t pos = uri.find('?');
-    if (pos != std::string::npos)
-    {
-        return uri.substr(pos + 1);
-    }
-    return "";
-}
-
 void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const HttpRequest &request) 
 {
-    std::string query = get_query(request.getURI());
-    std::cout << "Query: " << query << std::endl;
-
     Type scriptType = detect_type(scriptPath);
     std::string interpreter = get_interpreter(scriptType);
 
@@ -56,38 +43,54 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const H
         return;
     }
 
-    int pipe_fd[2];
-    if (pipe(pipe_fd) == -1)
+    int output_pipe[2];
+    int input_pipe[2];
+
+    if (pipe(output_pipe) == -1 || pipe(input_pipe) == -1)
     {
-        cgi_response("Failed to create pipe", response, 500);
+        cgi_response("Failed to create pipes", response, 500);
         return;
     }
 
     pid_t pid = fork();
     if (pid < 0)
     {
-        close(pipe_fd[0]);
-        close(pipe_fd[1]);
+        close(output_pipe[0]); close(output_pipe[1]);
+        close(input_pipe[0]); close(input_pipe[1]);
         cgi_response("Failed to fork process", response, 500);
         return;
     }
 
-    if (pid == 0)
+    if (pid == 0) // child process
     {
-        close(pipe_fd[0]);
-        dup2(pipe_fd[1], STDOUT_FILENO);
-        close(pipe_fd[1]);
+        dup2(output_pipe[1], STDOUT_FILENO);
+        close(output_pipe[0]);
+        close(output_pipe[1]);
+
+        dup2(input_pipe[0], STDIN_FILENO);
+        close(input_pipe[0]);
+        close(input_pipe[1]);
 
         char *argv[3] = {str_char(interpreter), str_char(scriptPath), NULL};
-        std::map<std::string, std::string> envMap = get_env(scriptPath, query);
+        std::map<std::string, std::string> envMap = get_env(scriptPath, request);
         char **env = convert_env(envMap);
 
         execve(str_char(interpreter), argv, env);
     }
 
-    close(pipe_fd[1]);
-    std::string output = read_output(pipe_fd[0]);
-    close(pipe_fd[0]);
+    close(output_pipe[1]);
+    close(input_pipe[0]);
+
+    if (request.getMethod() == "POST" || request.getMethod() == "DELETE")
+    {
+        const std::string &body = request.getBody();
+        if (!body.empty())
+            write(input_pipe[1], body.c_str(), body.size());
+    }
+    close(input_pipe[1]);
+
+    std::string output = read_output(output_pipe[0]);
+    close(output_pipe[0]);
 
     int status;
     waitpid(pid, &status, 0);
@@ -99,16 +102,19 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const H
     }
 
     StringMap headers = get_headers(output);
+    std::string body = get_body(output);
+
     if (headers.empty())
     {
         cgi_response("Empty response headers", response, 500);
         return;
     }
+
     for (StringMap::iterator it = headers.begin(); it != headers.end(); ++it)
     {
         response->setHeader(it->first, it->second);
     }
-    std::string body = get_body(output);
+
     if (body.empty() || body.size() <= 1)
     {
         cgi_response("Empty response body", response, 500);

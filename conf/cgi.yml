@@ -3,7 +3,7 @@ log_format: "[time] [[method]]: [uri] - [status] ([reason]) - [size]"
 server:
     server_name: "127.0.0.1"
     listen: 8080
-    max_client_body_size: 10
+    max_client_body_size: 1024
     max_client_header_size: 1024
     keep_alive: 30
 
@@ -18,10 +18,17 @@ server:
         index: "beqa.html"
 
     location:
+        methods: "POST DELETE GET"
         cgi: true
         path: "/cgi-bin"
         root: "/cgi-bin/"
-        autoindex: true
+
+    location:
+        methods: "GET"
+        cgi: true
+        path: "/cgi-test"
+        root: "/cgi-test/"
+
 
     errors:
         500: "500.html"
