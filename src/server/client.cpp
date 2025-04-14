@@ -16,7 +16,7 @@ void Server::isValidMethod(HttpRequest &request, const config_map &location){
 
 bool Server::handleResponse(int client_sock, const char *buffer) {
     HttpRequest request(client_sock, buffer);
-    HttpResponse response(client_sock, &request);
+    HttpResponse response(client_sock, &request, this->config);
 
     request.setMaxHeaderSize(Config::getSafe(*this->config, "max_client_header_size", 8192));
     request.setMaxBodySize(Config::getSafe(*this->config, "max_client_body_size", 8192));

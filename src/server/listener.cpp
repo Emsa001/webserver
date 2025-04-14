@@ -10,10 +10,18 @@ void Server::listener(int server_sock) {
     fd.revents = 0;
 
     fds.push_back(fd);
-
     const int timeout_ms = 1000;
 
-    while (!g_stop) {
+    Logger::success("Server: " + this->getServerName() + " started");
+
+    while (true) {
+        pthread_mutex_lock(&g_stop_mutex);  // Lock the mutex
+        if (g_stop) {
+            pthread_mutex_unlock(&g_stop_mutex);  // Unlock the mutex before breaking
+            break;
+        }
+        pthread_mutex_unlock(&g_stop_mutex);  // Unlock the mutex
+
         int ret = poll(fds.data(), fds.size(), timeout_ms);
         if (ret < 0) {
             perror("poll");
@@ -29,11 +37,11 @@ void Server::listener(int server_sock) {
         }
 
         this->checkIdleClients();
-        Logger::info("Active clients: " + intToString(fds.size() - 1));
     }
 
-    Logger::info("server: " + this->getServerName() + " stopped");
+    Logger::warning("Server: " + this->getServerName() + " stopped");
 }
+
 
 void Server::acceptNewConnections(int server_sock) {
     while (true) {

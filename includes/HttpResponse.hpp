@@ -10,7 +10,6 @@ class HttpRequest;
 
 class HttpResponse {
     private:
-
         HttpRequest *request; // Pointer to the request object
 
         std::string statusLine;  // Stores "HTTP/1.1 200 OK"
@@ -24,9 +23,10 @@ class HttpResponse {
 
         unsigned short statusCode;
         int socket;
+        config_map *config;
     
     public:
-        HttpResponse(int socket, HttpRequest *request) : request(request), socket(socket) {
+        HttpResponse(int socket, HttpRequest *request, config_map *config) : request(request), socket(socket), config(config) {
             statusLine = "HTTP/1.1 200 OK";
             listing = false;
             statusCode = 200;

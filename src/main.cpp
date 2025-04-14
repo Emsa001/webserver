@@ -1,6 +1,8 @@
 #include "Webserv.hpp"
 
-bool g_stop = false;
+volatile sig_atomic_t g_stop = 0;
+pthread_mutex_t Logger::logMutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t g_stop_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void* startServer(void* arg) {
     config_map* data = static_cast<config_map*>(arg);
@@ -11,9 +13,13 @@ void* startServer(void* arg) {
     return NULL;
 }
 
-void signalHandler( int signum ) {
-    g_stop = true;
-    std::cout << "Interrupt signal (" << signum << ") received.\n";
+void signalHandler(int signum) {
+    pthread_mutex_lock(&g_stop_mutex);
+    g_stop = 1;
+    pthread_mutex_unlock(&g_stop_mutex);
+
+    std::cout << "Signal (" << signum << ") received." << std::endl;
+    std::cout << "Stopping all servers..." << std::endl << std::endl;
 }
 
 int main()
@@ -31,9 +37,6 @@ int main()
     std::vector<pthread_t> threads;
 
     for(; it != servers.end(); it++){
-        std::string server_name = it->getMap()["server_name"];
-        std::cout << "Server name: " << server_name << std::endl;
-
         pthread_t thread;
         pthread_create(&thread, NULL, startServer, &it->getMap());
         threads.push_back(thread);
@@ -42,6 +45,8 @@ int main()
     for(size_t i = 0; i < threads.size(); i++) {
         pthread_join(threads[i], NULL);
     }
+
+    Logger::destroy();
 
     return 0;
 }
