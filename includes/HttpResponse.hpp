@@ -5,7 +5,6 @@
 #include "HttpRequest.hpp"
 
 class HttpRequest;
-
 class HttpRequest;
 
 class HttpResponse {

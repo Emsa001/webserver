@@ -6,12 +6,13 @@ void HttpResponse::directoryListing(const FileData &fileData) {
     listing += "<a href=\"../\">../</a>\n";
 
     std::vector<FileData> files = getFiles(fileData.path);
+    std::string path = this->request->getURL()->getPath();
 
     for (size_t i = 0; i < files.size(); i++) {
         if (files[i].isDirectory) {
-            listing += "<a href=\"" + files[i].name + "/\">./" + files[i].name + "/</a>\n";
+            listing += "<a href=\"" + path + "/" + files[i].name + "/\">./" + files[i].name + "/</a>\n";
         } else {
-            listing += "<a href=\"" + files[i].name + "\">./" + files[i].name + "</a>\n";
+            listing += "<a href=\"" + path + "/" + files[i].name + "\">./" + files[i].name + "</a>\n";
         }
     }
 

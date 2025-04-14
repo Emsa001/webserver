@@ -13,19 +13,9 @@ void* startServer(void* arg) {
     return NULL;
 }
 
-void signalHandler(int signum) {
-    pthread_mutex_lock(&g_stop_mutex);
-    g_stop = 1;
-    pthread_mutex_unlock(&g_stop_mutex);
-
-    std::cout << "Signal (" << signum << ") received." << std::endl;
-    std::cout << "Stopping all servers..." << std::endl << std::endl;
-}
-
 int main()
 {
     signal(SIGINT, signalHandler);
-
     std::cout << std::endl << std::endl << std::endl;
 
     Config& config = Config::instance();

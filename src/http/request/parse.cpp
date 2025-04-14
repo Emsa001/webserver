@@ -5,8 +5,14 @@ void HttpRequest::parse() {
     std::string line;
     std::istringstream requestStream(request);
 
-    // Parse the first line (method, URI, version)
+    
     std::getline(requestStream, line);
+    
+    size_t totalHeaderSize = line.size();
+    if (totalHeaderSize > this->maxHeaderSize) {
+        throw HttpRequestException(414);
+    }
+
     std::istringstream lineStream(line);
     lineStream >> this->method >> this->uri >> this->version;
 
@@ -14,7 +20,6 @@ void HttpRequest::parse() {
     this->url = new HttpURL(this->uri);
 
     // Parse the headers
-    size_t totalHeaderSize = 0;
     while (std::getline(requestStream, line) && line != "\r") {
         if (line.empty() || line == "\r\n") break;
 
@@ -43,7 +48,7 @@ void HttpRequest::parse() {
 
         bodyStream << requestStream.rdbuf();
         this->body = bodyStream.str();
-        if(this->body.size() > this->maxBodySize) {
+        if (this->body.size() > this->maxBodySize) {
             throw HttpRequestException(413);
         }
     }

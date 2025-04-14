@@ -53,19 +53,18 @@ StringVec split(const std::string &s, char delim) {
 
 StringVec splitFirst(const std::string &s, char delim) {
     StringVec result;
-    std::stringstream ss(s);
-    std::string item;
-
-    if (std::getline(ss, item, delim)) {
-        result.push_back(item);
-    }
-
-    if (std::getline(ss, item)) {
-        result.push_back(item);
+    size_t pos = s.find(delim);
+    
+    if (pos == std::string::npos) {
+        result.push_back(s);
+    } else {
+        result.push_back(s.substr(0, pos));
+        result.push_back(s.substr(pos + 1));
     }
 
     return result;
 }
+
 
 std::string trimChar(const std::string &str, char c) {
     if (str.empty()) return str;

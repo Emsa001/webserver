@@ -67,6 +67,7 @@ class HttpRequest {
         HttpRequest(int socket, const char *buffer) : buffer(buffer), socket(socket) {
             this->maxHeaderSize = 8192;
             this->maxBodySize = 8192;
+            this->url = NULL;
         };
         ~HttpRequest() {
             delete url;

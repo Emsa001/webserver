@@ -51,8 +51,11 @@
 #include "Cgi.hpp"
 #include "Logger.hpp"
 
+
 extern volatile sig_atomic_t g_stop;
 extern pthread_mutex_t g_stop_mutex;
+
+void signalHandler(int signum);
 
 // #include <iostream> // → Allows us to use std::cout and std::cerr for logging.
 // #include <fstream> // → Used to read files (to serve static files).
