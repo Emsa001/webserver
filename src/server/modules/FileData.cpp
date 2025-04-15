@@ -12,15 +12,15 @@ const FileData Server::createFileData(const config_map *location, HttpRequest *r
     fullPath += requestPath.substr(locationPath.size());
 
     if(fullPath[fullPath.size() - 1] == '/' && locationPath == requestPath){
-        std::string index = Config::getSafe(*location, "index", "index.html").getString();
+        std::string index = Config::getSafe(*location, "index", (std::string)"index.html").getString();
         fullPath += "/" + index;
     }
 
-    // std::cout << std::endl;
-    // std::cout << "Full path: " << fullPath << std::endl;
-    // std::cout << "Request path: " << requestPath << std::endl;
-    // std::cout << "Location path: " << locationPath << std::endl;
-    // std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout << "Full path: " << fullPath << std::endl;
+    std::cout << "Request path: " << requestPath << std::endl;
+    std::cout << "Location path: " << locationPath << std::endl;
+    std::cout << std::endl;
     return getFileData(fullPath);
 }
 

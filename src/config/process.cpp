@@ -18,9 +18,11 @@ bool ConfigParser::processLine()
         char p = i > 0 ? line[i - 1] : '\0';
         char c = line[i];
         char n = line.size() > i + 1 ? line[i + 1] : '\0';
+        
+        if(!key.empty() && std::isspace(c)) continue;
 
         if (handleComment(p, c, quote, i))
-            return 0;
+            break;
 
         if (handleIndentation(c, quote, key, previousIndent))
             continue;

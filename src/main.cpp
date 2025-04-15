@@ -21,13 +21,12 @@ int main()
     // Logger::init();
 
     Config& config = Config::instance();
-    config.parse("conf/cgi.yml");
+    config.parse("conf/default.yml");
 
     config_array servers = config.getServers();
     config_array::iterator it = servers.begin();
 
     std::vector<pthread_t> threads;
-
 
     for(; it != servers.end(); it++){
         pthread_t thread;

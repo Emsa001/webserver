@@ -26,8 +26,8 @@ void cgi_response(const std::string &message, HttpResponse *response, short code
     response->setStatusCode(code);
     if(code != 200)
         response->setHeader("Content-Type", "text/plain");
-    else
-        response->setHeader("Content-Type", "text/html");
+    // else
+    //     response->setHeader("Content-Type", "text/html");
 
     response->setHeader("Content-Length", intToString(message.size()));
     response->setBody(message);
@@ -99,6 +99,7 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const H
 
     if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
         throw HttpRequestException(500);
+
 
     set_headers(response, output);
     cgi_response(get_body(output), response, 200);

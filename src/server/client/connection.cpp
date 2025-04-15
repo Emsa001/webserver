@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "Webserv.hpp"
 
 void Server::acceptNewConnections(int server_sock) {
     while (true) {
@@ -27,12 +27,11 @@ void Server::acceptNewConnections(int server_sock) {
 
 void Server::checkIdleClients() {
     time_t now = time(NULL);
-    static const int IDLE_TIMEOUT = Config::getSafe(*(this->config), "keep_alive", 30).getInt();
 
     for (size_t i = 1; i < fds.size(); ++i) {
         int fd = fds[i].fd;
 
-        if (now - client_timestamps[fd] > IDLE_TIMEOUT) {
+        if (now - client_timestamps[fd] > this->keep_alive) {
             // std::cout << "Idle timeout, closing fd: " << fd << std::endl;
             Logger::clientIdle(fd);
             this->removeClient(i);

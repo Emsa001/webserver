@@ -10,6 +10,7 @@ class Server {
     private:
        
         config_map *config;
+        int keep_alive;
 
         std::vector<pollfd> fds;
         std::map<int, time_t> client_timestamps;
@@ -30,7 +31,9 @@ class Server {
         ClientRequestState *readChunk(int fd, int index, char *buffer);
         int readBytes(int fd, int index, char *buffer);
     public:
-        Server(config_map &config) : config(&config) {}
+        Server(config_map &config) : config(&config) {
+            this->keep_alive = Config::getSafe(config, "keep_alive", 30).getInt();;
+        }
         ~Server() {}
 
         int start();

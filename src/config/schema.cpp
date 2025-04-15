@@ -32,7 +32,7 @@ ConfigSchema createSchema() {
     ConfigSchema locationSchema;
     locationSchema.addEntry("path", STRING, true);
     locationSchema.addEntry("exact", BOOL, false);
-    locationSchema.addEntry("methods", STRING, false); // TODO: implement array? (I'm not doing it, too lazy)
+    locationSchema.addEntry("methods", STRING, false);
     locationSchema.addEntry("root", STRING, false);
     locationSchema.addEntry("index", STRING, false);
     locationSchema.addEntry("redirect", STRING, false);

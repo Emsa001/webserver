@@ -24,9 +24,10 @@ server:
     location:
         methods: "POST DELETE GET"
         cgi: true
-        path: "/cgi-test"
+        path: "/runCgi"
         root: "/cgi-test/"
-
+        index: "query.py"
+        exact: true
 
     errors:
         500: "500.html"
