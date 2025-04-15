@@ -29,6 +29,13 @@ std::string intToString(int i) {
     return ss.str();
 }
 
+int stringToInt(const std::string &s) {
+    std::stringstream ss(s);
+    int i;
+    ss >> i;
+    return i;
+}
+
 // Helper function to convert enum to string
 std::string type_to_string(ValueType type) {
     switch (type) {

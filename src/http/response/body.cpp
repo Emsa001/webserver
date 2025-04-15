@@ -25,7 +25,7 @@ void HttpResponse::directoryListing(const FileData &fileData) {
     this->build();
 }
 
-void HttpResponse::buildBody(FileData &fileData, const HttpRequest &request) {
+void HttpResponse::buildBody(FileData &fileData, const HttpRequest *request) {
 
     // std::cout << "Setting body" << std::endl;
     // std::cout << "File exists: " << fileData.exists << std::endl;

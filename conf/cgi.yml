@@ -1,8 +1,8 @@
 server:
     server_name: "127.0.0.1"
     listen: 8080
-    max_client_body_size: 1024
-    max_client_header_size: 1024
+    max_client_body_size: 10024
+    max_client_header_size: 4096
     keep_alive: 30
 
     location:
@@ -22,7 +22,7 @@ server:
         root: "/cgi-bin/"
 
     location:
-        methods: "GET"
+        methods: "POST DELETE GET"
         cgi: true
         path: "/cgi-test"
         root: "/cgi-test/"

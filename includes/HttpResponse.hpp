@@ -46,7 +46,7 @@ class HttpResponse {
         void directoryListing(const FileData &fileData);
         void respondStatusPage(unsigned short code);
 
-        void buildBody(FileData &fileData, const HttpRequest &request);
+        void buildBody(FileData &fileData, const HttpRequest *request);
         void setBody(const std::string &body) { this->body = body; }
         void setStatusCode(unsigned short code) {
             this->statusCode = code;

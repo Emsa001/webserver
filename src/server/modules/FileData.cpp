@@ -1,9 +1,9 @@
 #include "Webserv.hpp"
 
-const FileData Server::createFileData(const config_map *location, HttpRequest &request) const{
+const FileData Server::createFileData(const config_map *location, HttpRequest *request) const{
     const std::string &root = location->at("root");
     std::string locationPath = trimChar(location->at("path").getString(), '/');
-    std::string requestPath = trimChar(request.getURL()->getPath(), '/');
+    std::string requestPath = trimChar(request->getURL()->getPath(), '/');
 
     if(requestPath.empty()) requestPath = "/";
     if(locationPath.empty()) locationPath = "/";

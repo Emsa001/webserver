@@ -1,48 +1,5 @@
 #include "Server.hpp"
 
-void Server::listener(int server_sock) {
-    listen(server_sock, MAX_CLIENTS);
-    this->setNonBlocking(server_sock);
-
-    pollfd fd;
-    fd.fd = server_sock;
-    fd.events = POLLIN;
-    fd.revents = 0;
-
-    fds.push_back(fd);
-    const int timeout_ms = 1000;
-
-    Logger::success("Server: " + this->getServerName() + " started");
-
-    while (true) {
-        pthread_mutex_lock(&g_stop_mutex);  // Lock the mutex
-        if (g_stop) {
-            pthread_mutex_unlock(&g_stop_mutex);  // Unlock the mutex before breaking
-            break;
-        }
-        pthread_mutex_unlock(&g_stop_mutex);  // Unlock the mutex
-
-        int ret = poll(fds.data(), fds.size(), timeout_ms);
-        if (ret < 0) {
-            perror("poll");
-            break;
-        }
-
-        for (size_t i = 0; i < fds.size(); ++i) {
-            if (fds[i].fd == server_sock && (fds[i].revents & POLLIN)) {
-                this->acceptNewConnections(server_sock);
-            } else if (fds[i].revents & POLLIN) {
-                this->handleClientRead(i);
-            }
-        }
-
-        this->checkIdleClients();
-    }
-
-    Logger::warning("Server: " + this->getServerName() + " stopped");
-}
-
-
 void Server::acceptNewConnections(int server_sock) {
     while (true) {
         sockaddr_in client_addr;
@@ -91,6 +48,7 @@ void Server::removeClient(size_t index) {
     this->closeConnection(&fd);
     fds.erase(fds.begin() + index);
     client_timestamps.erase(fd_copy);
+    requestStates.erase(fd_copy);
 }
 
 void Server::closeConnection(int* client_sock) {

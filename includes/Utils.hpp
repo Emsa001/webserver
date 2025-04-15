@@ -5,6 +5,7 @@
 void trim(std::string &s);
 std::string trimChar(const std::string &str, char c);
 std::string intToString(int i);
+int stringToInt(const std::string &s);
 StringVec split(const std::string &s, char delim);
 StringVec splitFirst(const std::string &s, char delim);
 
