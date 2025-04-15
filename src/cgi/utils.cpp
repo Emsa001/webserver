@@ -75,3 +75,15 @@ StringMap get_headers(const std::string &output)
     }
     return headers;
 }
+
+void set_headers(HttpResponse *response, const std::string &output)
+{
+    StringMap headers = get_headers(output);
+    if(headers.empty())
+        throw HttpRequestException(500);
+
+    for (StringMap::iterator it = headers.begin(); it != headers.end(); ++it)
+    {
+        response->setHeader(it->first, it->second);
+    }
+}
