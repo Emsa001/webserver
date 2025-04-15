@@ -16,22 +16,9 @@ Cgi::Type Cgi::detect_type(const std::string &scriptPath)
         return PHP;
     if (ends_with(scriptPath, ".sh"))
         return SHELL;
+    if (ends_with(scriptPath, ".pl"))
+        return PERL;
     return UNKNOWN;
-}
-
-std::string Cgi::get_interpreter(Type type)
-{
-    switch (type)
-    {
-        case PYTHON:
-            return "/usr/bin/python3";
-        case PHP:
-            return "/usr/bin/php";
-        case SHELL:
-            return "/bin/sh";
-        default:
-            return "";
-    }
 }
 
 std::string get_body(const std::string &output)

@@ -57,7 +57,6 @@ std::string close_pipes(int output_pipe[2], int input_pipe[2], bool child)
 void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const HttpRequest *request) 
 {
     Type scriptType = detect_type(scriptPath);
-    std::string interpreter = get_interpreter(scriptType);
 
     if (scriptType == UNKNOWN)
         throw HttpRequestException(415);
@@ -75,14 +74,16 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const H
         throw HttpRequestException(500);
     }
 
-    if (pid == 0) // child process
+    if (pid == 0)
     {
         close_pipes(output_pipe, input_pipe, true);
-        char *argv[3] = {str_char(interpreter), str_char(scriptPath), NULL};
+        char *args[2];
+        args[0] = str_char(scriptPath);
+        args[1] = NULL;
         StringMap envMap = get_env(scriptPath, request);
         char **env = convert_env(envMap);
 
-        execve(str_char(interpreter), argv, env);
+        execve(scriptPath.c_str(), args, env);
     }
     
     if (request->getMethod() == "POST" || request->getMethod() == "DELETE")
@@ -102,5 +103,6 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const H
 
 
     set_headers(response, output);
+
     cgi_response(get_body(output), response, 200);
 }

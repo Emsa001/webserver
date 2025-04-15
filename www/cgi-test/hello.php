@@ -1,12 +1,12 @@
+#!/usr/bin/env php-cgi
 <?php
 
-echo "Content-Type: text/html";
 echo "\n\n";
 
+phpinfo();
 function get_current_date() {
     return date("Y-m-d H:i:s");
 }
-
 $current_date = get_current_date();
 
 ?>
