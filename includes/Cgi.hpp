@@ -12,6 +12,7 @@ class Cgi
             PYTHON,
             PHP,
             SHELL,
+            PERL,
             UNKNOWN 
         };
 

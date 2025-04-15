@@ -1,3 +1,4 @@
+#!/usr/bin/env php-cgi
 <?php
 
 echo "Content-Type: text/html";
