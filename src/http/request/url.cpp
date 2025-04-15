@@ -3,27 +3,31 @@
 HttpURL::HttpURL(const std::string &url) {
     StringVec parts = splitFirst(url, '?');
 
-    if(parts.size() == 0){
+    if (parts.empty()) {
         std::cerr << "Invalid URL" << std::endl;
-        return ;
+        this->path = "";
+        this->query = "";
+        return;
     }
 
     this->path = parts[0];
-    if(parts.size() == 1){
-        this->query = "";
-        return ;
+    this->query = (parts.size() > 1) ? parts[1] : "";
+
+    if (this->query.empty()) {
+        return;
     }
 
-    this->query = parts[1];
-    parts = split(this->query, '&');
-
-    StringVec::const_iterator it = parts.begin();
-    for(; it != parts.end(); it++){
+    StringVec queryParts = split(this->query, '&');
+    for (StringVec::const_iterator it = queryParts.begin(); it != queryParts.end(); ++it) {
         StringVec pair = splitFirst(*it, '=');
-        if(pair.size() != 2){
-            this->queryMap[pair[0]] = "";
+
+        if (pair.empty() || pair[0].empty()) {
             continue;
         }
-        this->queryMap[pair[0]] = pair[1];
+
+        const std::string &key = pair[0];
+        const std::string &value = (pair.size() > 1) ? pair[1] : "";
+
+        this->queryMap[key] = value;
     }
 }

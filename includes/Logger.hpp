@@ -2,48 +2,81 @@
 #define LOGGER_HPP
 
 #include "Webserv.hpp"
+#include <pthread.h>
+
+#define LOG_ENABLED true
 
 class Logger {
-public:
-    static void info(const std::string& message) {
-        // std::cout << BOLD << BLUE500 << "[INFO] " << RESET << message << std::endl;
-    }
+    private:
+        static pthread_mutex_t logMutex;
 
-    static void warning(const std::string& message) {
-        std::cout << BOLD << YELLOW500 << "[WARNING] " << RESET << message << std::endl;
-    }
+        static void lock() {
+            pthread_mutex_lock(&logMutex);
+        }
 
-    static void error(const std::string& message) {
-        std::cout << BOLD << RED500 << "[ERROR] " << RESET << message << std::endl;
-    }
+        static void unlock() {
+            pthread_mutex_unlock(&logMutex);
+        }
 
-    static void critical(const std::string& message) {
-        std::cout << BOLD << RED900 << "[CRITICAL] " << RESET << message << std::endl;
-    }
+        static void log(const std::string& level, const std::string& color, const std::string& message) {
+            if (!LOG_ENABLED) return;
+            lock();
+            std::cout << BOLD << color << "[" << level << "] " << RESET << message << std::endl;
+            unlock();
+        }
 
-    static void debug(const std::string& message) {
-        std::cout << BOLD << GREEN500 << "[DEBUG] " << RESET << message << std::endl;
-    }
+    public:
 
+        static void init(){
+            if (pthread_mutex_init(&logMutex, NULL) != 0) {
+                std::cerr << "Failed to initialize mutex" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+        }
 
-    // Custom Methods
+        static void destroy() {
+            pthread_mutex_destroy(&logMutex);
+        }
 
-    static void request(const std::string &message) {
-        std:: cout << BOLD << PURPLE400 << "[REQUEST] " << RESET << message << std::endl;
-    }
+        static void info(const std::string& message) {
+            log("INFO", BLUE500, message);
+        }
 
-    static void clientConnect(const int clientId) {
-        // std::cout << BOLD << GREEN500 << "[CONNECT] " << RESET << "Client " << clientId << " has connected." << std::endl;
-    }
+        static void success(const std::string& message) {
+            log("SUCCESS", GREEN500, message);
+        }
 
-    static void clientDisconnect(const int clientId) {
-        // std::cout << BOLD << ORANGE500 << "[DISCONNECT] " << RESET << "Client " << clientId << " has disconnected." << std::endl;
-    }
+        static void warning(const std::string& message) {
+            log("WARNING", YELLOW500, message);
+        }
 
-    static void clientIdle(const int clientId) {
-        // std::cout << BOLD << ORANGE300 << "[IDLE] " << RESET << "Client " << clientId << " is idle." << std::endl;
-    }
+        static void error(const std::string& message) {
+            log("ERROR", RED500, message);
+        }
 
+        static void critical(const std::string& message) {
+            log("CRITICAL", RED900, message);
+        }
+
+        static void debug(const std::string& message) {
+            log("DEBUG", GREEN500, message);
+        }
+
+        static void request(const std::string& message) {
+            log("REQUEST", PURPLE400, message);
+        }
+
+        static void clientConnect(const int clientId) {
+            log("CONNECT", GREEN500, "Client " + intToString(clientId) + " has connected.");
+        }
+
+        static void clientDisconnect(const int clientId) {
+            log("DISCONNECT", ORANGE500, "Client " + intToString(clientId) + " has disconnected.");
+        }
+
+        static void clientIdle(const int clientId) {
+            log("IDLE", ORANGE300, "Client " + intToString(clientId) + " is idle.");
+        }
 };
 
 #endif

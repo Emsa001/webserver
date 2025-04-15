@@ -1,6 +1,6 @@
 #include "HttpResponse.hpp"
 
-#define DEFAULT_LOG_FORMAT "[date] [time] [method]: [uri] - [status] ([size])"
+#define DEFAULT_LOG_FORMAT "[server] - [time] [[method]]: [uri] - [status] ([reason]) - [size]"
 
 std::string getDate();
 std::string getTime();
@@ -8,7 +8,8 @@ std::string getTime();
 void HttpResponse::log() {
 
     Config config = Config::instance();
-    std::string logFormat = config.getSafe(config.getRoot(), "log_format", DEFAULT_LOG_FORMAT).getString();
+    std::string logFormat = Config::getSafe(config.getRoot(), "log_format", (std::string)DEFAULT_LOG_FORMAT).getString();
+    std::string serverName = Config::getSafe(*(this->config), "server_name", "webserv").getString();
 
     std::string date = getDate();
     std::string time = getTime();
@@ -20,6 +21,9 @@ void HttpResponse::log() {
     // Replace placeholders in the log format
     std::string logMessage = logFormat;
     size_t pos;
+    while ((pos = logMessage.find("[server]")) != std::string::npos) {
+        logMessage.replace(pos, 8, serverName);
+    }
     while ((pos = logMessage.find("[date]")) != std::string::npos) {
         logMessage.replace(pos, 6, date);
     }
@@ -45,21 +49,20 @@ void HttpResponse::log() {
     Logger::request(logMessage);
 }
 
-
-std::string getDate(){
+std::string getDate() {
     time_t now = time(0);
     struct tm tstruct;
     char buf[80];
-    tstruct = *localtime(&now);
+    localtime_r(&now, &tstruct);
     strftime(buf, sizeof(buf), "%Y-%m-%d", &tstruct);
     return std::string(buf);
 }
 
-std::string getTime(){
+std::string getTime() {
     time_t now = time(0);
     struct tm tstruct;
     char buf[80];
-    tstruct = *localtime(&now);
+    localtime_r(&now, &tstruct);
     strftime(buf, sizeof(buf), "%H:%M:%S", &tstruct);
     return std::string(buf);
 }

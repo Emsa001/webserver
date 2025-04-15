@@ -15,7 +15,8 @@ void ConfigSchema::addNestedSchema(const std::string &key, const ConfigSchema &n
 ConfigSchema createSchema() {
     ConfigSchema rootSchema;
 
-    rootSchema.addEntry("log_format", STRING, true);
+    rootSchema.addEntry("log_format", STRING, false);
+
 
     // Server Schema
     ConfigSchema serverSchema;

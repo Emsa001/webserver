@@ -5,12 +5,10 @@
 #include "HttpRequest.hpp"
 
 class HttpRequest;
-
 class HttpRequest;
 
 class HttpResponse {
     private:
-
         HttpRequest *request; // Pointer to the request object
 
         std::string statusLine;  // Stores "HTTP/1.1 200 OK"
@@ -24,9 +22,10 @@ class HttpResponse {
 
         unsigned short statusCode;
         int socket;
+        config_map *config;
     
     public:
-        HttpResponse(int socket, HttpRequest *request) : request(request), socket(socket) {
+        HttpResponse(int socket, HttpRequest *request, config_map *config) : request(request), socket(socket), config(config) {
             statusLine = "HTTP/1.1 200 OK";
             listing = false;
             statusCode = 200;
@@ -47,7 +46,7 @@ class HttpResponse {
         void directoryListing(const FileData &fileData);
         void respondStatusPage(unsigned short code);
 
-        void buildBody(FileData &fileData, const HttpRequest &request);
+        void buildBody(FileData &fileData, const HttpRequest *request);
         void setBody(const std::string &body) { this->body = body; }
         void setStatusCode(unsigned short code) {
             this->statusCode = code;

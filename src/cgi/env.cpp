@@ -10,22 +10,22 @@ std::string get_query(const std::string &uri)
     return "";
 }
 
-StringMap Cgi::get_env(const std::string& scriptPath, const HttpRequest& request)
+StringMap Cgi::get_env(const std::string& scriptPath, const HttpRequest* request)
 {
-    std::string query = get_query(request.getURI());
+    std::string query = get_query(request->getURI());
 
     StringMap env;
     env["GATEWAY_INTERFACE"] = "CGI/1.1";
     env["SCRIPT_FILENAME"] = scriptPath;
-    env["REQUEST_METHOD"] = request.getMethod();
+    env["REQUEST_METHOD"] = request->getMethod();
     env["QUERY_STRING"] = query;
     env["SERVER_PROTOCOL"] = "HTTP/1.1";
     env["SERVER_SOFTWARE"] = "MyWebServer/1.0";
 
-    if (request.getMethod() == "POST" || request.getMethod() == "DELETE")
+    if (request->getMethod() == "POST" || request->getMethod() == "DELETE")
     {
-        env["CONTENT_LENGTH"] = intToString(request.getBody().size());
-        std::string contentType = request.getHeader("Content-Type");
+        env["CONTENT_LENGTH"] = intToString(request->getBody().size());
+        std::string contentType = request->getHeader("Content-Type");
         if (!contentType.empty())
             env["CONTENT_TYPE"] = contentType;
     }

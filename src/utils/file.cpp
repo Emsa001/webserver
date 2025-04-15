@@ -5,12 +5,15 @@ std::string getLastModifiedTime(const std::string &filePath) {
     if (stat(filePath.c_str(), &fileInfo) != 0) {
         return "Unknown";
     }
-    
+
     char buffer[20];
-    std::tm *timeinfo = std::localtime(&fileInfo.st_mtime);
-    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo);
-    return std::string(buffer);
+    std::tm timeinfo;
+    localtime_r(&fileInfo.st_mtime, &timeinfo);
+
+    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &timeinfo);
+    return std::string(buffer, buffer + std::strlen(buffer));
 }
+
 
 std::string readFileContent(const std::string &filePath) {
     std::ifstream file(filePath.c_str(), std::ios::in | std::ios::binary);

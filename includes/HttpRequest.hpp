@@ -27,7 +27,6 @@ https://www.rfc-editor.org/rfc/rfc2616#section-3.2.2
    a fully qualified domain name, the proxy MUST NOT change the host
    name.
 
-
 */
 
 class HttpURL {
@@ -47,36 +46,40 @@ class HttpURL {
         const StringMap &getQueryMap() const { return this->queryMap; }
 };
 
+struct ClientRequestState {
+    std::string buffer;
+    bool headersParsed;
+    size_t contentLength;
+    size_t expectedSize;
+};
+
 class HttpRequest {
     private:
         StringMap headers;
-        
+
         HttpURL *url;
         std::string method;
         std::string uri;
         std::string version;
         std::string body;
-        
-        const char *buffer;
 
         size_t maxHeaderSize;
         size_t maxBodySize;
 
         int socket;
+        std::string rawRequestData;
+
     public:
-        HttpRequest(int socket, const char *buffer) : buffer(buffer), socket(socket) {
-            this->maxHeaderSize = 8192;
-            this->maxBodySize = 8192;
-        };
+        HttpRequest(int socket, const std::string &rawData) : url(NULL), socket(socket), rawRequestData(rawData) { }
+
         ~HttpRequest() {
             delete url;
-        };
+        }
 
         void parse();
-        
-        // Setters
 
-        void setHeader(const std::string &key, const std::string &value) {  headers[key] = value; }
+        // Setters
+        void setHeader(const std::string &key, const std::string &value) { headers[key] = value; }
         void setMethod(const std::string &method) { this->method = method; }
         void setUri(const std::string &uri) { this->uri = uri; }
         void setVersion(const std::string &version) { this->version = version; }
@@ -84,22 +87,22 @@ class HttpRequest {
         void setMaxBodySize(int size) { this->maxBodySize = size; }
 
         // Getters
-
         const std::string &getMethod() const { return this->method; }
         const std::string &getURI() const { return this->uri; }
         const std::string &getVersion() const { return this->version; }
         HttpURL *getURL() const { return this->url; }
         const StringMap &getHeaders() const { return this->headers; }
         const std::string &getBody() const { return this->body; }
+
         const std::string getHeader(const std::string &key) const {
             StringMap::const_iterator it = this->headers.find(key);
             if (it != this->headers.end()) {
                 return it->second;
             }
-            return "";
+            return NULL;
         }
-
 };
+
 
 class HttpRequestException : public std::exception {
     private:
