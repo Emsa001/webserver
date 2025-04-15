@@ -71,6 +71,7 @@ void set_headers(HttpResponse *response, const std::string &output)
 
     for (StringMap::iterator it = headers.begin(); it != headers.end(); ++it)
     {
+        std::cout << it->first << ": " << it->second << std::endl;
         response->setHeader(it->first, it->second);
     }
 }

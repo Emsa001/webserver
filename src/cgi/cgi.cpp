@@ -102,5 +102,6 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const H
         throw HttpRequestException(500);
 
     set_headers(response, output);
+
     cgi_response(get_body(output), response, 200);
 }

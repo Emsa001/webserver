@@ -21,6 +21,7 @@ StringMap Cgi::get_env(const std::string& scriptPath, const HttpRequest* request
     env["QUERY_STRING"] = query;
     env["SERVER_PROTOCOL"] = "HTTP/1.1";
     env["SERVER_SOFTWARE"] = "MyWebServer/1.0";
+    env["REDIRECT_STATUS"] = "200";
 
     if (request->getMethod() == "POST" || request->getMethod() == "DELETE")
     {
