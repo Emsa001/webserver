@@ -25,6 +25,6 @@ class Cgi
 };
 
 std::string get_body(const std::string &output);
-StringMap get_headers(const std::string &output);
+void set_headers(HttpResponse *response, const std::string &output);
 
 #endif

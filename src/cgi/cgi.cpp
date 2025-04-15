@@ -20,6 +20,9 @@ std::string read_output(int pipe_fd)
 
 void cgi_response(const std::string &message, HttpResponse *response, short code)
 {
+    if (message.empty() || message.size() <= 1)
+        throw HttpRequestException(500);
+
     response->setStatusCode(code);
     if(code != 200)
         response->setHeader("Content-Type", "text/plain");
@@ -31,96 +34,72 @@ void cgi_response(const std::string &message, HttpResponse *response, short code
     response->build();
 }
 
+std::string close_pipes(int output_pipe[2], int input_pipe[2], bool child)
+{
+    std::string output;
+
+    if(child)
+        dup2(output_pipe[1], STDOUT_FILENO);
+    
+    close(output_pipe[1]);
+    if(!child)
+        output = read_output(output_pipe[0]);
+    close(output_pipe[0]);
+
+    if(child)
+        dup2(input_pipe[0], STDIN_FILENO);
+    close(input_pipe[1]);
+    close(input_pipe[0]); 
+
+    return output;
+}
+
 void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const HttpRequest *request) 
 {
     Type scriptType = detect_type(scriptPath);
     std::string interpreter = get_interpreter(scriptType);
 
     if (scriptType == UNKNOWN)
-    {
-        cgi_response("Not Implemented", response, 501);
-        return;
-    }
+        throw HttpRequestException(415);
 
     int output_pipe[2];
     int input_pipe[2];
 
     if (pipe(output_pipe) == -1 || pipe(input_pipe) == -1)
-    {
-        cgi_response("Failed to create pipes", response, 500);
-        return;
-    }
+        throw HttpRequestException(500);
 
     pid_t pid = fork();
     if (pid < 0)
     {
-        close(output_pipe[0]); 
-        close(output_pipe[1]);
-        close(input_pipe[0]); 
-        close(input_pipe[1]);
-        cgi_response("Failed to fork process", response, 500);
-        return;
+        close_pipes(output_pipe, input_pipe, false);
+        throw HttpRequestException(500);
     }
 
     if (pid == 0) // child process
     {
-        dup2(output_pipe[1], STDOUT_FILENO);
-        close(output_pipe[0]);
-        close(output_pipe[1]);
-
-        dup2(input_pipe[0], STDIN_FILENO);
-        close(input_pipe[0]);
-        close(input_pipe[1]);
-
+        close_pipes(output_pipe, input_pipe, true);
         char *argv[3] = {str_char(interpreter), str_char(scriptPath), NULL};
-        std::map<std::string, std::string> envMap = get_env(scriptPath, request);
+        StringMap envMap = get_env(scriptPath, request);
         char **env = convert_env(envMap);
 
         execve(str_char(interpreter), argv, env);
     }
-
-    close(output_pipe[1]);
-    close(input_pipe[0]);
-
+    
     if (request->getMethod() == "POST" || request->getMethod() == "DELETE")
     {
         const std::string &body = request->getBody();
         if (!body.empty())
             write(input_pipe[1], body.c_str(), body.size());
     }
-    close(input_pipe[1]);
 
-    std::string output = read_output(output_pipe[0]);
-    close(output_pipe[0]);
+    std::string output = close_pipes(output_pipe, input_pipe, false);
 
     int status;
     waitpid(pid, &status, 0);
 
     if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
-    {
-        cgi_response("Script execution failed", response, 500);
-        return;
-    }
+        throw HttpRequestException(500);
 
-    StringMap headers = get_headers(output);
-    std::string body = get_body(output);
-
-    if (headers.empty())
-    {
-        cgi_response("Empty response headers", response, 500);
-        return;
-    }
-
-    for (StringMap::iterator it = headers.begin(); it != headers.end(); ++it)
-    {
-        response->setHeader(it->first, it->second);
-    }
-
-    if (body.empty() || body.size() <= 1)
-    {
-        cgi_response("Empty response body", response, 500);
-        return;
-    }
-
-    cgi_response(body, response, 200);
+    set_headers(response, output);
+    cgi_response(get_body(output), response, 200);
 }
