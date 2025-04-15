@@ -41,7 +41,7 @@ server3:
     listen: 8082
     max_client_body_size: 16384
     max_client_header_size: 2048
-    keep_alive: 1
+    keep_alive: 30
 
     location:
         path: "/"
@@ -53,7 +53,7 @@ server3:
         path: "/cgi"
         root: "/myserver3/cgi/"
         index: "index.py"
-        methods: "POST DELETE"
+        methods: "GET POST DELETE"
         exact: true
         cgi: true
     

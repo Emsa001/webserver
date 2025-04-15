@@ -30,6 +30,7 @@ StringMap Cgi::get_env(const std::string& scriptPath, const HttpRequest* request
         if (!contentType.empty())
             env["CONTENT_TYPE"] = contentType;
     }
+    
 
     return env;
 }

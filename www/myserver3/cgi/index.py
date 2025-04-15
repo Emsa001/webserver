@@ -6,10 +6,8 @@ import cgitb
 import json
 import sys
 
-cgitb.enable()
-
 # Set up absolute upload directory path
-UPLOAD_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "uploads"))
+UPLOAD_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../uploads"))
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 def list_files():
@@ -56,18 +54,19 @@ def main():
     print("Content-Type: application/json\n")
 
     form = cgi.FieldStorage()
-    action = form.getvalue("action")
+    method = os.environ.get("REQUEST_METHOD")
 
-    if action == "upload":
+    if method == "POST":
         response = save_file(form)
-    elif action == "list":
+    elif method == "GET":
         response = list_files()
-    elif action == "delete":
+    elif method == "DELETE":
         response = delete_file(form)
     else:
-        response = {"status": "fail", "error": "File not found"}
+        response = {"status": "fail", "error": "Invalid request method"}
 
     print(json.dumps(response))
+
 
 if __name__ == "__main__":
     main()

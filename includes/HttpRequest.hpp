@@ -99,7 +99,7 @@ class HttpRequest {
             if (it != this->headers.end()) {
                 return it->second;
             }
-            return NULL;
+            return "";
         }
 };
 

@@ -83,7 +83,12 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const H
         StringMap envMap = get_env(scriptPath, request);
         char **env = convert_env(envMap);
 
-        execve(scriptPath.c_str(), args, env);
+        if (execve(scriptPath.c_str(), args, env) == -1)
+        {
+            perror("execve failed");
+            close_pipes(output_pipe, input_pipe, false);
+            throw HttpRequestException(500);
+        }
     }
     
     if (request->getMethod() == "POST" || request->getMethod() == "DELETE")
@@ -101,8 +106,6 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const H
     if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
         throw HttpRequestException(500);
 
-
     set_headers(response, output);
-
     cgi_response(get_body(output), response, 200);
 }
