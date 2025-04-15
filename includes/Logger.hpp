@@ -26,6 +26,14 @@ class Logger {
         }
 
     public:
+
+        static void init(){
+            if (pthread_mutex_init(&logMutex, NULL) != 0) {
+                std::cerr << "Failed to initialize mutex" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+        }
+
         static void destroy() {
             pthread_mutex_destroy(&logMutex);
         }

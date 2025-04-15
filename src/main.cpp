@@ -18,6 +18,8 @@ int main()
     signal(SIGINT, signalHandler);
     std::cout << std::endl << std::endl << std::endl;
 
+    // Logger::init();
+
     Config& config = Config::instance();
     config.parse("conf/cgi.yml");
 
@@ -25,6 +27,7 @@ int main()
     config_array::iterator it = servers.begin();
 
     std::vector<pthread_t> threads;
+
 
     for(; it != servers.end(); it++){
         pthread_t thread;
