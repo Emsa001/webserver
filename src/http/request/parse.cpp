@@ -1,28 +1,33 @@
 #include "HttpRequest.hpp"
 
 void HttpRequest::parse() {
-    std::string request(this->buffer);
-    std::string line;
-    std::istringstream requestStream(request);
+    size_t headerEnd = rawRequestData.find("\r\n\r\n");
+    if (headerEnd == std::string::npos)
+        throw HttpRequestException(400);
 
-    // Parse the first line (method, URI, version)
-    std::getline(requestStream, line);
+    std::string headerPart = rawRequestData.substr(0, headerEnd);
+    std::string bodyPart = rawRequestData.substr(headerEnd + 4);
+
+    std::istringstream headerStream(headerPart);
+    std::string line;
+
+    std::getline(headerStream, line);
+    size_t totalHeaderSize = line.size();
+    if (totalHeaderSize > this->maxHeaderSize) {
+        throw HttpRequestException(414);
+    }
+
     std::istringstream lineStream(line);
     lineStream >> this->method >> this->uri >> this->version;
-
-    // Parse the URL
     this->url = new HttpURL(this->uri);
 
-    // Parse the headers
-    size_t totalHeaderSize = 0;
-    while (std::getline(requestStream, line) && line != "\r") {
+    while (std::getline(headerStream, line) && line != "\r") {
         if (line.empty() || line == "\r\n") break;
 
         size_t pos = line.find(": ");
         if (pos != std::string::npos) {
             std::string key = line.substr(0, pos);
             std::string value = line.substr(pos + 2);
-
             key.erase(0, key.find_first_not_of(" \t\n\r"));
             key.erase(key.find_last_not_of(" \t\n\r") + 1);
             value.erase(0, value.find_first_not_of(" \t\n\r"));
@@ -37,13 +42,9 @@ void HttpRequest::parse() {
         }
     }
 
-    // Parse the body
     if (this->method == "POST" || this->method == "DELETE") {
-        std::ostringstream bodyStream;
-
-        bodyStream << requestStream.rdbuf();
-        this->body = bodyStream.str();
-        if(this->body.size() > this->maxBodySize) {
+        this->body = bodyPart;
+        if (this->body.size() > this->maxBodySize) {
             throw HttpRequestException(413);
         }
     }

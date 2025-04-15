@@ -27,7 +27,6 @@ void cgi_response(const std::string &message, HttpResponse *response, short code
         response->setHeader("Content-Type", "text/html");
 
     response->setHeader("Content-Length", intToString(message.size()));
-    response->setHeader("Connection", "close");
     response->setBody(message);
     response->build();
 }
@@ -36,20 +35,19 @@ std::string close_pipes(int output_pipe[2], int input_pipe[2], bool child)
 {
     
     if(child)
-    dup2(output_pipe[1], STDOUT_FILENO);
+        dup2(output_pipe[1], STDOUT_FILENO);
     
-    close(output_pipe[1]);
-    std::string output = read_output(output_pipe[0]);
     close(output_pipe[0]);
+    close(output_pipe[1]);
 
     if(child)
         dup2(input_pipe[0], STDIN_FILENO);
     close(input_pipe[0]); 
     close(input_pipe[1]);
-    return output;
+    return NULL;
 }
 
-void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const HttpRequest &request) 
+void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const HttpRequest *request) 
 {
     Type scriptType = detect_type(scriptPath);
     std::string interpreter = get_interpreter(scriptType);
@@ -88,14 +86,19 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const H
         execve(str_char(interpreter), argv, env);
     }
     
-    if (request.getMethod() == "POST" || request.getMethod() == "DELETE")
+    if (request->getMethod() == "POST" || request->getMethod() == "DELETE")
     {
-        const std::string &body = request.getBody();
+        const std::string &body = request->getBody();
         if (!body.empty())
             write(input_pipe[1], body.c_str(), body.size());
     }
 
-    std::string output = close_pipes(output_pipe, input_pipe, false);
+    close(output_pipe[1]);
+    std::string output = read_output(output_pipe[0]);
+    close(output_pipe[0]);
+
+    close(input_pipe[0]); 
+    close(input_pipe[1]);
 
     int status;
     waitpid(pid, &status, 0);

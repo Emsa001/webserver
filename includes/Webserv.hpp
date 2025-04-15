@@ -3,6 +3,14 @@
 
 #define PROJECT_NAME "webserv"
 
+#define DEFAULT_MAX_HEADER_SIZE 8192
+#define DEFAULT_MAX_BODY_SIZE 8192
+#define READ_BUFFER_SIZE 4096
+#define HARD_BUFFER_LIMIT 10 * 1024 * 1024 // 10 MB
+#define MAX_CLIENTS 10
+#define ROOT_DIR "./www"
+#define DEFAULT_METHODS "GET POST DELETE"
+
 #include "Colors.hpp"
 
 // system headers
@@ -32,6 +40,7 @@
 #include <algorithm>
 #include <fstream>
 #include <ctime>
+#include <csignal>
 
 #include <vector>
 #include <map>
@@ -40,7 +49,6 @@
 #include <cstdlib>
 #include <list>
 #include <dirent.h>
-
 
 #include "Aliases.hpp"
 
@@ -51,7 +59,11 @@
 #include "Cgi.hpp"
 #include "Logger.hpp"
 
-extern bool g_stop;
+
+extern volatile sig_atomic_t g_stop;
+extern pthread_mutex_t g_stop_mutex;
+
+void signalHandler(int signum);
 
 // #include <iostream> // → Allows us to use std::cout and std::cerr for logging.
 // #include <fstream> // → Used to read files (to serve static files).

@@ -1,6 +1,8 @@
 #include "Webserv.hpp"
 
-bool g_stop = false;
+volatile sig_atomic_t g_stop = 0;
+pthread_mutex_t Logger::logMutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t g_stop_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void* startServer(void* arg) {
     config_map* data = static_cast<config_map*>(arg);
@@ -11,16 +13,12 @@ void* startServer(void* arg) {
     return NULL;
 }
 
-void signalHandler( int signum ) {
-    g_stop = true;
-    std::cout << "Interrupt signal (" << signum << ") received.\n";
-}
-
 int main()
 {
     signal(SIGINT, signalHandler);
-
     std::cout << std::endl << std::endl << std::endl;
+
+    // Logger::init();
 
     Config& config = Config::instance();
     config.parse("conf/cgi.yml");
@@ -30,10 +28,8 @@ int main()
 
     std::vector<pthread_t> threads;
 
-    for(; it != servers.end(); it++){
-        std::string server_name = it->getMap()["server_name"];
-        std::cout << "Server name: " << server_name << std::endl;
 
+    for(; it != servers.end(); it++){
         pthread_t thread;
         pthread_create(&thread, NULL, startServer, &it->getMap());
         threads.push_back(thread);
@@ -42,6 +38,8 @@ int main()
     for(size_t i = 0; i < threads.size(); i++) {
         pthread_join(threads[i], NULL);
     }
+
+    Logger::destroy();
 
     return 0;
 }

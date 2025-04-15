@@ -1,10 +1,8 @@
-log_format: "[time] [[method]]: [uri] - [status] ([reason]) - [size]"
-
 server:
     server_name: "127.0.0.1"
     listen: 8080
-    max_client_body_size: 1024
-    max_client_header_size: 1024
+    max_client_body_size: 10024
+    max_client_header_size: 4096
     keep_alive: 30
 
     location:
@@ -24,7 +22,7 @@ server:
         root: "/cgi-bin/"
 
     location:
-        methods: "GET"
+        methods: "POST DELETE GET"
         cgi: true
         path: "/cgi-test"
         root: "/cgi-test/"
@@ -33,3 +31,15 @@ server:
     errors:
         500: "500.html"
         404: "404.html"
+
+server2:
+    server_name: "pabeckha"
+    listen: 81
+    max_client_body_size: 1024
+    max_client_header_size: 512
+    keep_alive: 30
+
+    location:
+        path: "/pabecka"
+        root: "/1/"
+        autoindex: true

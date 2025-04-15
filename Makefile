@@ -3,8 +3,8 @@ NAME			= webserv
 
 # compiler settings
 CXX				= c++
-CXXFLAGS		= -Wall -Wextra #-Werror # TODO
-CXXFLAGS		+= -std=c++98 -pedantic #-fsanitize=address
+CXXFLAGS		= -Wall -Wextra -Werror # TODO
+CXXFLAGS		+= -std=c++98 -pedantic #-fsanitize=thread
 CXXFLAGS		+= -I$(INCDIR)
 
 # source files
