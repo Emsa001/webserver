@@ -32,6 +32,23 @@ void cgi_response(const std::string &message, HttpResponse *response, short code
     response->build();
 }
 
+std::string close_pipes(int output_pipe[2], int input_pipe[2], bool child)
+{
+    
+    if(child)
+    dup2(output_pipe[1], STDOUT_FILENO);
+    
+    close(output_pipe[1]);
+    std::string output = read_output(output_pipe[0]);
+    close(output_pipe[0]);
+
+    if(child)
+        dup2(input_pipe[0], STDIN_FILENO);
+    close(input_pipe[0]); 
+    close(input_pipe[1]);
+    return output;
+}
+
 void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const HttpRequest &request) 
 {
     Type scriptType = detect_type(scriptPath);
@@ -55,44 +72,30 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const H
     pid_t pid = fork();
     if (pid < 0)
     {
-        close(output_pipe[0]); 
-        close(output_pipe[1]);
-        close(input_pipe[0]); 
-        close(input_pipe[1]);
+        close_pipes(output_pipe, input_pipe, false);
         cgi_response("Failed to fork process", response, 500);
+
         return;
     }
 
     if (pid == 0) // child process
     {
-        dup2(output_pipe[1], STDOUT_FILENO);
-        close(output_pipe[0]);
-        close(output_pipe[1]);
-
-        dup2(input_pipe[0], STDIN_FILENO);
-        close(input_pipe[0]);
-        close(input_pipe[1]);
-
+        close_pipes(output_pipe, input_pipe, true);
         char *argv[3] = {str_char(interpreter), str_char(scriptPath), NULL};
         std::map<std::string, std::string> envMap = get_env(scriptPath, request);
         char **env = convert_env(envMap);
 
         execve(str_char(interpreter), argv, env);
     }
-
-    close(output_pipe[1]);
-    close(input_pipe[0]);
-
+    
     if (request.getMethod() == "POST" || request.getMethod() == "DELETE")
     {
         const std::string &body = request.getBody();
         if (!body.empty())
             write(input_pipe[1], body.c_str(), body.size());
     }
-    close(input_pipe[1]);
 
-    std::string output = read_output(output_pipe[0]);
-    close(output_pipe[0]);
+    std::string output = close_pipes(output_pipe, input_pipe, false);
 
     int status;
     waitpid(pid, &status, 0);
