@@ -12,6 +12,4 @@ hello world
 
 
 TODO:
-    max_client_body_size: 10
-    POST | DELETE
     COOKIES
