@@ -20,16 +20,16 @@ cgi_query = [
 ]
 
 valid_cgi = [
-    I_url(f"{host}/cgi-test/hello.py", 200),
-    I_url(f"{host}/cgi-test/hello.sh", 200),
-    I_url(f"{host}/cgi-test/hello.php", 200),
+    I_url(f"{host}/cgi-bin/hello.py", 200),
+    I_url(f"{host}/cgi-bin/hello.sh", 200),
+    I_url(f"{host}/cgi-bin/hello.php", 200),
+    I_url(f"{host}/cgi-bin/hello.pl", 200),
 ]
 
 invalid_cgi = [
-    I_url(f"{host}/cgi-test/hello.pl", 501),
     I_url(f"{host}/cgi-test/", 403),
     I_url(f"{host}/cgi-test/hello", 404),
-    I_url(f"{host}/cgi-test/hello.py?param=invalid", 200),
+    I_url(f"{host}/cgi-bin/hello.py?param=invalid", 200),
     I_url(f"{host}/cgi-test/empty_body.py", 500),
     I_url(f"{host}/cgi-test/empty_headers.py", 500),
     I_url(f"{host}/cgi-test/empty_content_type.py", 500),

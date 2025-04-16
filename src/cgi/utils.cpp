@@ -23,23 +23,32 @@ Cgi::Type Cgi::detect_type(const std::string &scriptPath)
 
 std::string get_body(const std::string &output)
 {
-    std::string body = "\n";
+    std::string body;
     std::istringstream stream(output);
     std::string line;
     bool is_body = false;
 
     while (std::getline(stream, line))
     {
-        if (line.empty())
+        if (!line.empty() && *line.rbegin() == '\r')
+            line.erase(line.size() - 1);
+
+        if (!is_body && line.empty())
         {
             is_body = true;
             continue;
         }
+
         if (is_body)
-            body += line + "\n";
+        {
+            body += line;
+            body += "\n";
+        }
     }
+
     return body;
 }
+
 
 StringMap get_headers(const std::string &output)
 {
@@ -49,7 +58,10 @@ StringMap get_headers(const std::string &output)
 
     while (std::getline(stream, line))
     {
-        if (line.empty() || line == "\n")
+        if (!line.empty() && *line.rbegin() == '\r')
+            line.erase(line.size() - 1);
+
+        if (line.empty())
             break;
 
         size_t pos = line.find(':');
@@ -57,11 +69,17 @@ StringMap get_headers(const std::string &output)
         {
             std::string key = line.substr(0, pos);
             std::string value = line.substr(pos + 1);
+
+            if (!value.empty() && value[0] == ' ')
+                value.erase(0, 1);
+
             headers[key] = value;
         }
     }
+
     return headers;
 }
+
 
 void set_headers(HttpResponse *response, const std::string &output)
 {

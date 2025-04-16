@@ -22,14 +22,21 @@ void cgi_response(const std::string &message, HttpResponse *response, short code
 {
     if (message.empty() || message.size() <= 1)
         throw HttpRequestException(500);
-
+        
     response->setStatusCode(code);
-    if(code != 200)
-        response->setHeader("Content-Type", "text/plain");
-    // else
-    //     response->setHeader("Content-Type", "text/html");
 
-    response->setHeader("Content-Length", intToString(message.size()));
+    StringMap headers = response->getHeaders();
+
+    if (headers.find("Content-Type") == headers.end())
+    {
+        if(code != 200)
+        response->setHeader("Content-Type", "text/plain");
+        else
+            response->setHeader("Content-Type", "text/html");
+    }
+    if (headers.find("Content-Length") == headers.end())
+        response->setHeader("Content-Length", intToString(message.size()));
+        
     response->setBody(message);
     response->build();
 }

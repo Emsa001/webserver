@@ -18,7 +18,7 @@ server2:
     server_name: "MyServer2"
     listen: 8081
     max_client_body_size: 256
-    max_client_header_size: 512
+    max_client_header_size: 1024
     keep_alive: 5
 
     location:
