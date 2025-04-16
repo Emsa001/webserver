@@ -3,48 +3,23 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Stargazing for Beginners</title>
+        <title>Philosophy of 42</title>
         <link rel="stylesheet" href="styles.css" />
     </head>
     <body>
-        <header>
-            <h1>Stargazing for Beginners</h1>
-            <p>Discover the night sky and its wonders.</p>
-        </header>
-
-        <main>
-            <section class="intro">
-                <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d" alt="Starry Sky" />
-                <p>
-                    Whether you're in the city or the countryside, the stars are waiting. Here's how to get started with
-                    stargazing.
-                </p>
-            </section>
-
-            <section class="tips">
-                <h2>Top 3 Tips for Beginners</h2>
-                <ul>
-                    <li>
-                        🌌 <strong>Find a dark place:</strong> Light pollution hides the stars. Get away from city
-                        lights!
-                    </li>
-                    <li>
-                        🔭 <strong>Start with your eyes:</strong> No telescope needed—learn the constellations first.
-                    </li>
-                    <li>🗓 <strong>Use a star chart or app:</strong> Track what’s visible tonight in your location.</li>
-                </ul>
-            </section>
-
-            <section class="cta">
-                <h2>Ready to Explore?</h2>
-                <button id="exploreButton">Show a Stargazing Quote</button>
-                <p id="quoteDisplay"></p>
-            </section>
-        </main>
-
-        <footer>
-            <p>© 2025 Stargazing Guide. Reach for the stars ✨</p>
-        </footer>
+        <div class="container">
+            <header>
+                <h1>💡 Random Quote</h1>
+                <button id="load-btn">🔁 Load New Quotes</button>
+            </header>
+            <main id="quote-container">
+                <p id="quote-text"></p>
+                <p id="quote-author"></p>
+            </main>
+            <footer>
+                <p id="error-message"></p>
+            </footer>
+        </div>
 
         <script src="script.js"></script>
     </body>
