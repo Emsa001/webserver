@@ -19,7 +19,7 @@ bool ConfigParser::processLine()
         char c = line[i];
         char n = line.size() > i + 1 ? line[i + 1] : '\0';
         
-        if(!key.empty() && std::isspace(c)) continue;
+        if(!key.empty() && (std::isspace(c) && quote == '\0')) continue;
 
         if (handleComment(p, c, quote, i))
             break;
