@@ -19,19 +19,19 @@ server:
         methods: "POST DELETE GET"
         cgi: true
         path: "/cgi-bin"
-        root: "/cgi-bin/"
+        root: "/cgi-bin"
 
     location:
         methods: "POST DELETE GET"
         cgi: true
         path: "/cgi-test"
-        root: "/cgi-test/"
+        root: "/cgi-test"
 
     location:
         methods: "POST DELETE GET"
         cgi: true
         path: "/runCgi"
-        root: "/cgi-test/"
+        root: "/cgi-test"
         index: "query.py"
         exact: true
 
@@ -48,5 +48,5 @@ server2:
 
     location:
         path: "/pabecka"
-        root: "/1/"
+        root: "/1"
         autoindex: true
