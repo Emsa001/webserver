@@ -1,18 +1,24 @@
-#!/bin/bash
+#!/usr/bin/env perl
+# filepath: /home/btvildia/Desktop/webserver/www/cgi-bin/hello.pl
 
-current_date=$(date +"%Y-%m-%d %H:%M:%S")
+use strict;
+use warnings;
+use POSIX qw(strftime);
 
-echo "Content-Type: text/html"
-echo "something: test"
-echo ""
+# Print the HTTP header
+print "Content-Type: text/html\n\n";
 
-cat <<EOF
+# Get the current date and time
+my $current_date = strftime "%Y-%m-%d %H:%M:%S", localtime;
+
+# Print the HTML content
+print <<HTML;
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bash CGI</title>
+    <title>Perl CGI</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -28,7 +34,7 @@ cat <<EOF
             display: inline-block;
         }
         h1 {
-            color: #4CAF50;
+            color: #007BFF;
         }
         p {
             color: #333;
@@ -39,25 +45,25 @@ cat <<EOF
         .button a {
             text-decoration: none;
             color: white;
-            background-color: #4CAF50;
+            background-color: #007BFF;
             padding: 10px 20px;
             border-radius: 5px;
             font-size: 16px;
         }
         .button a:hover {
-            background-color: #45a049;
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Bash CGI</h1>
-        <p><strong>Current CGI Script:</strong> Bash is handling this request!</p>
-        <p><strong>Server Time:</strong> ${current_date}</p>
+        <h1>Perl CGI</h1>
+        <p><strong>Current CGI Script:</strong> Perl is handling this request!</p>
+        <p><strong>Server Time:</strong> $current_date</p>
         <div class="button">
-            <a href="http://localhost:8080/cgi-test/hello.php">Go to PHP CGI Script</a>
+            <a href="http://localhost:8080/cgi-bin/hello.sh">Go to Shell CGI Script</a>
         </div>
     </div>
 </body>
 </html>
-EOF
+HTML

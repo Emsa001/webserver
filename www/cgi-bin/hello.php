@@ -56,7 +56,7 @@ $current_date = get_current_date();
         <p><strong>Current CGI Script:</strong> PHP is handling this request!</p>
         <p><strong>Server Time:</strong> <?php echo $current_date; ?></p>
         <div class="button">
-            <a href="http://localhost:8080/cgi-test/hello.py">Go to Python CGI Script</a>
+            <a href="http://localhost:8080/cgi-bin/hello.py">Go to Python CGI Script</a>
         </div>
     </div>
 </body>
