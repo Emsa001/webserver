@@ -70,6 +70,7 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const H
 
     int output_pipe[2];
     int input_pipe[2];
+    std::cout << "Script path: " << scriptPath << std::endl;
 
     if (pipe(output_pipe) == -1 || pipe(input_pipe) == -1)
         throw HttpRequestException(500);
@@ -112,6 +113,7 @@ void Cgi::execute(const std::string &scriptPath, HttpResponse *response, const H
 
     if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
         throw HttpRequestException(500);
+
 
     set_headers(response, output);
     cgi_response(get_body(output), response, 200);

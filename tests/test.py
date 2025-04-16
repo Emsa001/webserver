@@ -26,6 +26,7 @@ valid_cgi = [
     I_url(f"{host}/cgi-bin/hello.pl", 200),
 ]
 
+
 invalid_cgi = [
     I_url(f"{host}/cgi-test/", 403),
     I_url(f"{host}/cgi-test/hello", 404),
