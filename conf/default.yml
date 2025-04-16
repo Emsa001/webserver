@@ -7,7 +7,7 @@ server1:
 
     location:
         path: "/"
-        root: "/myserver1"
+        root: "/myserver1/"
         methods: "GET"
     
     errors:
@@ -23,19 +23,19 @@ server2:
 
     location:
         path: "/"
-        root: "/myserver2"
+        root: "/myserver2/"
         index: "index.html"
         methods: "GET"
 
     location:
         path: "/public"
-        root: "/myserver2/public"
+        root: "/myserver2/public/"
         index: "/"
         autoindex: true
 
     location:
         path: "/secret"
-        root: "/myserver2"
+        root: "/myserver2/"
         index: "hidden.html"
 
     errors:
@@ -51,13 +51,13 @@ server3:
 
     location:
         path: "/"
-        root: "/myserver3/src"
+        root: "/myserver3/src/"
         index: "index.html"
         methods: "GET"
 
     location:
         path: "/cgi"
-        root: "/myserver3/cgi"
+        root: "/myserver3/cgi/"
         index: "index.py"
         methods: "GET POST DELETE"
         exact: true
