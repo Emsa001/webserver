@@ -8,7 +8,7 @@
 #define READ_BUFFER_SIZE 4096
 #define HARD_BUFFER_LIMIT 10 * 1024 * 1024 // 10 MB
 #define MAX_CLIENTS 10
-#define ROOT_DIR "./www"
+#define ROOT_DIR "./www/"
 #define DEFAULT_METHODS "GET POST DELETE"
 
 #include "Colors.hpp"
