@@ -85,23 +85,39 @@ std::string HttpResponse::getReasonPhrase(unsigned short code) {
     }
 }
 
+std::string const HttpResponse::getDefaultStatusPage() {
+    std::string errorMessage = this->getReasonPhrase(this->statusCode);
+    std::string code = intToString(this->statusCode);
+    
+    std::string body = "<html>"
+           "<head>"
+           "<title>" + code + " " + errorMessage + "</title>"
+           "</head>"
+           "<body>"
+           "<h1>" + code + " " + errorMessage + "</h1>"
+           "<p>" + errorMessage + "</p>"
+           "<hr>"
+           "<address>" + PROJECT_NAME + "</address>"
+           "</body>"
+           "</html>";
+
+    return body;
+}
+
 void HttpResponse::respondStatusPage(unsigned short code) {
     std::string errorMessage = this->getReasonPhrase(code);
-
-    this->body = "<html>"
-                 "<head>"
-                 "<title>" + intToString(code) + " " + errorMessage + "</title>"
-                 "</head>"
-                 "<body>"
-                 "<h1>" + intToString(code) + " " + errorMessage + "</h1>"
-                 "<p>" + errorMessage + "</p>"
-                 "<hr>"
-                 "<address>" + PROJECT_NAME + "</address>"
-                 "</body>"
-                 "</html>";
-
+    
+    ConfigValue *errors = &(this->config->at("errors"));
+    std::string errorPage = Config::getSafe(*errors, intToString(code), "").getString();
+    std::cout << "Error page: " << errorPage << std::endl;
+    
     this->setStatusCode(code);
 
+    if(!errorPage.empty() && fileExists(ROOT_DIR + errorPage))
+        this->body = readFileContent(ROOT_DIR + errorPage);
+    else
+        this->body = this->getDefaultStatusPage();
+    
     this->setHeader("Content-Type", "text/html");
     this->setHeader("Content-Length", intToString(this->body.size()));
 

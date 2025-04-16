@@ -24,6 +24,8 @@ class HttpResponse {
         int socket;
         config_map *config;
     
+        std::string const getDefaultStatusPage();
+
     public:
         HttpResponse(int socket, HttpRequest *request, config_map *config) : request(request), socket(socket), config(config) {
             statusLine = "HTTP/1.1 200 OK";

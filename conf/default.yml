@@ -12,7 +12,7 @@ server1:
     
     errors:
         500: "500.html"
-        404: "404.html"
+        404: "myserver1/errors/404.html"
 
 server2:
     server_name: "MyServer2"
@@ -34,7 +34,7 @@ server2:
 
     errors:
         500: "500.html"
-        404: "404.html"
+        404: ".mbnmk"
 
 server3:
     server_name: "MyServer3"

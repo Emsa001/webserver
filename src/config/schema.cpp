@@ -14,7 +14,6 @@ void ConfigSchema::addNestedSchema(const std::string &key, const ConfigSchema &n
 
 ConfigSchema createSchema() {
     ConfigSchema rootSchema;
-
     rootSchema.addEntry("log_format", STRING, false);
 
 
@@ -45,9 +44,7 @@ ConfigSchema createSchema() {
 
     // Error Schema
     ConfigSchema errorSchema;
-    errorSchema.addEntry("404", STRING, true);
-    errorSchema.addEntry("403", STRING, false);
-    errorSchema.addEntry("500", STRING, false);
+    errorSchema.allowAll(INT, STRING);
 
     rootSchema.addNestedSchema("errors", errorSchema);
 
