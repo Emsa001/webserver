@@ -21,7 +21,7 @@ int main()
     // Logger::init();
 
     Config& config = Config::instance();
-    config.parse("conf/default.yml");
+    config.parse("conf/cgi.yml");
 
     config_array servers = config.getServers();
     config_array::iterator it = servers.begin();

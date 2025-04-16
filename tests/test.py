@@ -23,10 +23,10 @@ valid_cgi = [
     I_url(f"{host}/cgi-test/hello.py", 200),
     I_url(f"{host}/cgi-test/hello.sh", 200),
     I_url(f"{host}/cgi-test/hello.php", 200),
+    I_url(f"{host}/cgi-test/hello.pl", 200),
 ]
 
 invalid_cgi = [
-    I_url(f"{host}/cgi-test/hello.pl", 501),
     I_url(f"{host}/cgi-test/", 403),
     I_url(f"{host}/cgi-test/hello", 404),
     I_url(f"{host}/cgi-test/hello.py?param=invalid", 200),

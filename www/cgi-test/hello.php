@@ -1,9 +1,6 @@
 #!/usr/bin/env php-cgi
 <?php
 
-echo "\n\n";
-
-phpinfo();
 function get_current_date() {
     return date("Y-m-d H:i:s");
 }
