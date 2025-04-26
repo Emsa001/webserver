@@ -80,3 +80,4 @@ class Logger {
 };
 
 #endif
+

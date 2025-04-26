@@ -101,6 +101,8 @@ class HttpRequest {
             }
             return "";
         }
+
+        int getSocket() const { return this->socket; }
 };
 
 

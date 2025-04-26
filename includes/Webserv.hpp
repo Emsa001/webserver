@@ -79,3 +79,4 @@ void signalHandler(int signum);
 // #include <poll.h> // → Allows us to use poll() for monitoring multiple clients.
 
 #endif
+

@@ -1,3 +1,14 @@
+# Available Log Format Variables:
+# -----------------------------------------
+# [server]  - Server name (e.g., my-server)
+# [date]    - Current date (e.g., 2025-04-16)
+# [time]    - Current time (e.g., 14:32:10)
+# [method]  - HTTP method (e.g., GET, POST)
+# [uri]     - Requested URI (e.g., /api/users)
+# [status]  - HTTP status code (e.g., 200, 404)
+# [reason]  - Status reason phrase (e.g., OK, Not Found)
+# [size]    - Response size in bytes (e.g., 512, 0)
+
 log_format: "[server] | 📅 [date] [time] | 🔄 [[method]] [uri] | [status] ([reason]) | 📦 [size]B"
 
 server1:
