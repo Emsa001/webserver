@@ -8,7 +8,7 @@ server:
     location:
         methods: "GET"
         path: "/"
-        root: "/myserver1/"
+        root: "/cgiserver/"
         index: "index.html"
         
     location:
