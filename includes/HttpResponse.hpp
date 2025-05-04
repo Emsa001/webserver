@@ -2,25 +2,37 @@
 #define HTTP_RESPONSE_HPP
 
 #include "Webserv.hpp"
+#include "HttpRequest.hpp"
+
+class HttpRequest;
+class HttpRequest;
 
 class HttpResponse {
     private:
+        HttpRequest *request; // Pointer to the request object
+
         std::string statusLine;  // Stores "HTTP/1.1 200 OK"
         StringMap headers;      // Stores key-value pairs like "Content-Type: text/html"
         std::string body;        // Stores the response body (usually html)
+
         bool listing;           // If true, the body will be a directory listing
+        bool cgi;               // If true, the body will be the output of a CGI script
 
         std::string response;    // Stores the entire response to be sent to the client
 
         unsigned short statusCode;
         int socket;
+        config_map *config;
     
+        std::string const getDefaultStatusPage();
+
     public:
-        HttpResponse(int socket) : socket(socket) {
+        HttpResponse(int socket, HttpRequest *request, config_map *config) : request(request), socket(socket), config(config) {
             statusLine = "HTTP/1.1 200 OK";
             listing = false;
             statusCode = 200;
             body = "";
+            cgi = false;
         };
         ~HttpResponse() {};
 
@@ -28,6 +40,7 @@ class HttpResponse {
         // Methods
         void respond();
         void build();
+        void log();
         
         std::string getReasonPhrase(unsigned short code);
         static std::string getMimeType(const std::string &path);
@@ -35,14 +48,22 @@ class HttpResponse {
         void directoryListing(const FileData &fileData);
         void respondStatusPage(unsigned short code);
 
-        void setBody(const FileData &fileData);
+        void buildBody(FileData &fileData, const HttpRequest *request);
+        void setBody(const std::string &body) { this->body = body; }
         void setStatusCode(unsigned short code) {
             this->statusCode = code;
             statusLine = "HTTP/1.1 " + intToString(code) + " " + this->getReasonPhrase(code);
         }
 
+        // Setters
+ 
+        void setResponse(const std::string &response) { this->response = response; }
         void setHeader(const std::string &key, const std::string &value) { headers[key] = value; }
-        void setListing(bool listing) { this->listing = listing; }
+        void setSettings(const config_map *location);
+
+        // Getters
+
+        StringMap getHeaders() const { return headers; }
 };
 
 #endif

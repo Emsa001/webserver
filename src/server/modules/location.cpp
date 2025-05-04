@@ -10,14 +10,14 @@
 // Best match approach
 
 const config_map* Server::findLocation(const std::string &path) {
+
     const config_array& locations = this->config->at("locations").getArray();
     StringVec pathSegments = split(trimChar(path, '/'), '/');
     const config_map* match = NULL;
 
     for (config_array::const_iterator it = locations.begin(); it != locations.end(); ++it) {
         const config_map* location = &it->getMap();
-        const config_map::const_iterator exactIt = location->find("exact");
-        const bool exact = (exactIt != location->end()) ? exactIt->second.getBool() : false;
+        const bool exact = Config::getSafe(*location, "exact", false);
         const std::string locationPath = location->at("path").getString();
 
         if (!exact) {

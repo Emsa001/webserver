@@ -14,14 +14,16 @@ void ConfigSchema::addNestedSchema(const std::string &key, const ConfigSchema &n
 
 ConfigSchema createSchema() {
     ConfigSchema rootSchema;
+    rootSchema.addEntry("log_format", STRING, false);
 
-    rootSchema.addEntry("log_format", STRING, true);
 
     // Server Schema
     ConfigSchema serverSchema;
     serverSchema.addEntry("server_name", STRING, true);
     serverSchema.addEntry("listen", INT, true);
     serverSchema.addEntry("max_client_body_size", INT, true);
+    serverSchema.addEntry("max_client_header_size", INT, true);
+    serverSchema.addEntry("keep_alive", INT, false);
 
     rootSchema.addNestedSchema("server", serverSchema);
 
@@ -29,7 +31,7 @@ ConfigSchema createSchema() {
     ConfigSchema locationSchema;
     locationSchema.addEntry("path", STRING, true);
     locationSchema.addEntry("exact", BOOL, false);
-    locationSchema.addEntry("methods", STRING, false); // TODO: implement array? (I'm not doing it, too lazy)
+    locationSchema.addEntry("methods", STRING, false);
     locationSchema.addEntry("root", STRING, false);
     locationSchema.addEntry("index", STRING, false);
     locationSchema.addEntry("redirect", STRING, false);
@@ -42,9 +44,7 @@ ConfigSchema createSchema() {
 
     // Error Schema
     ConfigSchema errorSchema;
-    errorSchema.addEntry("404", STRING, true);
-    errorSchema.addEntry("403", STRING, false);
-    errorSchema.addEntry("500", STRING, false);
+    errorSchema.allowAll(INT, STRING);
 
     rootSchema.addNestedSchema("errors", errorSchema);
 

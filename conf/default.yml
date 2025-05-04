@@ -1,30 +1,93 @@
-this_is_global: Hello
+# Available Log Format Variables:
+# -----------------------------------------
+# [server]  - Server name (e.g., my-server)
+# [date]    - Current date (e.g., 2025-04-16)
+# [time]    - Current time (e.g., 14:32:10)
+# [method]  - HTTP method (e.g., GET, POST)
+# [uri]     - Requested URI (e.g., /api/users)
+# [status]  - HTTP status code (e.g., 200, 404)
+# [reason]  - Status reason phrase (e.g., OK, Not Found)
+# [size]    - Response size in bytes (e.g., 512, 0)
+
+log_format: "[server] | 📅 [date] [time] | 🔄 [[method]] [uri] | [status] ([reason]) | 📦 [size]B"
+
+server0:
+    server_name: "MainServer"
+    listen: 80
+    max_client_body_size: 4096
+    max_client_header_size: 1024
+    keep_alive: 30
+
+    location:
+        path: "/"
+        root: "/mainserver/"
+        methods: "GET"
 
 server1:
-    listen: 80
-    location:
-        path: "/public"
-        root: "./public"
-        index: "index.html"
+    server_name: "MyServer1"
+    listen: 8080
+    max_client_body_size: 4096
+    max_client_header_size: 1024
+    keep_alive: 30
 
     location:
-        path: "/profile"
-        root: "./profile"
-        index: "index.html"
-                                 
-    location:
-        path: "/test"
-        root: "./test"
-        index: "index.html"
+        path: "/"
+        root: "/myserver1/"
+        methods: "GET"
     
     errors:
-        404: "404.html"
         500: "500.html"
+        404: "myserver1/errors/404.html"
 
 server2:
-    listen: 81
-    max_client_body_size: 2000
+    server_name: "MyServer2"
+    listen: 8081
+    max_client_body_size: 256
+    max_client_header_size: 1024
+    keep_alive: 5
+
     location:
-        path: "/test2"
-        root: "./tes2"
-        index: "index2.html"
+        path: "/"
+        root: "/myserver2/"
+        index: "index.html"
+        methods: "GET"
+
+    location:
+        path: "/public"
+        root: "/myserver2/public/"
+        index: "/"
+        autoindex: true
+
+    location:
+        path: "/secret"
+        root: "/myserver2/"
+        index: "hidden.html"
+
+    errors:
+        500: "500.html"
+        404: ".mbnmk"
+
+server3:
+    server_name: "MyServer3"
+    listen: 8082
+    max_client_body_size: 16384
+    max_client_header_size: 2048
+    keep_alive: 30
+
+    location:
+        path: "/"
+        root: "/myserver3/src/"
+        index: "index.html"
+        methods: "GET"
+
+    location:
+        path: "/cgi"
+        root: "/myserver3/cgi/"
+        index: "index.py"
+        methods: "GET POST DELETE"
+        exact: true
+        cgi: true
+    
+    errors:
+        500: "500.html"
+        404: "404.html"

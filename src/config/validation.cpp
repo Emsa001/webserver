@@ -1,35 +1,37 @@
 #include "Webserv.hpp"
 
 bool ConfigSchema::validate(const std::string &key, ValueType type, int blockKind) const {
-    const SchemaMap *validSchema;
+    const ConfigSchema *validSchema = this;
 
     if(ConfigParser::isReserved(key)) return true;
 
     switch(blockKind){
         case SERVER:
             if (nestedSchemas.find("server") != nestedSchemas.end()) {
-                validSchema = &(nestedSchemas.find("server")->second.schema);
+                validSchema = &(nestedSchemas.find("server")->second);
             }
             break;
         case LOCATION:
             if (nestedSchemas.find("location") != nestedSchemas.end()) {
-                validSchema = &(nestedSchemas.find("location")->second.schema);
+                validSchema = &(nestedSchemas.find("location")->second);
             }
             break;
         case ERRORS:
             if (nestedSchemas.find("errors") != nestedSchemas.end()) {
-                validSchema = &(nestedSchemas.find("errors")->second.schema);
+                validSchema = &(nestedSchemas.find("errors")->second);
             }
-            break;
-        default:
-            validSchema = &this->schema;
             break;
     }
 
-    if (validSchema->find(key) == validSchema->end()) {
+    ValueType keyType = ConfigValue::detectType(key, false).getType();
+    if(validSchema->allowAllKey == keyType && validSchema->allowAllValue == type){
+        return true;
+    }
+
+    if (validSchema->schema.find(key) == validSchema->schema.end()) {
         return false;
     }
-    if (validSchema->find(key)->second.type != type) {
+    if (validSchema->schema.find(key)->second.type != type) {
         return false;
     }
 

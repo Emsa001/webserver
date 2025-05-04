@@ -20,4 +20,4 @@ typedef std::pair<std::string, std::string> StringPair;
 typedef std::pair<std::string, unsigned short> StringUIntPair;
 
 
-#endif 
+#endif

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: escura <escura@student.42wolfsburg.de>     +#+  +:+       +#+        */
+/*   By: escura <escura@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/05 14:45:07 by escura            #+#    #+#             */
-/*   Updated: 2025/03/10 13:53:42 by escura           ###   ########.fr       */
+/*   Updated: 2025/04/16 16:14:44 by escura           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ typedef std::map<std::string, ConfigValue> config_map;
 typedef std::vector<ConfigValue> config_array;
 
 class ConfigValue {
-
     private:
         ValueType type;
 
@@ -85,7 +84,6 @@ std::ostream& operator<<(std::ostream& os, const ConfigValue& cv);
 
 std::string type_to_string(ValueType type);
 
-
 class ConfigSchema {
     public:
         struct SchemaEntry {
@@ -97,6 +95,9 @@ class ConfigSchema {
         typedef std::map<std::string, ConfigSchema> NestedSchemaMap;
 
     private:
+        ValueType allowAllKey;
+        ValueType allowAllValue;
+
         SchemaMap schema;
         NestedSchemaMap nestedSchemas;
 
@@ -105,10 +106,19 @@ class ConfigSchema {
         ~ConfigSchema() {};
 
         void addEntry(const std::string &key, ValueType type, bool required);
+        
         void addNestedSchema(const std::string &key, const ConfigSchema &nestedSchema);
         bool validate(const std::string &key, ValueType type, int blockKind) const;
         bool validateRequired(const ConfigParser *config) const;
         bool validateMap(config_map &map) const;
+
+        void allowAll(ValueType key, ValueType value) {
+            this->allowAllKey = key;
+            this->allowAllValue = value;
+        }
+
+        ValueType getAllowAllKey() const { return this->allowAllKey; }
+        ValueType getAllowAllValue() const { return this->allowAllValue; }
 
         void print(int indent = 0) const {
             std::string indentStr(indent, ' ');
@@ -234,6 +244,12 @@ class Config{
 
         const config_map &getRoot() const { return this->root; }
         const config_array &getServers() const { return this->servers; }
+
+        // Will return the value of the key if it exists, otherwise it will return the default value
+        static ConfigValue getSafe(const config_map &map, const std::string &key, const ConfigValue &defaultValue = ConfigValue()){
+            config_map::const_iterator it = map.find(key);
+            return (it != map.end()) ? it->second : defaultValue;
+        }
 };
 
 // functions
