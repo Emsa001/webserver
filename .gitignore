@@ -6,4 +6,7 @@
 webserv
 test
 
+# documents
+*.pdf
+
 gtest/

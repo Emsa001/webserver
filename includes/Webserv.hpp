@@ -58,10 +58,10 @@
 #include "Server.hpp"
 #include "Cgi.hpp"
 #include "Logger.hpp"
+#include "SocketHandler.hpp"
 
 
 extern volatile sig_atomic_t g_stop;
-extern pthread_mutex_t g_stop_mutex;
 
 void signalHandler(int signum);
 
