@@ -76,7 +76,7 @@ void Server::handleClientRead(size_t index) {
 
             request.setMaxHeaderSize(Config::getSafe(*this->config, "max_client_header_size", DEFAULT_MAX_HEADER_SIZE));
             request.setMaxBodySize(Config::getSafe(*this->config, "max_client_body_size", DEFAULT_MAX_BODY_SIZE));
-
+            
             if (!this->handleResponse(fd, &request)) {
                 this->removeClient(index);
             }
