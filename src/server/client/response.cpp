@@ -25,9 +25,9 @@ bool Server::handleResponse(int client_sock, HttpRequest *request) {
         if (location == NULL) {
             throw HttpRequestException(404);
         }
-
+        
         this->isValidMethod(request, *location);
-
+        
         FileData fileData = this->createFileData(location, request);
         if (!fileData.exists) {
             response.respondStatusPage(404);
@@ -43,5 +43,6 @@ bool Server::handleResponse(int client_sock, HttpRequest *request) {
         return (connectionHeader != "close");
     }
 
+    
     return (connectionHeader != "close");
 }

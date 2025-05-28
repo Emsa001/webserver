@@ -107,9 +107,9 @@ std::string const HttpResponse::getDefaultStatusPage() {
 void HttpResponse::respondStatusPage(unsigned short code) {
     std::string errorMessage = this->getReasonPhrase(code);
     
-    ConfigValue *errors = &(this->config->at("errors"));
-    std::string errorPage = Config::getSafe(*errors, intToString(code), "").getString();
-    std::cout << "Error page: " << errorPage << std::endl;
+    // ConfigValue *errors = &(this->config->at("errors"));
+    config_map errors = Config::getSafe(*this->config, "errors", ConfigValue()).getMap();
+    std::string errorPage = Config::getSafe(errors, intToString(code), "").getString();
     
     this->setStatusCode(code);
 
