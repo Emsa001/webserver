@@ -1,8 +1,6 @@
 #include "Webserv.hpp"
 
-volatile sig_atomic_t g_stop = 0;
-pthread_mutex_t Logger::logMutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t g_stop_mutex = PTHREAD_MUTEX_INITIALIZER;
+// volatile sig_atomic_t g_stop = 0;
 
 void* startServer(void* arg) {
     config_map* data = static_cast<config_map*>(arg);
@@ -23,20 +21,11 @@ int main()
     Config& config = Config::instance();
     config.parse("conf/default.yml");
 
-    config_array servers = config.getServers();
-    config_array::iterator it = servers.begin();
+    //TODO: replace threads
 
-    std::vector<pthread_t> threads;
-
-    for(; it != servers.end(); it++){
-        pthread_t thread;
-        pthread_create(&thread, NULL, startServer, &it->getMap());
-        threads.push_back(thread);
-    }
-
-    for(size_t i = 0; i < threads.size(); i++) {
-        pthread_join(threads[i], NULL);
-    }
+    Server s(it->getMap());
+    s.start();
+    // TODO: initialize servers
 
     Logger::destroy();
 

@@ -1,13 +1,7 @@
 #include "Webserv.hpp"
 
 bool Server::isStop(){
-    pthread_mutex_lock(&g_stop_mutex);
-    if (g_stop) {
-        pthread_mutex_unlock(&g_stop_mutex);
-        return true;
-    }
-    pthread_mutex_unlock(&g_stop_mutex);
-    return false;
+    return g_stop;
 }
 
 void Server::listener(int server_sock) {
