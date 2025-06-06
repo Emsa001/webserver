@@ -5,7 +5,8 @@ NAME			= webserv
 CXX				= c++
 CXXFLAGS		= -Wall -Wextra #-Werror # TODO
 CXXFLAGS		+= -std=c++98 -pedantic
-# CXXFLAGS		+= -fsanitize=thread
+# CXXFLAGS		+= -fsanitize=address
+CXXFLAGS		+= -g
 CXXFLAGS		+= -I$(INCDIR)
 
 # source files

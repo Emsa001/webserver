@@ -10,6 +10,7 @@
 class SocketHandler {
 private:
     config_array _servers;
+    std::vector<pollfd> _sockets;
 public:
     SocketHandler(config_array& servers);
     SocketHandler();

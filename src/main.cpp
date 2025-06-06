@@ -16,15 +16,15 @@ int main()
     signal(SIGINT, signalHandler);
     std::cout << std::endl << std::endl << std::endl;
 
-    // Logger::init();
+    Logger::init();
 
-    Config& config = Config::instance();
-    config.parse("conf/default.yml");
+    // Config& config = Config::instance();
+    // config.parse("conf/default.yml");
 
     //TODO: replace threads
 
-    Server s(it->getMap());
-    s.start();
+    // Server s(it->getMap());
+    // s.start();
     // TODO: initialize servers
 
     Logger::destroy();
